@@ -1,4 +1,4 @@
-package Pipeline_reg_N;
+package Normalizer_Types;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 typedef struct {Bit#(1) sign;
@@ -49,4 +49,8 @@ typedef struct {Bit#(1) nan_flag;
 
 //module mkPipeline_reg #(Int#() n) (Empty);
 
-endpackage: Pipeline_reg_N
+interface Normalizer_IFC;
+   interface Server #(Input_value_n,Output_posit_n) inoutifc;
+endinterface
+
+endpackage: Normalizer_Types

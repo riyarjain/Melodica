@@ -1,4 +1,4 @@
-package Pipeline_reg;
+package Extracter_Types;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 typedef struct {Bit#(PositWidth) posit_inp;
@@ -36,4 +36,8 @@ typedef struct {PositType zero_infinity_flag;
 
 //module mkPipeline_reg #(Int#() n) (Empty);
 
-endpackage: Pipeline_reg
+interface Extracter_IFC;
+   interface Server #(Input_posit,Output_posit) inoutifc;
+endinterface
+
+endpackage: Extracter_Types

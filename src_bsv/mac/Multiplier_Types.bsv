@@ -1,4 +1,4 @@
-package Pipeline_reg_M;
+package Multiplier_Types;
 import FShow :: *;
 import Posit_User_Types :: *;
 import Posit_Numeric_Types :: *;
@@ -28,4 +28,8 @@ typedef struct {Bit#(1) sign;
 
 //module mkPipeline_reg #(Int#() n) (Empty);
 
-endpackage: Pipeline_reg_M
+interface Multiplier_IFC;
+   interface Server #(Inputs_m,Outputs_m) inoutifc;
+endinterface
+
+endpackage: Multiplier_Types

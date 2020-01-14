@@ -5,9 +5,8 @@ import GetPut       :: *;
 import ClientServer :: *;
 
 import Utils :: *;
-import Normalizer_IFCP :: *;
+import Normalizer_Types :: *;
 import Posit_Numeric_Types :: *;
-import Pipeline_reg_N :: *;
 import Posit_User_Types :: *;
 module mkNormalizer (Normalizer_IFC);
 

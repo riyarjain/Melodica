@@ -5,8 +5,7 @@ import GetPut       :: *;
 import ClientServer :: *;
 
 import Utils :: *;
-import Multiplier_IFCP :: *;
-import Pipeline_reg_M :: *;
+import Multiplier_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 

@@ -5,9 +5,8 @@ import GetPut       :: *;
 import ClientServer :: *;
 
 import Utils :: *;
-import Extracter_IFCP :: *;
+import Extracter_Types :: *;
 import Posit_Numeric_Types :: *;
-import Pipeline_reg :: *;
 import Posit_User_Types :: *;
 
 module mkExtracter (Extracter_IFC );
