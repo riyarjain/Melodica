@@ -1,0 +1,3 @@
+[submodule "SoftPosit"]
+	path = SoftPosit
+	url = https://gitlab.com/cerlane/SoftPosit
