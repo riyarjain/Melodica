@@ -235,7 +235,22 @@ module mkNormalizer (Normalizer_IFC);
         //case2: flag_endcase states if all expo(other than when es = 0) and frac bits are being truncated we check if the flag_prev_truncate is 0  
         //case3: when k_expo is all 1s and all frac bits are being truncated and frac and all other bits are 0 it will be equidistant even if expo bits is zero (other than when es = 0)
 
-        Bit#(1) flag_equidistant = (((((unpack(dIn.frac[shift_2-2:0]) ==  0 || (shift_2 == 1)) && dIn.truncated_frac_msb == 1'b0) || (shift_2 == 0)) && dIn.frac[shift_2] == 1'b0) && flag_prev_truncate == 1'b1 && dIn.truncated_frac_zero == 1'b1 && expo_even == 1'b1 || (dIn.flag_endcase == 1'b1 && flag_prev_truncate == 1'b1 && (es_int != 0)) || (dIn.k_expo == '1 && dIn.shift_1 == 0 && dIn.frac ==  0 && dIn.truncated_frac_zero == 1'b1 &&  dIn.truncated_frac_msb == 1'b0 && (es_int != 0)) ? 1'b1 : 1'b0);
+        Bit#(1) flag_equidistant = 1'b0;
+	if(shift_2>= 0)
+		if(dIn.frac[shift_2] == 1'b0 && flag_prev_truncate == 1'b1 && dIn.truncated_frac_zero == 1'b1 && expo_even == 1'b1)
+			if(shift_2 == 0)
+				flag_equidistant = 1'b1;
+			else if(shift_2 == 1 && dIn.truncated_frac_msb == 1'b0 )
+				flag_equidistant = 1'b1;
+			else if(shift_2>=2 && unpack(dIn.frac[shift_2-2:0]) ==  0 && dIn.truncated_frac_msb == 1'b0)
+				flag_equidistant = 1'b1;
+	else if(dIn.flag_endcase == 1'b1 && flag_prev_truncate == 1'b1 && (es_int != 0)) 
+		flag_equidistant = 1'b1;
+	else if(dIn.k_expo == '1 && dIn.shift_1 == 0 && dIn.frac ==  0 && dIn.truncated_frac_zero == 1'b1 &&  dIn.truncated_frac_msb == 1'b0 && (es_int != 0))
+		flag_equidistant = 1'b1;
+	else
+		flag_equidistant = 1'b0;
+
         //we bound the sum of k expo and frac to maximum if it exceeds
         //k_expo + shifted fraction bits + if the prev truncated bit is 1/0 - if the number is equidistant
         UInt#(PositWidthMinus1) uint_k_expo_frac = boundedPlus(unpack(dIn.k_expo +(extend(dIn.frac)>>(shift_2))-extend(flag_equidistant)),unpack(extend(flag_prev_truncate)));
