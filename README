@@ -1,0 +1,8 @@
+For running any code:
+1. change testbench code : correctly change the BDPI function depending on the requirement- the BDPI functions are in Test_c.c from the softposit folder
+2. ./Gen_Posit_Numeric_Types --posit-width 8 --exp-width 5
+this will make changes in Posit_Numeric_Types.bsv
+3.  may have to make change the bit sizes in the testbench if hard coded- only in a few cases but check
+4. in the makefile there is RANDOM flag - that makes the input random using LFSR
+	RANDOM_PRINT flag - that makes the input random using LFSR and also print the intermediate values got during simulation
+5. make compile link_d
