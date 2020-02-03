@@ -1,5 +1,32 @@
+// Copyright (c) HPC Lab, Department of Electrical Engineering, IIT Bombay
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 package Adder;
 
+// --------------------------------------------------------------
+// This package defines:
+//
+// mkAdder: 3-stage posit adder
+// --------------------------------------------------------------
+
+// Library imports
 import FIFOF        :: *;
 import GetPut       :: *;
 import ClientServer :: *;
@@ -182,7 +209,9 @@ module mkAdder (Adder_IFC );
 	endfunction
 
 
-	//INPUT STAGE
+        // --------
+        // Pipeline stages
+	// stage_0: INPUT STAGE
 	rule stage_0;
 		//dIn reads the values from input pipeline register 
       		let dIn = fifo_input_reg.first;  fifo_input_reg.deq;
@@ -207,7 +236,7 @@ module mkAdder (Adder_IFC );
    	endrule
 
 
-	//STAGE 1
+	// STAGE 1: Calculating scale and addition of scale
 	rule stage_1;
 		//dIn reads the values from pipeline register stored from previous stage
 		let dIn = fifo_stage0_reg.first;  fifo_stage0_reg.deq;
@@ -233,7 +262,7 @@ module mkAdder (Adder_IFC );
 	endrule
 
 	 
-	//STAGE 2 -- OUTPUT
+	//STAGE 2 -- OUTPUT and calculation of fraction
 	rule stage_2;
 		//dIn reads the values from pipeline register stored from previous stage
 		let dIn = fifo_stage1_reg.first;  fifo_stage1_reg.deq;

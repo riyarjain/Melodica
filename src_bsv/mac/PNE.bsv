@@ -1,4 +1,22 @@
-// HPC Lab, Department of Electrical Engineering, IIT Bombay
+// Copyright (c) HPC Lab, Department of Electrical Engineering, IIT Bombay
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 package PNE;
 
@@ -13,18 +31,14 @@ package PNE;
 import ClientServer     :: *;
 import GetPut           :: *;
 import FIFO             :: *;
-import Extracter_IFCP	:: *;
 import Extracter	:: *;
-import Normalizer_IFCP	:: *;
 import Normalizer	:: *;
-import Adder_IFCP 	:: *;
 import Adder		:: *;
-import Multiplier_IFCP	:: *;
 import Multiplier	:: *;
-import Pipeline_reg	:: *;
-import Pipeline_reg_N	:: *;
-import Pipeline_reg_M	:: *;
-import Pipeline_reg_A 	:: *;
+import Extracter_Types  :: *;
+import Normalizer_Types :: *;
+import Multiplier_Types :: *;
+import Adder_Types    	:: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Utils :: *;
@@ -83,9 +97,6 @@ rule rl_connect0;
  	zero_infinity_flag2: extOut2.zero_infinity_flag ,
 	scale2 : extOut2.scale,
 	frac2 : extOut2.frac});
-	// the fraction and scale are extended since operation is on quire
-	//using signed extension for scale value
-	//fraction value is normally extended but also shifted to maked the MSB the highest valued fraction bit
 endrule
 
 rule rl_connect2;
