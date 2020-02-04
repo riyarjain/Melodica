@@ -1,0 +1,291 @@
+#!/usr/bin/python3
+
+# Copyright (c) HPC Lab, Department of Electrical Engineering, IIT Bombay
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+
+# ================================================================
+#
+# Background: The Posit Numeric Type can be parameterized using
+# Width and Exponent Size. Based on these two parameters several 
+# sub-field types can be computed.
+#
+# Further, in BSV we often want the sizes both as types and as values.
+#
+# Since all these sizes are inter-related, hand-written declarations can be
+# error-prone.
+#
+# This program is given just 2 basic, independent sizes:
+#    PositWidth         (Width of a posit number)
+#    Exponent           (Width of exponent field)
+#
+# and generates declarations for all the sized elements of interest in BSV
+# source code as a BSV package. Each declaration shows the actual size
+# and, as a comment, the formula used, if it is derived from other
+# sizes.  The basic sizes are provided on the command line.
+#
+# --help will remind you of the command-line arguments.
+#COMMAND:::: ./Gen_Posit_Numeric_Types --posit-width 16 --exp-width 1
+# ================================================================
+
+import argparse
+import sys
+import os
+import math
+
+# ================================================================
+# Key data structure:
+#     items :: [(name::string, value::int: formula::string)]
+#
+# ================================================================
+
+def main (argv):
+    # Parse command line arguments
+    parser = argparse.ArgumentParser (
+              formatter_class=argparse.RawDescriptionHelpFormatter
+            , description="Generate BSV type definitions for Posit Numbers")
+
+    parser.add_argument (
+              '--pkg'
+            , action="store"
+            , dest='pkgName'
+            , help='Name of BSV package'
+            , default="Posit_Numeric_Types"
+            )
+    parser.add_argument(
+              '--posit-width'
+            , type=int
+            , action="store"
+            , dest='positWidth'
+            , default=16
+            , help="Posit number width"
+            )
+    parser.add_argument(
+              '--exp-width'
+            , type=int
+            , action="store"
+            , dest='expWidth'
+            , default=5
+            , help="Exponent field width"
+            )
+
+    args = parser.parse_args()
+
+    items = [ ("PositWidth",        args.positWidth,    "(basic)"),
+              ("ExpWidth",          args.expWidth,      "(basic)")]
+
+    print_items (items)
+
+    items = compute_derived_values (items)
+
+    # ---- Generate BSV source file
+    generate_BSV_file (args.pkgName, items)
+
+    return 0
+
+# ================================================================
+# Print 'items'
+
+def print_items (items):
+    for (attr, val, formula) in items:
+        print ("    {0:20s}= {1:4}    {2}".format ((attr + ":"), val, formula))
+
+# ================================================================
+# Select value associated with name from items
+
+def sel (items, name):
+    for (attr, val, formula) in items:
+        if (attr == name):
+            return val
+    print ("Error: no attr {0} in items".format (name))
+    sys.exit (1)
+
+def sel2 (items, name):
+    for (attr, val, formula) in items:
+        if (attr == name):
+            return (val, formula)
+    print ("Error: no attr {0} in items".format (name))
+    sys.exit (1)
+
+# ================================================================
+# Compute derived values
+
+def compute_derived_values (items):
+    items.append (("PositWidthMinus1",
+                   sel (items, "PositWidth") - 1,
+                   "PositWidth - 1"))
+
+    items.append (("PositWidthMinus3",
+                   sel (items, "PositWidth") - 3,
+                   "PositWidth - 3"))
+
+    items.append (("MaxExpValue",
+                   2 ** sel (items, "ExpWidth"),
+                   "2 ^ ExpWidth"))
+
+    items.append (("FracWidth",
+                   sel (items, "PositWidthMinus3") - sel (items, "ExpWidth"),
+                   "PositWidth-3-ExpWidth"))
+
+    items.append (("ScaleWidth",
+                   math.ceil (math.log2 (((sel (items, "MaxExpValue") * sel (items, "PositWidthMinus1")) - 1))),
+                   "log2((PositWidth-1)*(2^ExpWidth)-1)"))
+
+    items.append (("ScaleWidthPlus1",
+                   sel (items, "ScaleWidth") + 1,
+                   "ScaleWidth + 1"))
+
+    items.append (("BitsPerPositWidth",
+                   math.ceil (math.log2 (sel (items, "PositWidth"))),
+                   "log2 (PositWidth)"))
+	
+    items.append (("BitsPerExpWidth",
+                   math.ceil (math.log2 (max((sel (items, "ExpWidth")),1))),
+                   "log2 (ExpWidth)"))
+
+    items.append (("ScaleWidthMinusExpWidth",
+                   sel (items, "ScaleWidth") - sel (items, "ExpWidth"),
+                   "ScaleWidth - ExpWidth"))
+
+    items.append (("ScaleWidthMinusExpWidthPlus1",
+                   sel (items, "ScaleWidthMinusExpWidth") + 1,
+                   "ScaleWidth - ExpWidth"))
+
+    items.append (("Iteration",
+                   math.ceil (math.log2 (sel (items, "PositWidthMinus1"))),
+                   "log2 (PositWidth-1)"))
+
+    items.append (("RegimeWidth",
+                   sel (items, "BitsPerPositWidth") + 1,
+                   "log2 (PositWidth) + 1"))
+
+    return items
+
+# ================================================================
+# Generate the output (BSV source file)
+
+def generate_BSV_file (BSV_package_name, items):
+    filename = BSV_package_name + ".bsv"
+    fout = open (filename, "w")
+
+    fout.write ("// Copyright (c) HPC Lab, Department of Electrical Engineering, IIT Bombay\n" +
+                "//\n" +
+                "// Permission is hereby granted, free of charge, to any person obtaining a copy\n" +
+                "// of this software and associated documentation files (the \"Software\"), to deal\n" +
+                "// in the Software without restriction, including without limitation the rights\n" +
+                "// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n" +
+                "// copies of the Software, and to permit persons to whom the Software is\n" +
+                "// furnished to do so, subject to the following conditions:\n" +
+                "\n" +
+                "// The above copyright notice and this permission notice shall be included in\n" +
+                "// all copies or substantial portions of the Software.\n" +
+		"\n" +
+                "//THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
+                "// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
+                "// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
+                "// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
+                "// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
+                "// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
+                "// THE SOFTWARE." +
+                "\n" +
+                "package " + BSV_package_name + ";\n")
+    fout.write ("\n" +
+                "// ================================================================\n" +
+                "// Basic sizes, from which everything else is derived\n" +
+                "\n")
+
+    fout.write ("// PositWidth        = {0:2d}    (= 0x{1:02x})    (bits in posit number)\n".format (
+                sel (items, "PositWidth"), sel (items, "PositWidth")))
+    fout.write ("// ExpWidth          = {0:2d}    (= 0x{1:02x})    (width of exponent field)\n".format (
+                sel (items, "ExpWidth"), sel (items, "ExpWidth")))
+
+    fout.write ("\n" +
+                "// ================================================================\n" +
+                "// Type decls\n")
+
+    gen_decls (fout, True, items)
+
+    fout.write ("\n" +
+                "/*// ================================================================\n" +
+                "// Utility functions\n")
+
+    fout.write ("\n" +
+                "function  Bit#(1)  fnSign (Bit #(n)  posit);\n" +
+                "   return  posit [(valueOf (n) - 1)];\n" +
+                "endfunction\n")
+
+    fout.write ("\n" +
+                "function  Bit#(n)  fnUnsignedPosit (Bit #(n)  posit);\n" +
+                "   return  extend (posit [(valueOf (n) - 1):0]);\n" +
+                "endfunction\n")
+
+
+    fout.write ("\n" +
+                "// ================================================================*/\n"
+		"\n" +
+                "endpackage: " + BSV_package_name + "\n")
+
+    print ("Wrote file: ", filename)
+
+# ================================================================
+# Generate declarations, either for type size or for value
+
+def gen_decls (fout, size_not_val, items):
+    fout.write ("\n" +
+                "// Posit Fields ---------------\n" +
+                "\n")
+    gen_decl (fout, size_not_val, "PositWidth", sel2 (items, "PositWidth"))
+    gen_decl (fout, size_not_val, "ExpWidth", sel2 (items, "ExpWidth"))
+    gen_decl (fout, size_not_val, "PositWidthMinus1", sel2 (items, "PositWidthMinus1"))
+    gen_decl (fout, size_not_val, "PositWidthMinus3", sel2 (items, "PositWidthMinus3"))
+    gen_decl (fout, size_not_val, "BitsPerPositWidth", sel2 (items, "BitsPerPositWidth"))
+    gen_decl (fout, size_not_val, "Iteration", sel2 (items, "Iteration"))
+    gen_decl (fout, size_not_val, "RegimeWidth", sel2 (items, "RegimeWidth"))
+    fout.write ("\n")
+    gen_decl (fout, size_not_val, "MaxExpValue",   sel2 (items, "MaxExpValue"))
+    gen_decl (fout, size_not_val, "BitsPerExpWidth", sel2 (items, "BitsPerExpWidth"))
+    fout.write ("\n")
+    gen_decl (fout, size_not_val, "FracWidth",  sel2 (items, "FracWidth"))
+    fout.write ("\n")
+    gen_decl (fout, size_not_val, "ScaleWidth",    sel2 (items, "ScaleWidth"))
+    gen_decl (fout, size_not_val, "ScaleWidthPlus1",  sel2 (items, "ScaleWidthPlus1"))
+    gen_decl (fout, size_not_val, "ScaleWidthMinusExpWidth",  sel2 (items, "ScaleWidthMinusExpWidth"))
+    gen_decl (fout, size_not_val, "ScaleWidthMinusExpWidthPlus1",  sel2 (items, "ScaleWidthMinusExpWidthPlus1"))
+    fout.write ("\n")
+
+    return 0
+
+# ================================================================
+# Generate a single declaration
+
+def gen_decl (fout, size_not_val, ide, val_and_formula):
+    (val, formula) = val_and_formula
+    if size_not_val:
+        ide = str.upper (ide [0:1]) + ide [1:]
+        fout.write ("typedef  {0:8d}   {1:30s};    // {2}\n".format (val, ide, formula))
+    else:
+        ide = str.lower (ide)
+        fout.write ("Integer  {0:>28s} = {1:8d};    // {2}\n".format (ide, val, formula))
+
+# ================================================================
+# For non-interactive invocations, call main() and use its return value
+# as the exit code.
+if __name__ == '__main__':
+  sys.exit (main (sys.argv))
