@@ -32,7 +32,7 @@ CXXFAMILY=$(shell $(BLUESPECDIR)/bin/bsenv c++_family)
 
 
 # Change me -- Where are the DISTRO objects
-DISTRO = ./
+DISTRO ?= ./
 SOFTPOSIT_OBJPATH = $(DISTRO)SoftPosit/build/Linux-x86_64-GCC
 
 BSC_CFLAGS = \
@@ -166,7 +166,7 @@ VERILOG_CODE_DIR_ADDER=VerilogCode/Adder
 OUTPUT_ADDER = builds/Adder/output
 
 #MULTIPLIER------------
-MULTIPLIER_PATH = .:$(BLUESPEC_LIB):src_bsv/Multiplier:src_bsv/lib:common:$(Testbench_Path)  
+MULTIPLIER_PATH = .:$(BLUESPEC_LIB):src_bsv/Multiplier:src_bsv/lib:src_bsv/common:$(Testbench_Path)  
 BUILD_DIR_MULTIPLIER=builds/Multiplier
 BUILD_BSIM_DIR_MULTIPLIER=builds/Multiplier
 BSC_BUILDDIR_MULTIPLIER=-simdir $(BUILD_BSIM_DIR_MULTIPLIER) -bdir $(BUILD_DIR_MULTIPLIER) -info-dir $(BUILD_DIR_MULTIPLIER)
