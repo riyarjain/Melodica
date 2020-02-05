@@ -1,20 +1,31 @@
 
 One-time setup for configuring the environment:
-1. change testbench code : correctly change the BDPI function depending on the
-requirement- the BDPI functions are in Test_c.c from the softposit folder
-[NS] What is the requirement? Can you give an example?
 
-2. ./Gen_Posit_Numeric_Types --posit-width 8 --exp-width 5
+1. Melodica is generic in terms of size of posits so one has to run 
+./Gen_Posit_Numeric_Types --posit-width 8 --exp-width 5
+which is available in ./src_bsv/lib/
 This will make generate the types package Posit_Numeric_Types.bsv (in this
 example for a 8,5 posit). This package contains type definitions for the
 various Posit sub-fields based on Posit parameter
 
-3. may have to make change the bit sizes in the testbench if hard coded- only
-in a few cases but check
-[NS] This is vague. Either you have to, or you don't :) How is a user supposed
-to guess? Give the recipe where a user has to make the edits. 
+2. Melodica Uses SoftPosit to compare and check the answers
+The Softposit library used is : https://gitlab.com/cerlane/SoftPosit.git
+One has to build the library, please refer the site for the same.
 
-4. in the makefile if the RANDOM flag is set - that makes the input random
+3.The Testbench compares the result with SoftPosit via BDPI functionanlity 
+of BSV so one has to correctly change the BDPI function depending on the
+requirement- the BDPI functions mapped to functions are 
+in ./src_c/softposit_wrappers.c 
+Example : if one has to check Adder 16 bits input
+import "BDPI" positAdd16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+if one has to check Adder 8 bits input
+import "BDPI" positAdd8  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+
+4. To check and compare FDP instructions with SoftPosits, the Testbench has 
+BDPI fucntions that has the sizes manually added due to the size issue that 
+occurs when communicating with ./src_c/softposit_wrappers.c.  
+
+5. In the makefile if the RANDOM flag is set - that makes the input random
 using LFSR RANDOM_PRINT flag - that makes the input random using LFSR and also
 print the intermediate values got during simulation
 
