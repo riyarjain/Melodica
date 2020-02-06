@@ -21,7 +21,7 @@ import "BDPI" positAdd16  = function Bit#(PositWidth) checkoperation (Bit#(Posit
 if one has to check Adder 8 bits input
 import "BDPI" positAdd8  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
 
-4. To check and compare FDP instructions with SoftPosits, the Testbench has 
+4. To check and compare FDP, Posit To Quire and Quire to Posit instructions with SoftPosits, the Testbench has 
 BDPI fucntions that has the sizes manually added due to the size issue that 
 occurs when communicating with ./src_c/softposit_wrappers.c.  
 

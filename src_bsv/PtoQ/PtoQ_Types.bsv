@@ -27,4 +27,4 @@ typedef struct {Bit#(1) sign;
 		PositType zero_infinity_flag;} Stage1_qp deriving(Bits,FShow);
 //Stage0_n consists of sign of posit, zero and infinity flag, NaN flag, regime field, exponent field, fraction field, number of bits in regime field
 
-endpackage: Pipeline_reg_P_To_Q
+endpackage: PtoQ_Types

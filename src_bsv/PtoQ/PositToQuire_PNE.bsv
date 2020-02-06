@@ -35,7 +35,7 @@ import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import PositToQuire ::*;
 import PtoQ_Types	:: *;
-import Pipeline_reg_E :: *;
+import Extracter_Types :: *;
 
 interface PositToQuire_PNE ;
    interface Server #(Bit#(PositWidth),Bit#(QuireWidth)) compute;
