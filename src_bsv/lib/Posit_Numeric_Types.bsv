@@ -22,31 +22,36 @@ package Posit_Numeric_Types;
 // ================================================================
 // Basic sizes, from which everything else is derived
 
-// PositWidth        = 16    (= 0x10)    (bits in posit number)
-// ExpWidth          =  1    (= 0x01)    (width of exponent field)
+// PositWidth        = 32    (= 0x20)    (bits in posit number)
+// ExpWidth          =  2    (= 0x02)    (width of exponent field)
+// FloatWidth          = 32    (= 0x20)    (width of exponent field)
 
 // ================================================================
 // Type decls
 
 // Posit Fields ---------------
 
-typedef        16   PositWidth                    ;    // (basic)
-typedef         1   ExpWidth                      ;    // (basic)
-typedef        15   PositWidthMinus1              ;    // PositWidth - 1
-typedef        13   PositWidthMinus3              ;    // PositWidth - 3
-typedef         4   BitsPerPositWidth             ;    // log2 (PositWidth)
-typedef         4   Iteration                     ;    // log2 (PositWidth-1)
-typedef         5   RegimeWidth                   ;    // log2 (PositWidth) + 1
+typedef        32   PositWidth                    ;    // (basic)
+typedef         2   ExpWidth                      ;    // (basic)
+typedef        32   FloatWidth                    ;    // (basic)
+typedef         8   FloatExpWidth                 ;    // Exponent width of single precision float
+typedef        23   FloatFracWidth                ;    // Fraction width of single precision float
+typedef       127   FloatBias                     ;    // Bais for single precision float
+typedef        31   PositWidthMinus1              ;    // PositWidth - 1
+typedef        29   PositWidthMinus3              ;    // PositWidth - 3
+typedef         5   BitsPerPositWidth             ;    // log2 (PositWidth)
+typedef         5   Iteration                     ;    // log2 (PositWidth-1)
+typedef         6   RegimeWidth                   ;    // log2 (PositWidth) + 1
 
-typedef         2   MaxExpValue                   ;    // 2 ^ ExpWidth
-typedef         0   BitsPerExpWidth               ;    // log2 (ExpWidth)
+typedef         4   MaxExpValue                   ;    // 2 ^ ExpWidth
+typedef         1   BitsPerExpWidth               ;    // log2 (ExpWidth)
 
-typedef        12   FracWidth                     ;    // PositWidth-3-ExpWidth
+typedef        27   FracWidth                     ;    // PositWidth-3-ExpWidth
 
-typedef         5   ScaleWidth                    ;    // log2((PositWidth-1)*(2^ExpWidth)-1)
-typedef         6   ScaleWidthPlus1               ;    // ScaleWidth + 1
-typedef         4   ScaleWidthMinusExpWidth       ;    // ScaleWidth - ExpWidth
-typedef         5   ScaleWidthMinusExpWidthPlus1  ;    // ScaleWidth - ExpWidth
+typedef         7   ScaleWidth                    ;    // log2((PositWidth-1)*(2^ExpWidth)-1)
+typedef         8   ScaleWidthPlus1               ;    // ScaleWidth + 1
+typedef         5   ScaleWidthMinusExpWidth       ;    // ScaleWidth - ExpWidth
+typedef         6   ScaleWidthMinusExpWidthPlus1  ;    // ScaleWidth - ExpWidth
 
 
 /*// ================================================================

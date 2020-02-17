@@ -19,7 +19,7 @@
 // THE SOFTWARE.
 
 
-package Add_Tb;
+package FtoP_Tb;
 
 // -----------------------------------------------------------------
 // This package defines:
@@ -35,11 +35,11 @@ import ClientServer     :: *;
 import GetPut           :: *;
 import FIFO             :: *;
 import LFSR             :: *;
-import PNE              :: *;
+import FtoP_PNE              :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
-import "BDPI" positAdd8  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+import "BDPI" floatToPosit32  = function Bit#(PositWidth) checkoperation (Bit#(FloatWidth) in1)	;
 `ifdef FPGA
 interface FpgaLedIfc;
 (* always_ready *)
@@ -50,7 +50,7 @@ endinterface
 `endif
 
 `ifdef RANDOM
-typedef 10 Num_Tests;    // Number of random tests to be run
+typedef 100 Num_Tests;    // Number of random tests to be run
 `endif
 
 typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
@@ -69,36 +69,30 @@ module mkTestbench (Empty);
 // Depending on which input mode we are using, the input to the DUT will be
 // from a LFSR or from a counter. The LFSR is always sized to the maximal size
 `ifdef RANDOM
-LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_16;
-LFSR  #(Bit #(PositWidth))            lfsr2           <- mkLFSR_16;
+LFSR  #(Bit #(FloatWidth))            lfsr1          <- mkLFSR_32;
 Reg   #(Bool)                 rgSetup        <- mkReg (False);
 `endif
 
 Reg   #(Bool)                 rgGenComplete  <- mkReg (False);
 
-Reg   #(Bit #(PositWidth))   rgCurInput     <- mkReg (0);
-Reg   #(Bit #(PositWidth))   rgCurInput1     <- mkReg (0);
+Reg   #(Bit #(FloatWidth))   rgCurInput     <- mkReg (0);
 
 //`ifdef RANDOM
-FIFO  #(Bit #(PositWidth))   ffInputVals    <- mkSizedFIFO (valueOf (
-                                                   TAdd# (Pipe_Depth,2)));
-FIFO  #(Bit #(PositWidth))   ffInputVals1    <- mkSizedFIFO (valueOf (
+FIFO  #(Bit #(FloatWidth))   ffInputVals    <- mkSizedFIFO (valueOf (
                                                    TAdd# (Pipe_Depth,2)));
 //`endif
-Reg   #(Bit#(TAdd#(PositWidth,PositWidth)))   wrongOut    <- mkReg (0);
+Reg   #(Bit#(TAdd#(FloatWidth,FloatWidth)))   wrongOut    <- mkReg (0);
 Reg   #(Bit #(PositWidth))   rgCurOutput    <- mkReg (0);
-Reg   #(Bit #(PositWidth))   rgCurOutput1    <- mkReg (0);
 Reg   #(Bool)                 rgChkComplete  <- mkReg (False);
 Reg   #(Bool)                 rgError        <- mkReg (False);
 
-PNE            dut            <- mkPNE_test;	
+FtoP_PNE            dut            <- mkFtoP_PNE_test;	
 Reg #(Bool) doneSet <-mkReg(False);
 // -----------------------------------------------------------------
 
 rule lfsrGenerate(!doneSet);
 `ifdef RANDOM
-	lfsr1.seed('h03);// to create different random series
-	lfsr2.seed('h03);
+	lfsr1.seed('h05);// to create different random series
 `endif
 	doneSet<= True;
 endrule
@@ -106,42 +100,27 @@ endrule
 rule rlGenerate (!rgGenComplete && doneSet);
 `ifdef RANDOM
    // Drive input into DUT
-   //let inPosit11 = 16'b1000000000000010;
-   //let inPosit22 = 16'b1000000000000010;
-   let inPosit11 = lfsr1.value();
-   let inPosit22 = lfsr2.value();
-   dut.compute.request.put (InputTwoPosit{posit_inp1 : truncate (inPosit11),posit_inp2 : truncate (inPosit22) });
+   let inPosit11 = 32'b00101000001010100101010011000000;
+   //let inPosit11 = lfsr1.value();
+   dut.compute.request.put (truncate (inPosit11));
 
    // Bookkeeping
    rgCurInput <= rgCurInput + 1;
    ffInputVals.enq (truncate (inPosit11));
-   ffInputVals1.enq (truncate (inPosit22));
    // Prepare LFSR for the next input
    lfsr1.next ();
-   lfsr2.next ();
    // Completion of test generation
 
    rgGenComplete <= ((rgCurInput + 1) == fromInteger (valueOf (Num_Tests)));
 
 `else
    // Drive input into DUT
-   dut.compute.request.put (InputTwoPosit{posit_inp1 : truncate (rgCurInput),posit_inp2 : truncate (rgCurInput1) });
-  // dut.compute.request.put (rgCurInput);
+   dut.compute.request.put (truncate (rgCurInput));
    // Prepare for next input
 	ffInputVals.enq (truncate (rgCurInput));
-   	ffInputVals1.enq (truncate (rgCurInput1));
-	if((rgCurInput1 + 1) == 0)
-	begin
-		rgCurInput1 <= 0;
-		rgCurInput <= rgCurInput + 1;
-	end
-	else
-	begin
-		rgCurInput1 <= rgCurInput1 + 1;
-	end
-	
+	rgCurInput <= rgCurInput + 1;
    // Completion of test generation
-   rgGenComplete <= ((rgCurInput + 1) == 0 && (rgCurInput1 + 1) == 0);
+   rgGenComplete <= ((rgCurInput + 1) == 0);
 `endif
 endrule
 
@@ -150,15 +129,14 @@ endrule
 // --------
 //rule rlCheck (!rgChkComplete && !rgError);
 rule rlCheck (!rgChkComplete && doneSet );
-      let rsp <- dut.compute.response.get ();
+      let rsp <- dut.compute.response.get();
 	let input1_c = ffInputVals.first; ffInputVals.deq;
-      let input2_c = ffInputVals1.first; ffInputVals1.deq;
-	let expected = checkoperation(input1_c,input2_c);
+	let expected = checkoperation(input1_c);
    `ifdef RANDOM
       
       // Detected an error
       if (rsp.out_posit != expected) begin
-         $display ("[%0d]::ERR::Input=%b::Input2=%b::Expected Output=%b::Output=%b", $time, input1_c,input2_c,expected, rsp.out_posit);
+         $display ("[%0d]::ERR::Input=%b::Expected Output=%b::Output=%b", $time, input1_c,expected, rsp.out_posit);
          rgError <= True;
 	 wrongOut <= wrongOut+1;
          
@@ -175,22 +153,13 @@ rule rlCheck (!rgChkComplete && doneSet );
 
       // Detected an error
       if (rsp.out_posit != expected) begin
-         $display ("[%0d]::ERR::Input=%b::Input2=%b::Expected Output=%b::Output=%b", $time, input1_c,input2_c,expected, rsp.out_posit);
+         $display ("[%0d]::ERR::Input=%b::Expected Output=%b::Output=%b", $time, input1_c,expected, rsp.out_posit);
          rgError <= True;
 	 wrongOut <= wrongOut+1;
       end
 
          // Next output expected
-	if((rgCurOutput1 + 1) == 0)
-	begin
-		rgCurOutput1 <= 0;
 		rgCurOutput <= rgCurOutput + 1;
-	end
-	else
-	begin
-		rgCurOutput1 <= rgCurOutput1 + 1;
-	end
-
          // Completion condition
          rgChkComplete <= ((rgCurOutput + 1) == 0);
       //end

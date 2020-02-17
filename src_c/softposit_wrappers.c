@@ -2,6 +2,18 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #include <math.h>
+
+
+typedef union {
+  float f;
+  unsigned u;
+}ufloat;
+
+typedef union {
+  double d;
+  unsigned long u;
+} udouble ;
+
 unsigned char positAdd8(unsigned char a, unsigned char b)
 {
 	posit8_t x,y;
@@ -121,6 +133,25 @@ unsigned long long fdpAdd8(unsigned long long a,unsigned char c, unsigned char d
 	qZ = q8_fdp_add(qZ, x, y);
 	return qZ.v;
 }
+
+unsigned int floatToPosit16(unsigned int a)
+{
+	ufloat b;
+	b.u = a;
+	posit16_t pZ = convertDoubleToP16(b.f);	
+	return pZ.v;
+	
+}
+
+unsigned int floatToPosit32(unsigned int a)
+{
+	ufloat b;
+	b.u = a;
+	posit32_t pZ = convertDoubleToP32(b.f);	
+	return pZ.v;
+	
+}
+
 
 /*
 struct Tuple1 {unsigned long long a1; unsigned long long b1;};

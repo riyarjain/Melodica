@@ -44,19 +44,19 @@ import Posit_Numeric_Types :: *;
 	typedef TAdd#(FracWidthMul4,1)					LogFracWidthMul4Plus1	;//logFW4+1	
 
 	//FDP
-	typedef TDiv#(TMul#(PositWidth,PositWidth),2)				QuireWidth;
-	typedef TSub#(QuireWidth,2)						QuireWidthMinus2;
-	typedef TDiv#(QuireWidth,2)						QuireWidthBy2;
-	typedef TDiv#(PositWidth,2)						PositWidthBy2;
-	typedef TSub#(QuireWidthBy2,PositWidthBy2)				FracWidthQuire 	;//Frac_size_quire
-	typedef TSub#(PositWidth,1)						CarryWidthQuire ;
-	typedef FracWidthQuire							IntWidthQuire;
-	typedef TSub#(QuireWidth,1)		QuireWidthMinus1;
-	typedef QuireWidthMinus1 CarryWidthPlusIntWidthPlusFracWidthQuire;
-	typedef TLog#(CarryWidthPlusIntWidthPlusFracWidthQuire)			LogCarryWidthPlusIntWidthPlusFracWidthQuire;
-	typedef TSub#(FracWidthQuire,FracWidth)					FracWidthQuireMinusFracWidth;
-	typedef TSub#(FracWidthQuireMinusFracWidth,FracWidth)			FracWidthQuireMinusFracWidthMul2;//FracWidthQuire-FracWidth*2
-	typedef TAdd#(FracWidthQuire,IntWidthQuire)				IntWidthQuirePlusFracWidthQuire;
+	typedef TDiv#(TMul#(PositWidth,PositWidth),2)				QuireWidth;//QW = (PW^2)/2
+	typedef TSub#(QuireWidth,2)						QuireWidthMinus2;//QW-2
+	typedef TDiv#(QuireWidth,2)						QuireWidthBy2;//QW/2
+	typedef TDiv#(PositWidth,2)						PositWidthBy2;//PW/2
+	typedef TSub#(QuireWidthBy2,PositWidthBy2)				FracWidthQuire 	;//FWQ = QW/2 - PW/2
+	typedef TSub#(PositWidth,1)						CarryWidthQuire ;//PW-1
+	typedef FracWidthQuire							IntWidthQuire;//= FWQ
+	typedef TSub#(QuireWidth,1)						QuireWidthMinus1;//QW-1
+	typedef QuireWidthMinus1 						CarryWidthPlusIntWidthPlusFracWidthQuire;//QW-1= CWQ+FWQ+IWQ
+	typedef TLog#(CarryWidthPlusIntWidthPlusFracWidthQuire)			LogCarryWidthPlusIntWidthPlusFracWidthQuire;//log(QW-1)
+	typedef TSub#(FracWidthQuire,FracWidth)					FracWidthQuireMinusFracWidth;//FWQ-FW
+	typedef TSub#(FracWidthQuireMinusFracWidth,FracWidth)			FracWidthQuireMinusFracWidthMul2;//FWQ-FracWidth*2
+	typedef TAdd#(FracWidthQuire,IntWidthQuire)				IntWidthQuirePlusFracWidthQuire;//IWQ+FWQ
 
 	//Q-TO-P
 	typedef TAdd#(LogCarryWidthPlusIntWidthPlusFracWidthQuire,1)		LogCarryWidthPlusIntWidthPlusFracWidthQuirePlus1;
@@ -64,6 +64,13 @@ import Posit_Numeric_Types :: *;
 	typedef	TSub#(QuireWidthMinus2,FracWidth) 				QuireWidthMinus2MinusFracWidth;	
 	typedef	TSub#(QuireWidthMinus2MinusFracWidth,1) 			QuireWidthMinus3MinusFracWidth;
 
+	//f-To-P
+	typedef TSub#(TAdd#(FloatFracWidth,FloatExpWidth),1) 			FloatExpoBegin; //(FloatFracWidth+FloatExpWidth-1)
+	typedef TAdd#(FloatExpWidth,1) 						FloatExpWidthPlus1; //(FloatExpWidth+1)
+	typedef TSub#(FloatFracWidth,1) 					FloatFracWidthMinus1; //(FloatFracWidth-1)
+	typedef TSub#(FloatFracWidth,FracWidth)					FloatFracWidthMinusFracWidth; //(FloatFracWidth-FracWidth)
+	typedef TSub#(FloatFracWidthMinusFracWidth,1)				FloatFracWidthMinusFracWidthMinus1;
+	typedef TSub#(FloatFracWidthMinusFracWidth,2)				FloatFracWidthMinusFracWidthMinus2;
 
 	typedef struct {Bit#(PositWidth) posit_inp1;
 			Bit#(PositWidth) posit_inp2;

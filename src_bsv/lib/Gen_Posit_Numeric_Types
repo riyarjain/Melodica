@@ -42,7 +42,7 @@
 # sizes.  The basic sizes are provided on the command line.
 #
 # --help will remind you of the command-line arguments.
-#COMMAND:::: ./Gen_Posit_Numeric_Types --posit-width 16 --exp-width 1
+#COMMAND:::: ./Gen_Posit_Numeric_Types --posit-width 32 --exp-width 2 --float-width 32
 # ================================================================
 
 import argparse
@@ -85,12 +85,28 @@ def main (argv):
             , default=5
             , help="Exponent field width"
             )
+    parser.add_argument(
+              '--float-width'
+            , type=int
+            , action="store"
+            , dest='floatWidth'
+            , default=32
+            , help="Floating point number width"
+            )
 
     args = parser.parse_args()
-
+    print(args)
     items = [ ("PositWidth",        args.positWidth,    "(basic)"),
-              ("ExpWidth",          args.expWidth,      "(basic)")]
-
+              ("ExpWidth",          args.expWidth,      "(basic)"),
+			  ("FloatWidth",        args.floatWidth,    "(basic)")]
+    if args.floatWidth == 32:
+        items.append (("FloatExpWidth", 8, "Exponent width of single precision float"))
+        items.append (("FloatFracWidth", 23, "Fraction width of single precision float"))
+        items.append (("FloatBias", 127, "Bais for single precision float"))
+    elif args.floatWidth == 64:	
+        items.append (("FloatExpWidth", 11, "Exponent width of double precision float"))
+        items.append (("FloatFracWidth", 52, "Fraction width of double precision float"))
+        items.append (("FloatBias", 1023, "Bais for double precision float"))
     print_items (items)
 
     items = compute_derived_values (items)
@@ -177,7 +193,6 @@ def compute_derived_values (items):
                    "log2 (PositWidth) + 1"))
 
     return items
-
 # ================================================================
 # Generate the output (BSV source file)
 
@@ -215,6 +230,9 @@ def generate_BSV_file (BSV_package_name, items):
                 sel (items, "PositWidth"), sel (items, "PositWidth")))
     fout.write ("// ExpWidth          = {0:2d}    (= 0x{1:02x})    (width of exponent field)\n".format (
                 sel (items, "ExpWidth"), sel (items, "ExpWidth")))
+    fout.write ("// FloatWidth          = {0:2d}    (= 0x{1:02x})    (width of exponent field)\n".format (
+                sel (items, "FloatWidth"), sel (items, "FloatWidth")))
+   
 
     fout.write ("\n" +
                 "// ================================================================\n" +
@@ -253,6 +271,10 @@ def gen_decls (fout, size_not_val, items):
                 "\n")
     gen_decl (fout, size_not_val, "PositWidth", sel2 (items, "PositWidth"))
     gen_decl (fout, size_not_val, "ExpWidth", sel2 (items, "ExpWidth"))
+    gen_decl (fout, size_not_val, "FloatWidth", sel2 (items, "FloatWidth"))
+    gen_decl (fout, size_not_val, "FloatExpWidth", sel2 (items, "FloatExpWidth"))
+    gen_decl (fout, size_not_val, "FloatFracWidth", sel2 (items, "FloatFracWidth"))
+    gen_decl (fout, size_not_val, "FloatBias",  sel2 (items, "FloatBias"))
     gen_decl (fout, size_not_val, "PositWidthMinus1", sel2 (items, "PositWidthMinus1"))
     gen_decl (fout, size_not_val, "PositWidthMinus3", sel2 (items, "PositWidthMinus3"))
     gen_decl (fout, size_not_val, "BitsPerPositWidth", sel2 (items, "BitsPerPositWidth"))
