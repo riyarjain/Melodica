@@ -38,7 +38,7 @@ import Posit_User_Types :: *;
 import Normalizer_Types	:: *;
 import Normalizer ::*;
 
-module mkFtoP_Extracter(FtoP_IFC );
+module mkFtoP_Extracter (FtoP_IFC );
 	Normalizer_IFC   normalizer <- mkNormalizer;
 	FIFOF #(Bit#(FloatWidth) )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Stage0_fp )  fifo_stage0_reg <- mkFIFOF;
@@ -100,18 +100,15 @@ module mkFtoP_Extracter(FtoP_IFC );
 	endfunction
 	
 	function Tuple3#(Bit#(FracWidth), Bit#(1), Bit#(1)) fv_calculate_frac(Bit#(FloatFracWidth) frac);
-		if(valueOf(FloatFracWidth) >= valueOf(FracWidth))
-			begin
+		`ifdef (FloatFracWidth >= FracWidth)
 			let a_frac_truncate = valueOf(FloatFracWidthMinusFracWidth);
 			Bit#(1) truncated_frac_msb = a_frac_truncate > 0 ? frac[a_frac_truncate-1]:1'b0;
 			Bit#(1) truncated_frac_zero = a_frac_truncate > 1 ? pack(unpack(frac[a_frac_truncate-2:0]) ==  0):1'b1;
 			return tuple3(frac[valueOf(FloatFracWidthMinus1):a_frac_truncate],truncated_frac_msb,truncated_frac_zero);
-			end
-		else
-			begin
-			Bit#(FracWidth) frac_extend=  {frac,'0};
-			return tuple3(frac_extend,1'b0,1'b1);
-			end
+		`else
+			Bit#(FloatFracWidth) frac_extend= frac[valueOf(FloatFracWidthMinus1):0];
+			return tuple3({frac_extend,'0},1'b0,1'b1);
+		`endif
 			
 	endfunction
 	// stage_0: INPUT STAGE. Checks for special cases. 
