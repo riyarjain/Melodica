@@ -108,33 +108,33 @@ module mkNormalizer (Normalizer_IFC);
     // exponent bits are to be used
     function Tuple3#(UInt#(BitsPerPositWidth),Bit#(ExpWidthPlus1), Bit#(ExpWidth)) fv_expo_window_mask (UInt#(BitsPerPositWidth) n_2_k,Bit#(ExpWidth) expo);
         let es_bit = fromInteger(es_int);
-            Bit#(ExpWidthPlus1) one = extend(1'b1);
-        Bit#(ExpWidth) mask = '1;
+        Bit#(ExpWidthPlus1) one = extend(1'b1);
+        Bit#(ExpWidth) expo_new = expo;
         UInt#(BitsPerPositWidth) shift;
         Bit#(ExpWidthPlus1) shift_new;
         if(n_2_k<es_bit)//if the number of bits available is less than the maximum number of bits the exponent can use
             begin
                 shift = 0;// dont shift the exponent, it will be placed at the last
-                Bit#(ExpWidth) mask_e = '1<<n_2_k;//mask_e tells which bits of exponent are overlapping with regime field due to less number of bits available for exponent
+                Bit#(ExpWidth) mask_e = '1>>(es_bit - n_2_k);//mask_e tells which bits of exponent are overlapping with regime field due to less number of bits available for exponent
                 if((expo & mask_e) == 0)//if the overlap bits are 0 i.e. dont hold any information
                     begin
-                    shift_new = 0;//???????????????????(es)>1???one<<(n_2_k-1)//since no change in exponent no shift in frac bits
-                    mask = '1;// use all exponent bits
+                    shift_new = 0;//n_2_k se shift expo
+                    expo_new = expo >> n_2_k;// use all exponent bits
                     end
                 else
                      
                     begin
                     shift_new = extend(twos_complement(expo));//use the complement of the value of exponent since we are increasing or decreasing the regime by 1 as required, as round off of exponent as can be seen in the mask 
-                    mask = truncate(one<<n_2_k);//any of the overlap bits is 1 ????????????(es)>1???
+                    expo_new = truncate(one<<n_2_k) & expo;//any of the overlap bits is 1 ????????????(es)>1???
                     end
             end
         else
             begin
                 shift = n_2_k-es_bit;//shift the es bits to place them just after the regime field
                 shift_new = 0;//no change in fraction bits
-                mask = '1;//use all exponent bits
+                expo_new = expo;//use all exponent bits
             end
-        return tuple3(shift,shift_new,mask);
+        return tuple3(shift,shift_new,expo_new);
     endfunction
 
     // ------------
@@ -165,7 +165,9 @@ module mkNormalizer (Normalizer_IFC);
             truncated_frac_msb : dIn.truncated_frac_msb,
             //truncated_frac_zero checks if all the other bits(other than msb) of the trucated fraction are zero or not: if all bits are zero the  truncated_frac_zero = 1
             truncated_frac_zero : dIn.truncated_frac_zero};
-            //$display("dIn.frac %b",dIn.frac);
+	    `ifdef RANDOM_PRINT            
+		$display("dIn.frac %b",dIn.frac);
+	     `endif
         fifo_stage0_reg.enq(stage0_regf);
        endrule
 
@@ -182,8 +184,7 @@ module mkNormalizer (Normalizer_IFC);
         //shift_new = the number of overlap bits between regime and exponent
         //mask : see which exponent to be used
         let n_2_k = (n_2_int-dIn.no_of_bit_k);
-        match{.shift0, .shift_new0, .mask0} = fv_expo_window_mask(n_2_k,dIn.expo);
-        let expo_masked = dIn.expo & mask0;
+        match{.shift0, .shift_new0, .expo_masked} = fv_expo_window_mask(n_2_k,dIn.expo);
         //we bound the sum of k and expo to maximum if it exceeds
         // k + shift expo depending on available bits
         UInt#(PositWidthMinus1) uint_k_expo = boundedPlus(unpack(dIn.k) , unpack(extend(expo_masked)<<shift0));
@@ -211,7 +212,7 @@ module mkNormalizer (Normalizer_IFC);
             //if there is no shift in truncated_frac_zero remains but if there is a shift we have to see the new rounded frac bits, old truncated_frac_msb and old truncated_frac_zero
             truncated_frac_zero : shift_new0 == 0 ? dIn.truncated_frac_zero :(shift_new0 == fromInteger(1) ?  dIn.truncated_frac_zero & (~dIn.truncated_frac_msb) : dIn.truncated_frac_zero & (~dIn.truncated_frac_msb) & ((unpack(dIn.frac[shift_new0-2:0]) ==  0)? 1'b1 : 1'b0)) };
             `ifdef RANDOM_PRINT
-            $display("shift0 %b shift_new0 %b mask0 %b dIn.frac %b n_2_k %b expo %b truncated_frac_msb %b truncated_frac_zero %b ",shift0, shift_new0, mask0,dIn.frac,n_2_k,dIn.expo,stage1_regf.truncated_frac_msb,dIn.truncated_frac_zero);
+            $display("shift0 %b shift_new0 %b expo_new %b dIn.frac %b n_2_k %b expo %b truncated_frac_msb %b truncated_frac_zero %b ",shift0, shift_new0, expo_masked,dIn.frac,n_2_k,dIn.expo,stage1_regf.truncated_frac_msb,dIn.truncated_frac_zero);
             $display("dIn.k %b",dIn.k);
             $display("dIn.no_of_bit_k %b",dIn.no_of_bit_k);
             `endif

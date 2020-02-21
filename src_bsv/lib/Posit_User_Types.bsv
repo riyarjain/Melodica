@@ -41,7 +41,7 @@ import Posit_Numeric_Types :: *;
 	typedef TSub#(FracWidthMul4MinusFracWidth,1)			FracWidthMul4MinusFracWidthMinus1;//FW4-FW-1
 	typedef TAdd#(FracWidthMul4MinusFracWidth,1)			FracWidthMul4MinusFracWidthPlus1;//FW4-FW+1
 	typedef TLog#(FracWidthMul4)					LogFracWidthMul4	;//logFW4
-	typedef TAdd#(FracWidthMul4,1)					LogFracWidthMul4Plus1	;//logFW4+1	
+	typedef TAdd#(LogFracWidthMul4,1)					LogFracWidthMul4Plus1	;//logFW4+1	
 
 	//FDP
 	typedef TDiv#(TMul#(PositWidth,PositWidth),2)				QuireWidth;//QW = (PW^2)/2
@@ -71,6 +71,15 @@ import Posit_Numeric_Types :: *;
 	typedef TSub#(FloatFracWidth,FracWidth)					FloatFracWidthMinusFracWidth; //(FloatFracWidth-FracWidth)
 	typedef TSub#(FloatFracWidthMinusFracWidth,1)				FloatFracWidthMinusFracWidthMinus1;
 	typedef TSub#(FloatFracWidthMinusFracWidth,2)				FloatFracWidthMinusFracWidthMinus2;
+
+	//P-to-F
+	typedef TLog#(FloatFracWidth)						LogFloatFracWidth;//LogFracWidth = log(FracWidth)
+	typedef TAdd#(LogFloatFracWidth,1)					LogFloatFracWidthPlus1;//LogFloatFWPlus1 =LogFloatFW + 1
+	typedef TSub#(FracWidth,FloatFracWidth)					FracWidthMinusFloatFracWidth; //(FracWidth-FloatFracWidth)
+	typedef TAdd#(FloatFracWidth,1) 					FloatFracWidthPlus1; //(FloatFracWidth-1)
+	
+
+
 
 	typedef struct {Bit#(PositWidth) posit_inp1;
 			Bit#(PositWidth) posit_inp2;

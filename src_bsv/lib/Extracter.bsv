@@ -67,16 +67,6 @@ module mkExtracter (Extracter_IFC );
 			//return 00 for all other cases
 	endfunction
 
-	//expo_window function is used to output a es bit mask depending on the number of bits available to be considered as exponent
-	function Bit#(ExpWidth) fv_expo_window_es(UInt#(Iteration) iter0);
-		Bit#(ExpWidth) mask = '1;
-		for (Integer k = 1; k<=es_int; k=k+1)
-			if(iter0 == fromInteger(es_int - k))
-				mask ='1>>k;
-		return mask;
-	endfunction
-
-
 
 //frac shift function is used to output the number of bits I need to shift the frac so that the the starting of the fraction is the first bit in output then it is appended with zeros
 	function Bit#(FracWidth) fv_frac_shift(UInt#(Iteration) iter0);
@@ -150,7 +140,7 @@ module mkExtracter (Extracter_IFC );
 			k_scale : (extend(dIn.k)<<es_int),
 			//if es = 5
 			// if we have more than 4 bits available we have to shift the window for the exponent field else the windows position is fixed at last and the number of bits in exponent is decided using 5 bit mask depending on the number of bits available
-			expo: (dIn.iteration>=fromInteger(es_int) ? dIn.new_inp1[dIn.iteration-1:dIn.iteration-fromInteger(es_int)] : (fv_expo_window_es(dIn.iteration) & truncate(dIn.new_inp1))),
+			expo: (dIn.iteration>=fromInteger(es_int) ? dIn.new_inp1[dIn.iteration-1:dIn.iteration-fromInteger(es_int)] : (truncate(dIn.new_inp1)<<(fromInteger(es_int) - dIn.iteration))),
 			//the frac size bit mask is decided on the number of bits available for fraction field
 			frac :(truncate(dIn.new_inp1) << fv_frac_shift(dIn.iteration))};
 			//frac :(frac_window(dIn.iteration) & truncate(dIn.new_inp1) )
