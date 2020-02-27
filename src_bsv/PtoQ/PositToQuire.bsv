@@ -49,7 +49,7 @@ module mkPositToQuire (PositToQuire_IFC );
 	FIFOF #(Output_posit )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Stage1_qp )  fifo_stage1_reg <- mkFIFOF;
 
-//This function will be used to get the Int-Frac value from the scale and frac value got from multiplying the values
+	//This function will be used to get the Int-Frac value from the scale and frac value got from multiplying the values
 	function Bit#(IntWidthQuirePlusFracWidthQuire) calculate_frac_int(Bit#(FracWidthPlus1) f, Int#(ScaleWidthPlus1) s);
 		Bit#(IntWidthQuirePlusFracWidthQuire) f_new = extend(f);
 		//first 1 bits of fraction are integer bits so if scale = 0 we have to shift fract left by FWQ-FW
@@ -59,16 +59,19 @@ module mkPositToQuire (PositToQuire_IFC );
 		return f_new;
 	endfunction
 
-
+	// --------
+        // Pipeline stages
+	// stage_0: INPUT STAGE: extract posits
 	rule stage_0;
 		let in_posit1 = Input_posit {posit_inp : fifo_input_reg.first};
 		fifo_input_reg.deq;
    		extracter.inoutifc.request.put (in_posit1);
 	endrule
-
+	// stage_1: calculate integer part of quire
 	rule stage_1;
 		//dIn reads the values from pipeline register stored from previous stage
 		let extOut <- extracter.inoutifc.response.get();
+		//calculate integer from scale
 		let int_frac = calculate_frac_int({1'b1,extOut.frac},extOut.scale);
 		let stage1_reg = Stage1_qp{sign : extOut.sign,
 					   int_frac : int_frac,
@@ -76,6 +79,7 @@ module mkPositToQuire (PositToQuire_IFC );
 		fifo_stage1_reg.enq(stage1_reg);
 	endrule
 	
+	// stage_2 : check special cases 
 	rule stage_2;
 		let dIn = fifo_stage1_reg.first;  fifo_stage1_reg.deq;
 		Bit#(CarryWidthQuire) carry = '0;

@@ -47,6 +47,7 @@ module mkPtoF_Extracter (PtoF_IFC );
 	//This function checks if the scale value has exceeded the limits max and min set due to the restricted availability of regime bits
 	// fraction bits will be shifted to take care of the scale value change due to it being bounded
 	//output : bounded scale value and the shift in frac bits
+	//the shift in frac bits is to be bounded becoz of the change in bit sizes
 	function Tuple2#(Int#(FloatExpWidth), Int#(LogFloatFracWidthPlus1)) fv_calculate_scale_shift(Int#(ScaleWidthPlus1) scale);
 		
 			Int#(FloatExpWidth) maxB,minB,scale1;
@@ -84,6 +85,7 @@ module mkPtoF_Extracter (PtoF_IFC );
 
 	endfunction
 	
+	//function defines shift in fraction depending on number of fraction bit change from posit to float
 	function Tuple3#(Bit#(FloatFracWidth), Bit#(1), Bit#(1)) fv_calculate_frac(Bit#(FracWidth) frac);
 		//`ifdef (FracWidth >= FLoatFracWidth)
 			let a_frac_truncate = valueOf(FracWidthMinusFloatFracWidth);
@@ -97,15 +99,22 @@ module mkPtoF_Extracter (PtoF_IFC );
 			
 	endfunction
 
+	// --------
+        // Pipeline stages
+	// stage_0: INPUT STAGE - Extract Posit
 	rule stage_0;
-		//dIn reads the values from input pipeline register 
+		//interpret the posit into its fields to convert it to float
 		extracter.inoutifc.request.put (fifo_input_reg.first);
 		fifo_input_reg.deq;
 	endrule
 
+	// stage_1: INPUT STAGE
 	rule stage_1;
 		let extOut <- extracter.inoutifc.response.get ();
+		//get extractor output
+		//calculate scale for posits and frac shift due to restrictions on scale sizes
 		match{.scale0, .frac_change0} = fv_calculate_scale_shift(extOut.scale);
+		//calculate fraction shifts and truncated bits
 		match{.frac0,.truncated_frac_msb0,.truncated_frac_zero0} = fv_calculate_frac(extOut.frac);
 		let stage0_regf = Stage0_pf {
 			//carrying sign bit fordward
@@ -128,14 +137,23 @@ module mkPtoF_Extracter (PtoF_IFC );
 
 	rule stage_2;
 		let dIn = fifo_stage0_reg.first;  fifo_stage0_reg.deq;
-		Bit#(FloatFracWidthPlus1) frac = {1,dIn.frac}; 
+		//add hidden bit
+		Bit#(FloatFracWidthPlus1) frac = {1,dIn.frac};
+		//if the truncated bits are zero or not 
+		//if frac change < 0 then frac bits lost but if >0 then basically frac is maximum since scale is already maximum  
 		let truncated_frac_zero = dIn.frac_change < 0 ? ~dIn.truncated_frac_msb & pack(unpack(frac[abs(dIn.frac_change):0]) ==  0): (dIn.frac_change == 0 ?dIn.truncated_frac_zero: 1'b0);
+		//the truncated bits msb
+		//if frac change < 0 then frac bits lost but if >0 then basically frac is maximum since scale is already maximum 
 		let truncated_frac_msb = dIn.frac_change < 0 ? frac[abs(dIn.frac_change)+1]: (dIn.frac_change == 0 ?dIn.truncated_frac_msb: 1'b1);
 		Int#(FloatExpWidthPlus1) scale_f =signExtend(dIn.scale);
 		Int#(FloatExpWidthPlus1) floatBias_int = fromInteger(valueOf(FloatBias));
+		//calculate exponent after adding bias
 		Bit#(FloatExpWidth) scale_plus_bias = truncate(pack(scale_f+floatBias_int));
+		//shift fraction depending on frac change
 		Bit#(FloatFracWidth) frac_f = dIn.frac_change < 0 ?truncate(frac>>abs(dIn.frac_change)+1): (dIn.frac_change == 0 ? truncate(frac) : '1);
+		//concatenate sign, exponent and fraction bits
 		Bit#(FloatWidth) float_no= {dIn.sign,scale_plus_bias,frac_f};
+		//round the number depending on fraction bits lost
 		Bit#(1) add_round =(~(truncated_frac_zero) | lsb(frac_f)) & (truncated_frac_msb);
 		Bit#(FloatFracWidth) frac_zero = 0;
 		float_no = dIn.zero_infinity_flag == ZERO ? 0 : dIn.zero_infinity_flag == INF ? {'1,frac_zero} : (float_no+extend(add_round)) ;

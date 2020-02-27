@@ -43,6 +43,7 @@ module mkFtoP_Extracter (FtoP_IFC );
 	FIFOF #(Bit#(FloatWidth) )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Stage0_fp )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Output_posit_n )  fifo_output_reg <- mkFIFOF;
+	// function checks if float is nan if exponent = 11..11, fraction > 00...000
 	function Bit#(1) fv_check_nan(Bit#(FloatExpWidth) expo_f,Bit#(FloatFracWidth) frac_f);
 		if(expo_f == '1 && frac_f != 0)
 			return 1'b1;
@@ -50,6 +51,8 @@ module mkFtoP_Extracter (FtoP_IFC );
 			return 1'b0;
 	endfunction
 
+	// function checks if float is infinity if exponent = 11..11, fraction = 00...000
+	// function checks if float is zero if exponent = 00..00, fraction = 00...000
 	function PositType fv_check_ziflag(Bit#(FloatExpWidth) expo_f,Bit#(FloatFracWidth) frac_f);
 		if(expo_f == '1 && frac_f == 0)
 			return INF;
@@ -62,6 +65,7 @@ module mkFtoP_Extracter (FtoP_IFC );
 	//This function checks if the scale value has exceeded the limits max and min set due to the restricted availability of regime bits
 	// fraction bits will be shifted to take care of the scale value change due to it being bounded
 	//output : bounded scale value and the shift in frac bits
+	//the shift in frac bits is to be bounded becoz of the change in bit sizes
 	function Tuple2#(Int#(ScaleWidthPlus1), Int#(LogFracWidthPlus1)) fv_calculate_scale_shift(Int#(FloatExpWidth) scale);
 		
 			Int#(ScaleWidthPlus1) maxB,minB,scale1;
@@ -99,6 +103,7 @@ module mkFtoP_Extracter (FtoP_IFC );
 
 	endfunction
 	
+	//function defines shift in fraction depending on number of fraction bit change from float to posit
 	function Tuple3#(Bit#(FracWidth), Bit#(1), Bit#(1)) fv_calculate_frac(Bit#(FloatFracWidth) frac);
 		`ifdef (FloatFracWidth >= FracWidth)
 			let a_frac_truncate = valueOf(FloatFracWidthMinusFracWidth);
@@ -111,17 +116,24 @@ module mkFtoP_Extracter (FtoP_IFC );
 		`endif
 			
 	endfunction
-	// stage_0: INPUT STAGE. Checks for special cases. 
+
+	// --------
+        // Pipeline stages
+	// stage_0: INPUT STAGE, interpret float and calculate exponent and frac 
 	rule stage_0;
 		//dIn reads the values from input pipeline register 
       		let dIn = fifo_input_reg.first;  fifo_input_reg.deq;
+		//get sign, exponent and fraction bits
 		Bit#(FloatExpWidth) expo_f_unsigned = (dIn[valueOf(FloatExpoBegin):valueOf(FloatFracWidth)]);
 		Int#(FloatExpWidthPlus1) expo_f = unpack({0,expo_f_unsigned});
 		Bit#(FloatFracWidth) frac_f = truncate(dIn);
 		Bit#(1) sign_f = msb(dIn);
+		//calculate scale after subtracting bias
 		Int#(FloatExpWidthPlus1) floatBias_int = fromInteger(valueOf(FloatBias));
 		Int#(FloatExpWidth) expo_minus_floatBias = truncate(expo_f-floatBias_int);
+		//calculate scale for posits and frac shift due to restrictions on scale sizes
 		match{.scale0, .frac_change0} = fv_calculate_scale_shift(expo_minus_floatBias);
+		//calculate fraction shifts and truncated bits
 		match{.frac0,.truncated_frac_msb0,.truncated_frac_zero0} = fv_calculate_frac(frac_f); 
 		let stage0_regf = Stage0_fp {
 			//carrying sign bit fordward
@@ -143,10 +155,15 @@ module mkFtoP_Extracter (FtoP_IFC );
 	`endif
 		fifo_stage0_reg.enq(stage0_regf);
 	endrule
-	
-	rule stage_2;
+
+	// stage_1: truncate frac bits	
+	rule stage_1;
+		//dIn reads the values from input pipeline register 
 		let dIn = fifo_stage0_reg.first;  fifo_stage0_reg.deq;
-		Bit#(FracWidthPlus1) frac = {1,dIn.frac};  
+		//add hidden bit
+		Bit#(FracWidthPlus1) frac = {1,dIn.frac}; 
+		//if the truncated bits are zero or not 
+		//if frac change < 0 then frac bits lost but if >0 then basically frac is maximum since scale is already maximum 
 		let truncated_frac_zero = dIn.frac_change < 0 ? pack(unpack(frac[abs(dIn.frac_change):0]) ==  0): (dIn.frac_change == 0 ?1'b1: 1'b0);					
 		normalizer.inoutifc.request.put (Input_value_n {
 		sign: dIn.sign,
@@ -158,9 +175,11 @@ module mkFtoP_Extracter (FtoP_IFC );
 		truncated_frac_zero : ~dIn.truncated_frac_msb & dIn.truncated_frac_zero & truncated_frac_zero});
 	endrule
 
+	// stage_2: normalizer	
 	rule rl_out;
-	   let normOut <- normalizer.inoutifc.response.get ();
-	   fifo_output_reg.enq(normOut);
+		//normalize the values got after interpreting the float
+		let normOut <- normalizer.inoutifc.response.get ();
+		fifo_output_reg.enq(normOut);
 	endrule
 interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
 endmodule
