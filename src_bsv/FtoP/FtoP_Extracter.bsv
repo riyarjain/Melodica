@@ -51,8 +51,6 @@ module mkFtoP_Extracter (FtoP_IFC );
 			return 1'b0;
 	endfunction
 
-	// function checks if float is infinity if exponent = 11..11, fraction = 00...000
-	// function checks if float is zero if exponent = 00..00, fraction = 00...000
 	function PositType fv_check_ziflag(Bit#(FloatExpWidth) expo_f,Bit#(FloatFracWidth) frac_f);
 		if(expo_f == '1 && frac_f == 0)
 			return INF;
@@ -60,61 +58,6 @@ module mkFtoP_Extracter (FtoP_IFC );
 			return ZERO;
 		else
 			return REGULAR;
-	endfunction
-
-	//This function checks if the scale value has exceeded the limits max and min set due to the restricted availability of regime bits
-	// fraction bits will be shifted to take care of the scale value change due to it being bounded
-	//output : bounded scale value and the shift in frac bits
-	//the shift in frac bits is to be bounded becoz of the change in bit sizes
-	function Tuple2#(Int#(ScaleWidthPlus1), Int#(LogFracWidthPlus1)) fv_calculate_scale_shift(Int#(FloatExpWidth) scale);
-		
-			Int#(ScaleWidthPlus1) maxB,minB,scale1;
-			Int#(FloatExpWidth) frac_change;
-			Int#(LogFracWidthPlus1) frac_change_bounded;
-			//max scale value is defined here... have to saturate the scale value 
-			// max value = (N-2)*(2^es) 
-			// scale = regime*(2^es) + expo.... max value of regime = N-2(00...1)
-			maxB = fromInteger((valueOf(PositWidth) -2)*(2**(valueOf(ExpWidth))));
-			//similarly calculate the min 
-		 	minB = -maxB;
-			//frac_change gives the number of bits that are more or less than scale bounds so that we can shift the frac bits to not lose scale information
-			Int#(LogFracWidthPlus1) max_frac = unpack({1'b0,'1});
-			Int#(LogFracWidthPlus1) min_frac = unpack({1'b1,extend(1'b1)});
-			Int#(FloatExpWidth) max_frac_extend = signExtend(max_frac);
-			Int#(FloatExpWidth) min_frac_extend = signExtend(min_frac);				
-			if (scale<extend(minB))
-				begin
-				frac_change = truncate(scale - extend(minB));// find the change in scale to bind it
-				scale1 = minB;//bound scale
-				frac_change_bounded = truncate(max(frac_change,min_frac_extend));
-				end
-			else if (scale>extend(maxB))
-				begin
-				frac_change = truncate(scale - extend(maxB));// find the change in scale to bind it
-				scale1 = maxB;//bound scale
-				frac_change_bounded = truncate(min(frac_change,max_frac_extend));
-				end
-			else
-				begin
-				frac_change_bounded = fromInteger(0);
-				scale1 = truncate(scale);//no change
-				end
-			return tuple2(scale1,frac_change_bounded);
-
-	endfunction
-	
-	//function defines shift in fraction depending on number of fraction bit change from float to posit
-	function Tuple3#(Bit#(FracWidth), Bit#(1), Bit#(1)) fv_calculate_frac(Bit#(FloatFracWidth) frac);
-		`ifdef (FloatFracWidth >= FracWidth)
-			let a_frac_truncate = valueOf(FloatFracWidthMinusFracWidth);
-			Bit#(1) truncated_frac_msb = a_frac_truncate > 0 ? frac[a_frac_truncate-1]:1'b0;
-			Bit#(1) truncated_frac_zero = a_frac_truncate > 1 ? pack(unpack(frac[a_frac_truncate-2:0]) ==  0):1'b1;
-			return tuple3(frac[valueOf(FloatFracWidthMinus1):a_frac_truncate],truncated_frac_msb,truncated_frac_zero);
-		`else
-			Bit#(FloatFracWidth) frac_extend= frac[valueOf(FloatFracWidthMinus1):0];
-			return tuple3({frac_extend,'0},1'b0,1'b1);
-		`endif
-			
 	endfunction
 
 	// --------
@@ -132,9 +75,9 @@ module mkFtoP_Extracter (FtoP_IFC );
 		Int#(FloatExpWidthPlus1) floatBias_int = fromInteger(valueOf(FloatBias));
 		Int#(FloatExpWidth) expo_minus_floatBias = truncate(expo_f-floatBias_int);
 		//calculate scale for posits and frac shift due to restrictions on scale sizes
-		match{.scale0, .frac_change0} = fv_calculate_scale_shift(expo_minus_floatBias);
+		match{.scale0, .frac_change0} = fv_calculate_scale_shift_fp(expo_minus_floatBias);
 		//calculate fraction shifts and truncated bits
-		match{.frac0,.truncated_frac_msb0,.truncated_frac_zero0} = fv_calculate_frac(frac_f); 
+		match{.frac0,.truncated_frac_msb0,.truncated_frac_zero0} = fv_calculate_frac_fp(frac_f); 
 		let stage0_regf = Stage0_fp {
 			//carrying sign bit fordward
 			sign : sign_f ,

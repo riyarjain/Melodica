@@ -42,7 +42,7 @@
 # sizes.  The basic sizes are provided on the command line.
 #
 # --help will remind you of the command-line arguments.
-#COMMAND:::: ./Gen_Posit_Numeric_Types --posit-width 32 --exp-width 2 --float-width 32
+#COMMAND:::: ./Gen_Posit_Numeric_Types --posit-width 32 --exp-width 5 --float-width 32
 # ================================================================
 
 import argparse
@@ -164,6 +164,10 @@ def compute_derived_values (items):
                    math.ceil (math.log2 (((sel (items, "MaxExpValue") * sel (items, "PositWidthMinus1")) - 1))),
                    "log2((PositWidth-1)*(2^ExpWidth)-1)"))
 
+    items.append (("FracWidthMinus1",
+                   sel (items, "FracWidth") - 1,
+                   "FracWidth - 1"))
+
     items.append (("ScaleWidthPlus1",
                    sel (items, "ScaleWidth") + 1,
                    "ScaleWidth + 1"))
@@ -191,6 +195,26 @@ def compute_derived_values (items):
     items.append (("RegimeWidth",
                    sel (items, "BitsPerPositWidth") + 1,
                    "log2 (PositWidth) + 1"))
+
+    items.append (("FloatFracWidthMinusFracWidth",
+                   sel (items, "FloatFracWidth") - sel (items, "FracWidth"),
+                   "(FloatFracWidth-FracWidth)"))
+
+    items.append (("FloatFracWidthMinus1",
+                   sel (items, "FloatFracWidth") - 1,
+                   "(FloatFracWidth-1)"))
+
+    items.append (("FracWidthMinusFloatFracWidth",
+                   sel (items, "FracWidth") - sel (items, "FloatFracWidth"),
+                   "(FracWidth-FloatFracWidth)"))
+
+    items.append (("LogFracWidthPlus1",
+                   math.ceil (math.log2 (sel (items, "FracWidth"))) + 1,
+                   "log2 (FracWidth) + 1"))
+
+    items.append (("LogFloatFracWidthPlus1",
+                   math.ceil (math.log2 (sel (items, "FloatFracWidth"))) + 1,
+                   "log2 (FloatFracWidth) + 1"))
 
     return items
 # ================================================================
@@ -252,12 +276,183 @@ def generate_BSV_file (BSV_package_name, items):
     fout.write ("\n" +
                 "function  Bit#(n)  fnUnsignedPosit (Bit #(n)  posit);\n" +
                 "   return  extend (posit [(valueOf (n) - 1):0]);\n" +
-                "endfunction\n")
+                "endfunction\n" +
+                "// ================================================================*/\n")
+
+    fout.write ("//function defines shift in fraction depending on number of fraction bit change from float to posit\n" +
+                "function Tuple3#(Bit#(FracWidth), Bit#(1), Bit#(1)) fv_calculate_frac_fp(Bit#(FloatFracWidth) frac);\n"
+	            "begin \n")
+    if sel2(items, "FloatFracWidth") >= sel2(items, "FracWidth"):
+    	fout.write ("	let a_frac_truncate = valueOf(FloatFracWidthMinusFracWidth);\n" +
+	                "	Bit#(1) truncated_frac_msb = a_frac_truncate > 0 ? frac[a_frac_truncate-1]:1'b0;\n" +
+	                "	Bit#(1) truncated_frac_zero = a_frac_truncate > 1 ? pack(unpack(frac[a_frac_truncate-2:0]) ==  0):1'b1;\n" +
+	                "	return tuple3(frac[valueOf(FloatFracWidthMinus1):a_frac_truncate],truncated_frac_msb,truncated_frac_zero);\n")
+    else:
+    	fout.write ("	Bit#(FracWidth) frac_extend={frac,'0}; \n" +
+    				"	return tuple3(frac_extend,1'b0,1'b1); \n")
+    fout.write ("end \n" +
+				"endfunction\n")
+
+    fout.write ("//function defines shift in fraction depending on number of fraction bit change from posit to float\n " +
+                "function Tuple3#(Bit#(FloatFracWidth), Bit#(1), Bit#(1)) fv_calculate_frac_pf(Bit#(FracWidth) frac);\n"
+	            "begin \n")
+    if sel2(items, "FloatFracWidth") <= sel2(items, "FracWidth"):
+    	fout.write ("	let a_frac_truncate = valueOf(FracWidthMinusFloatFracWidth);\n" +
+	                "	Bit#(1) truncated_frac_msb = a_frac_truncate > 0 ? frac[a_frac_truncate-1]:1'b0;\n" +
+	                "	Bit#(1) truncated_frac_zero = a_frac_truncate > 1 ? pack(unpack(frac[a_frac_truncate-2:0]) ==  0):1'b1;\n" +
+	                "	return tuple3(frac[valueOf(FracWidthMinus1):a_frac_truncate],truncated_frac_msb,truncated_frac_zero);\n")
+    else:
+    	fout.write ("	Bit#(FracWidth) frac_extend= frac[valueOf(FracWidthMinus1):0]; \n" +
+    				"	return tuple3({frac_extend,'0},1'b0,1'b1); \n")
+    fout.write ("end \n" +
+				"endfunction\n")
+
+    
+
+    fout.write ("\n" +
+                "//This function checks if the scale value has exceeded the limits max and min set due to the restricted availability of regime bits \n" +
+                "// fraction bits will be shifted to take care of the scale value change due to it being bounded \n" +
+                "//output : bounded scale value and the shift in frac bits \n" +
+		"//the shift in frac bits is to be bounded becoz of the change in bit sizes \n" +
+                "function Tuple2#(Int#(ScaleWidthPlus1), Int#(LogFracWidthPlus1)) fv_calculate_scale_shift_fp(Int#(FloatExpWidth) scale);\n" +
+                "	Int#(ScaleWidthPlus1) maxB,minB,scale1; \n" +
+                "	Int#(FloatExpWidth) frac_change; \n" +
+                "	Int#(LogFracWidthPlus1) frac_change_bounded; \n" +
+                "	//max scale value is defined here... have to saturate the scale value \n" +
+                "	// max value = (N-2)*(2^es)  \n" +
+                "	// scale = regime*(2^es) + expo.... max value of regime = N-2(00...1) \n" +
+                "	maxB = fromInteger((valueOf(PositWidth) -2)*(2**(valueOf(ExpWidth)))); \n" +
+                "	//similarly calculate the min \n" +
+                "	minB = -maxB; \n" +
+                "	//frac_change gives the number of bits that are more or less than scale bounds so that we can shift the frac bits to not lose scale information \n" +
+                "	Int#(LogFracWidthPlus1) max_frac = unpack({1'b0,'1}); \n" +
+                "	Int#(LogFracWidthPlus1) min_frac = unpack({1'b1,extend(1'b1)}); \n")
+    if sel2(items, "FloatExpWidth") >= sel2(items, "LogFracWidthPlus1"):
+        fout.write ("\n" +
+        		    "	Int#(FloatExpWidth) max_frac_extend = signExtend(max_frac); \n" +
+                	"	Int#(FloatExpWidth) min_frac_extend = signExtend(min_frac); \n");
+    else:
+    	fout.write ("\n" +
+        		    "	Int#(FloatExpWidth) max_frac_extend = truncate(max_frac); \n" +
+                	"	Int#(FloatExpWidth) min_frac_extend = truncate(min_frac); \n");
+    if sel2(items, "FloatExpWidth") >= sel2(items, "ScaleWidthPlus1"):
+    	fout.write ("\n" +
+	                "	if (scale<extend(minB)) \n" +
+	                "	begin \n" +
+	                "		frac_change = truncate(scale - extend(minB));// find the change in scale to bind it \n")
+    else:
+    	fout.write ("\n" +
+	                "	if (extend(scale)<(minB)) \n" +
+	                "	begin \n" +
+	                "		frac_change = truncate(extend(scale) - (minB));// find the change in scale to bind it \n")
+    fout.write ("		scale1 = minB;//bound scale \n")
+    if sel2(items, "LogFracWidthPlus1") >= sel2(items, "FloatExpWidth"):
+    	fout.write ("		frac_change_bounded = extend(max(frac_change,min_frac_extend));\n")
+    else:
+    	fout.write ("		frac_change_bounded = truncate(max(frac_change,min_frac_extend));\n")
+
+    fout.write ("end \n")
+    if sel2(items, "FloatExpWidth") >= sel2(items, "ScaleWidthPlus1"):
+    	fout.write ("	else if (scale>extend(maxB)) \n" + 
+					"	begin \n" +
+	                "		frac_change = truncate(scale - extend(maxB));// find the change in scale to bind it \n")
+    else:
+    	fout.write ("	else if (extend(scale)>(maxB)) \n" +
+	                "	begin \n" +
+	                "		frac_change = truncate(extend(scale) - (maxB));// find the change in scale to bind it \n")
+    fout.write ("		scale1 = maxB;//bound scale \n")
+    if sel2(items, "LogFracWidthPlus1") >= sel2(items, "FloatExpWidth"):
+    	fout.write ("		frac_change_bounded = extend(min(frac_change,max_frac_extend));\n")
+    else:
+    	fout.write ("		frac_change_bounded = truncate(min(frac_change,max_frac_extend));\n")
+
+    fout.write ("end \n" +
+                "	else \n" +
+                "	begin \n" +
+                "		frac_change_bounded = fromInteger(0); \n")
+    if sel2(items, "FloatExpWidth") >= sel2(items, "ScaleWidthPlus1"):
+        fout.write ("		scale1 = truncate(scale);//no change \n")
+    else:
+    	fout.write ("		scale1 = extend(scale);//no change \n")
+    fout.write ("	end \n" +
+                "	return tuple2(scale1,frac_change_bounded); \n" +
+                "endfunction \n" )
+
 
 
     fout.write ("\n" +
-                "// ================================================================*/\n"
-		"\n" +
+                "//This function checks if the scale value has exceeded the limits max and min set due to the restricted availability of regime bits \n" +
+                "// fraction bits will be shifted to take care of the scale value change due to it being bounded \n" +
+                "//output : bounded scale value and the shift in frac bits \n" +
+		"//the shift in frac bits is to be bounded becoz of the change in bit sizes \n" +
+                "function Tuple2#(Int#(FloatExpWidth), Int#(LogFloatFracWidthPlus1)) fv_calculate_scale_shift_pf(Int#(ScaleWidthPlus1) scale);\n" +
+                "	Int#(FloatExpWidth) maxB,minB,scale1; \n" +
+                "	Int#(ScaleWidthPlus1) frac_change; \n" +
+                "	Int#(LogFloatFracWidthPlus1) frac_change_bounded; \n" +
+                "	//max scale value is defined here... have to saturate the scale value \n" +
+                "	// max value = (N-2)*(2^es)  \n" +
+                "	// scale = regime*(2^es) + expo.... max value of regime = N-2(00...1) \n" +
+                "	maxB = fromInteger(valueOf(FloatBias)); \n" +
+                "	//similarly calculate the min \n" +
+                "	minB = -fromInteger(valueOf(FloatBias)); \n" +
+                "	//frac_change gives the number of bits that are more or less than scale bounds so that we can shift the frac bits to not lose scale information \n" +
+                "	Int#(LogFloatFracWidthPlus1) max_frac = unpack({1'b0,'1}); \n" +
+                "	Int#(LogFloatFracWidthPlus1) min_frac = unpack({1'b1,extend(1'b1)}); \n")
+    if sel2(items, "ScaleWidthPlus1") >= sel2(items, "LogFloatFracWidthPlus1"):
+        fout.write ("\n" +
+        		    "	Int#(ScaleWidthPlus1) max_frac_extend = signExtend(max_frac); \n" +
+                	"	Int#(ScaleWidthPlus1) min_frac_extend = signExtend(min_frac); \n");
+    else:
+    	fout.write ("\n" +
+        		    "	Int#(ScaleWidthPlus1) max_frac_extend = truncate(max_frac); \n" +
+                	"	Int#(ScaleWidthPlus1) min_frac_extend = truncate(min_frac); \n");
+    if sel2(items, "FloatExpWidth") < sel2(items, "ScaleWidthPlus1"):
+    	fout.write ("\n" +
+	                "	if (scale<extend(minB)) \n" +
+	                "	begin \n" +
+	                "		frac_change = truncate(scale - extend(minB));// find the change in scale to bind it \n")
+    else:
+    	fout.write ("\n" +
+	                "	if (extend(scale)<(minB)) \n" +
+	                "	begin \n" +
+	                "		frac_change = truncate(extend(scale) - (minB));// find the change in scale to bind it \n")
+    fout.write ("		scale1 = minB;//bound scale \n")
+    if sel2(items, "LogFloatFracWidthPlus1") >= sel2(items, "ScaleWidthPlus1"):
+    	fout.write ("		frac_change_bounded = extend(max(frac_change,min_frac_extend));\n")
+    else:
+    	fout.write ("		frac_change_bounded = truncate(max(frac_change,min_frac_extend));\n")
+
+    fout.write ("	end \n")
+    if sel2(items, "FloatExpWidth") < sel2(items, "ScaleWidthPlus1"):
+    	fout.write ("	else if (scale>extend(maxB)) \n" + 
+					"	begin \n" +
+	                "		frac_change = truncate(scale - extend(maxB));// find the change in scale to bind it \n")
+    else:
+    	fout.write ("	else if (extend(scale)>(maxB)) \n" +
+	                "	begin \n" +
+	                "		frac_change = truncate(extend(scale) - (maxB));// find the change in scale to bind it \n")
+    fout.write ("		scale1 = maxB;//bound scale \n")
+    if sel2(items, "LogFloatFracWidthPlus1") >= sel2(items, "ScaleWidthPlus1"):
+    	fout.write ("		frac_change_bounded = extend(min(frac_change,max_frac_extend));\n")
+    else:
+    	fout.write ("		frac_change_bounded = truncate(min(frac_change,max_frac_extend));\n")
+
+    fout.write ("	end \n" +
+                "	else \n" +
+                "	begin \n" +
+                "		frac_change_bounded = fromInteger(0); \n")
+    if sel2(items, "FloatExpWidth") < sel2(items, "ScaleWidthPlus1"):
+        fout.write ("		scale1 = truncate(scale);//no change \n")
+    else:
+    	fout.write ("		scale1 = extend(scale);//no change \n")
+    fout.write ("	end \n" +
+                "	return tuple2(scale1,frac_change_bounded); \n" +
+                "endfunction \n" )
+
+
+    fout.write ("\n" +
+                "// ================================================================\n"
+				"\n" +
                 "endpackage: " + BSV_package_name + "\n")
 
     print ("Wrote file: ", filename)
@@ -288,8 +483,17 @@ def gen_decls (fout, size_not_val, items):
     fout.write ("\n")
     gen_decl (fout, size_not_val, "ScaleWidth",    sel2 (items, "ScaleWidth"))
     gen_decl (fout, size_not_val, "ScaleWidthPlus1",  sel2 (items, "ScaleWidthPlus1"))
+    gen_decl (fout, size_not_val, "FracWidthMinus1",  sel2 (items, "FracWidthMinus1"))
     gen_decl (fout, size_not_val, "ScaleWidthMinusExpWidth",  sel2 (items, "ScaleWidthMinusExpWidth"))
     gen_decl (fout, size_not_val, "ScaleWidthMinusExpWidthPlus1",  sel2 (items, "ScaleWidthMinusExpWidthPlus1"))
+    gen_decl (fout, size_not_val, "FloatFracWidthMinus1",  sel2 (items, "FloatFracWidthMinus1"))
+    if sel2(items, "FloatFracWidth") >= sel2(items, "FracWidth"):
+    	gen_decl (fout, size_not_val, "FloatFracWidthMinusFracWidth",  sel2 (items, "FloatFracWidthMinusFracWidth"))
+    else:
+    	gen_decl (fout, size_not_val, "FracWidthMinusFloatFracWidth",  sel2 (items, "FracWidthMinusFloatFracWidth"))
+
+    gen_decl (fout, size_not_val, "LogFracWidthPlus1",  sel2 (items, "LogFracWidthPlus1"))
+    gen_decl (fout, size_not_val, "LogFloatFracWidthPlus1",  sel2 (items, "LogFloatFracWidthPlus1")) 
     fout.write ("\n")
 
     return 0
