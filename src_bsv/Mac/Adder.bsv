@@ -135,11 +135,9 @@ module mkAdder (Adder_IFC );
 	// Output : sign, scale, fraction, round_frac, frac_change
 	function Tuple5#(Bit#(1), Int#(ScaleWidthPlus1),Bit#(FracWidthMul4),Bit#(1),Int#(LogFracWidthPlus1)) fv_calculate_sum(Bit#(1) sgn1,Bit#(1)sgn2, Int#(ScaleWidthPlus1) s,Bit#(FracWidthMul4)f1,Bit#(FracWidthMul4)f2,Bit#(1) round_frac_f1,Bit#(1) round_frac_f2);
 		Bit#(FracWidthMul4Plus1)frac_sum;
-		Bit#(LogFracWidthMul4Plus1) frac_shift_1;
 		Bit#(ScaleWidthPlus1) frac_shift;
 		Int#(ScaleWidthPlus2) s1;
 		Bit#(FracWidthMul4Plus1) mask = '1;
-		Bit#(ScaleWidthPlus1) zero_one = '1;
 		//Bit#(LogFracWidthMul4Plus1) zero_one_1 = valueOf(ScaleWidthPlus1)>=valueOf(LogFracWidthMul4Plus1)?'1:extend(zero_one);
 		Bit#(1) round_frac = round_frac_f1 | round_frac_f2;//now if any one is also high means that there was a frac rounding before so we check if any one had a frac rounding it will be affect in output rounding
 		Bit#(FracWidthMul4) frac_trunc;
@@ -150,8 +148,7 @@ module mkAdder (Adder_IFC );
 			//add the fractional values since same sign of inputs
 			frac_sum = extend(f1) + extend(f2);
 			// have to shift the fractional output value so that the first bit is 1(hidden bit is 1), so count the number of 0s
-			frac_shift_1 = min(extend(zero_one),extend(pack(countZerosMSB(frac_sum))));
-			frac_shift =  truncate(frac_shift_1);
+			frac_shift =  fv_frac_shit_adder_mac(frac_sum);
 			//scale = scale + 1 (sum of hidden bit leads to an extension 1 bit) - (the number of bits the fractional bits had to be shifted will be provided by or to scale)
 			s1 = boundedMinus(signExtend(s) , unpack(extend(frac_shift)-1));//this just bound till the end points we need stricter bounds to max and min value so use calculate scale shift for the bounds
 			match {.scale0,.frac_change0} = fv_calculate_scale_shift(s1);//after applying stricter bound on scale
@@ -175,8 +172,7 @@ module mkAdder (Adder_IFC );
 			// if 2nd is rounded and not 1st
 			frac_sum = extend(f1) - extend(f2) - extend(round_frac_f2 & ~round_frac_f1);
 			// have to shift the fractional output value so that the first bit is 1(hidden bit is 1), so count the number of 0s
-			frac_shift_1 = min(extend(zero_one),extend(pack(countZerosMSB(frac_sum))));
-			frac_shift =  truncate(frac_shift_1);
+			frac_shift =  fv_frac_shit_adder_mac(frac_sum);
 			//scale = scale + 1 (sum of hidden bit leads to an extension 1 bit) - (the number of bits the fractional bits had to be shifted will be provided by scale) 
 			s1 = boundedMinus(signExtend(s) , unpack(extend(frac_shift)-1));//this just bound till the end points we need stricter bounds to max and min value so use calculate scale shift for the bounds
 			match {.scale0,.frac_change0} = fv_calculate_scale_shift(s1);//after applying stricter bound on scale
@@ -193,8 +189,7 @@ module mkAdder (Adder_IFC );
 			// have to shift the fractional output value so that the first bit is 1(hidden bit is 1), so count the number of 0s
 			frac_sum = extend(f2) - extend(f1) - extend(round_frac_f1);
 			// have to shift the fractional output value so that the first bit is 1(hidden bit is 1), so count the number of 0s
-			frac_shift_1 = min(extend(zero_one),extend(pack(countZerosMSB(frac_sum))));
-			frac_shift =  truncate(frac_shift_1);
+			frac_shift =  fv_frac_shit_adder_mac(frac_sum);
 			//scale = scale + 1 (sum of hidden bit leads to an extension 1 bit) - (the number of bits the fractional bits had to be shifted will be provided by scale)
 			s1 = boundedMinus(signExtend(s) , unpack(extend(frac_shift)-1));//this just bound till the end points we need stricter bounds to max and min value so use calculate scale shift for the bounds
 			match {.scale0,.frac_change0} = fv_calculate_scale_shift(s1);//after applying stricter bound on scale

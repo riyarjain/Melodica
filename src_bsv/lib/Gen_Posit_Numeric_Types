@@ -216,6 +216,23 @@ def compute_derived_values (items):
                    math.ceil (math.log2 (sel (items, "FloatFracWidth"))) + 1,
                    "log2 (FloatFracWidth) + 1"))
 
+    items.append (("FracWidthMul4",
+    				sel (items, "FracWidth") * 4,
+                   "FracWidth * 4"))
+
+    items.append (("FracWidthMul4Plus1",
+    				sel (items, "FracWidthMul4") + 1,
+                   "FracWidthMul4 + 1"))
+
+    items.append (("LogFracWidthMul4",
+                   math.ceil (math.log2 (sel (items, "FracWidthMul4"))),
+                   "log2 (FracWidthMul4)"))
+
+    items.append (("LogFracWidthMul4Plus1",
+                   sel (items, "LogFracWidthMul4") + 1,
+                   "LogFracWidthMul4 + 1"))
+
+
     return items
 # ================================================================
 # Generate the output (BSV source file)
@@ -449,6 +466,20 @@ def generate_BSV_file (BSV_package_name, items):
                 "	return tuple2(scale1,frac_change_bounded); \n" +
                 "endfunction \n" )
 
+    fout.write ("function Bit#(ScaleWidthPlus1) fv_frac_shit_adder_mac(Bit#(FracWidthMul4Plus1) frac_sum); \n" +
+				"	Bit#(LogFracWidthMul4Plus1) frac_shift_1; \n" +
+				"	Bit#(ScaleWidthPlus1) zero_one = '1; \n" +
+				"	Bit#(ScaleWidthPlus1) frac_shift; \n")
+    if sel2(items, "ScaleWidthPlus1") < sel2(items, "LogFracWidthMul4Plus1"):
+    	fout.write ("	frac_shift_1 = min(extend(zero_one),extend(pack(countZerosMSB(frac_sum)))); \n" +
+    				"	frac_shift =  truncate(frac_shift_1);\n")
+    else:
+    	fout.write ("	frac_shift_1 = min(truncate(zero_one),extend(pack(countZerosMSB(frac_sum)))); \n" +
+    				"	frac_shift =  extend(frac_shift_1);\n")
+    fout.write ("	return frac_shift; \n" +
+    			"endfunction \n" )
+
+
 
     fout.write ("\n" +
                 "// ================================================================\n"
@@ -493,7 +524,11 @@ def gen_decls (fout, size_not_val, items):
     	gen_decl (fout, size_not_val, "FracWidthMinusFloatFracWidth",  sel2 (items, "FracWidthMinusFloatFracWidth"))
 
     gen_decl (fout, size_not_val, "LogFracWidthPlus1",  sel2 (items, "LogFracWidthPlus1"))
-    gen_decl (fout, size_not_val, "LogFloatFracWidthPlus1",  sel2 (items, "LogFloatFracWidthPlus1")) 
+    gen_decl (fout, size_not_val, "LogFloatFracWidthPlus1",  sel2 (items, "LogFloatFracWidthPlus1"))
+    gen_decl (fout, size_not_val, "FracWidthMul4",  sel2 (items, "FracWidthMul4"))
+    gen_decl (fout, size_not_val, "FracWidthMul4Plus1",  sel2 (items, "FracWidthMul4Plus1"))
+    gen_decl (fout, size_not_val, "LogFracWidthMul4",  sel2 (items, "LogFracWidthMul4"))
+    gen_decl (fout, size_not_val, "LogFracWidthMul4Plus1",  sel2 (items, "LogFracWidthMul4Plus1")) 
     fout.write ("\n")
 
     return 0

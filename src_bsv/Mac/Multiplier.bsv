@@ -72,7 +72,7 @@ module mkMultiplier (Multiplier_IFC );
 		frac_product = extend(f1) * extend(f2);
 		frac_product = (frac_product << (valueOf(FracWidthMul4MinusFracWidthMul2)));
 		//frac_shift gives the number of bit shift in fraction product such that the MSB is 1
-		frac_shift =  truncate(min(extend(zero_one),(pack(countZerosMSB(frac_product)))));
+		frac_shift =  (min(extend(zero_one),extend(pack(countZerosMSB(frac_product)))));
 		//Sign is given by the xor of the two signs
 		//sign = 1 if negative number
 		return tuple3(sgn1 ^ sgn2,(frac_product<<frac_shift),frac_shift); 
