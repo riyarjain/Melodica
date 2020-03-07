@@ -61,12 +61,15 @@ typedef struct {Bit#(1) sign;
 typedef struct {Bit#(1) sign;
 		PositType zero_infinity_flag;
 		Bit#(1) nan_flag;
-		Bit#(PositWidthMinus1) k_expo_frac;} Stage2_n deriving(Bits,FShow);
+		Bit#(PositWidthMinus1) k_expo_frac;
+		Bool rounding;} Stage2_n deriving(Bits,FShow);
 //Stage2_n is the data available at the end of second pipeline
 //Stage2_n consists of sign of posit, zero and infinity flag, NaN flag, regime and exponent and fraction field combined
 
 typedef struct {Bit#(1) nan_flag;
-		Bit#(PositWidth) out_posit;} Output_posit_n deriving(Bits,FShow);
+		Bit#(PositWidth) out_posit;
+		PositType zero_infinity_flag;
+		Bool rounding;} Output_posit_n deriving(Bits,FShow);
 //Output_posit is the data available at the end of second pipeline
 //Output_posit consists of  NaN flag, posit as output
 

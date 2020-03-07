@@ -33,6 +33,7 @@ import GetPut       :: *;
 import ClientServer :: *;
 
 // Project imports
+import Utils :: *;
 import Normalizer_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
@@ -273,17 +274,18 @@ module mkNormalizer (Normalizer_IFC);
         UInt#(PositWidthMinus1) uint_k_expo_frac = boundedPlus(unpack(dIn.k_expo +(extend(dIn.frac)>>(shift_2))-extend(flag_equidistant)),unpack(extend(flag_prev_truncate)));
         uint_k_expo_frac = uint_k_expo_frac + extend(uint_k_expo_frac == 0 && flag_equidistant == 0 ?1'b1:1'b0);
         
-
+	Bool rounding = (flag_prev_truncate - flag_equidistant == 1'b1 || uint_k_expo_frac == 0 && flag_equidistant == 0);
         // data to be stored in stored in fifo that will be used in stage 2
                 let stage2_regf = Stage2_n {
             //carrying sign bit forward
             sign : dIn.sign ,
             //carrying zero and infinity flag forward
-                        zero_infinity_flag : dIn.zero_infinity_flag,
+            zero_infinity_flag : dIn.zero_infinity_flag,
             //carrying nan flag forward
             nan_flag : dIn.nan_flag,
             //combining the regime and exponent field with the fraction field
-            k_expo_frac : pack(uint_k_expo_frac)};
+            k_expo_frac : pack(uint_k_expo_frac),
+	    rounding : rounding};
         fifo_stage2_reg.enq(stage2_regf);
         `ifdef RANDOM_PRINT
         $display("dIn.sign %b",dIn.sign);
@@ -303,7 +305,9 @@ module mkNormalizer (Normalizer_IFC);
             //carrying nan flag forward
             nan_flag : dIn.nan_flag,
             // depending on sign bit and zero_infinity_flag giving the final output
-            out_posit: (dIn.zero_infinity_flag == REGULAR ? fv_outp_sign(dIn.k_expo_frac,dIn.sign) : fv_outp_z_i(dIn.zero_infinity_flag))};
+            out_posit: (dIn.zero_infinity_flag == REGULAR ? fv_outp_sign(dIn.k_expo_frac,dIn.sign) : fv_outp_z_i(dIn.zero_infinity_flag)),
+            zero_infinity_flag : dIn.zero_infinity_flag,
+	    rounding : dIn.rounding};
 
         fifo_output_reg.enq(output_regf);
 
