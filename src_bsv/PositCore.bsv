@@ -17,8 +17,8 @@ import PositToQuire_PNE_PC :: *;
 import QuireToPosit_PNE_PC :: *;
 import FloatingPoint :: *;
 
-`ifdef Quills
-import Fpu :: *;
+`ifdef QUILLS
+import FPU_Types :: *;
 `else
 // Type definitions
 typedef FloatingPoint#(11,52) FDouble;

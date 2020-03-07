@@ -33,7 +33,6 @@ import GetPut       :: *;
 import ClientServer :: *;
 
 // Project imports
-import Utils :: *;
 import Normalizer_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
