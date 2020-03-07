@@ -32,7 +32,6 @@ import FIFOF        :: *;
 import GetPut       :: *;
 import ClientServer :: *;
 
-import Utils :: *;
 import Extracter_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;

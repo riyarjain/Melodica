@@ -7,8 +7,6 @@ import GetPut       :: *;
 import ClientServer :: *;
 
 // Project imports
-import Utils :: *;
-
 import Normalizer_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
@@ -19,7 +17,9 @@ import PositToQuire_PNE_PC :: *;
 import QuireToPosit_PNE_PC :: *;
 import FloatingPoint :: *;
 
-`ifndef Quills
+`ifdef Quills
+import Fpu :: *;
+`else
 // Type definitions
 typedef FloatingPoint#(11,52) FDouble;
 typedef FloatingPoint#(8,23)  FSingle;
@@ -29,14 +29,17 @@ typedef union tagged {
    FSingle S;
    Bit #(PositWidth) P;
    } FloatU deriving(Bits,Eq);
+
+typedef Tuple2#( FloatU, FloatingPoint::Exception )       Fpu_Rsp;
 `endif
-typedef enum {FMA_P, FCVT_P_S, FCVT_S_P, FCVT_P_Q, FCVT_Q_P} PositCmds
+
+typedef enum {FMA_P, FCVT_P_S, FCVT_S_P, FCVT_P_R, FCVT_R_P} PositCmds
 deriving (Bits, Eq, FShow);
 
+typedef Tuple4 #(FloatU, FloatU, RoundMode, PositCmds) Posit_Req;
+
 interface PositCore_IFC;
-   interface Server #(
-      Tuple4 #(FloatU, FloatU, RoundMode, PositCmds),
-      Tuple2 #(FloatU, FloatingPoint::Exception)) server_core;
+   interface Server #(Posit_Req, Fpu_Rsp) server_core;
 endinterface
 
 (* synthesize *)
@@ -51,8 +54,8 @@ module mkPositCore (PositCore_IFC);
 
 	FIFO #(PositCmds) opcode <- mkFIFO;
 
-	FIFO #(Tuple4 #(FloatU, FloatU, RoundMode, PositCmds)) ffI <- mkFIFO;
-	FIFO #(Tuple2 #(FloatU, FloatingPoint::Exception)) ffO <- mkFIFO;
+	FIFO #(Posit_Req) ffI <- mkFIFO;
+	FIFO #(Fpu_Rsp) ffO <- mkFIFO;
 	
 	rule rl_fdp(tpl_4(ffI.first) == FMA_P);
 		fdp.compute.request.put((InputTwoPosit{posit_inp1 : tpl_1(ffI.first).P,posit_inp2 : tpl_2(ffI.first).P}));
@@ -74,15 +77,15 @@ module mkPositCore (PositCore_IFC);
 		ffI.deq;
 	endrule
 
-	rule rl_ptoq(tpl_4(ffI.first) == FCVT_P_Q);
+	rule rl_ptoq(tpl_4(ffI.first) == FCVT_P_R);
 		ptoq.compute.request.put(tpl_1(ffI.first).P);
-		opcode.enq(FCVT_P_Q);
+		opcode.enq(FCVT_P_R);
 		ffI.deq;
 	endrule
 	
-	rule rl_qtop(tpl_4(ffI.first) == FCVT_Q_P);
+	rule rl_qtop(tpl_4(ffI.first) == FCVT_R_P);
 		qtop.compute.request.put(?);
-		opcode.enq(FCVT_Q_P);
+		opcode.enq(FCVT_R_P);
 		ffI.deq;
 	endrule
 
@@ -97,14 +100,14 @@ module mkPositCore (PositCore_IFC);
 				ffO.enq(tuple2(posit_out,excep));
 				opcode.deq;
 			end
-		else if(op == FCVT_P_Q)
+		else if(op == FCVT_R_P)
 			begin
 				let a <- ptoq.compute.response.get();
 				FloatU posit_out = tagged P 0;
 				ffO.enq(tuple2(posit_out,excep));
 				opcode.deq;
 			end
-		else if(op == FCVT_P_S)
+		else if(op == FCVT_S_P)
 			begin
 				let out_pf <- ptof.compute.response.get();
 				FSingle fs = FSingle{sign : unpack(msb(out_pf)), exp : (out_pf[valueOf(FloatExpoBegin):valueOf(FloatFracWidth)]), sfd : truncate(out_pf) };
@@ -112,7 +115,7 @@ module mkPositCore (PositCore_IFC);
 				ffO.enq(tuple2(posit_out,excep));
 				opcode.deq;
 			end
-		else if(op == FCVT_S_P)
+		else if(op == FCVT_P_S)
 			begin
 				let out_pf <- ftop.compute.response.get();
 				excep.invalid_op = out_pf.nan_flag == 1'b1;
@@ -123,7 +126,7 @@ module mkPositCore (PositCore_IFC);
 				ffO.enq(tuple2(posit_out,excep));
 				opcode.deq;
 			end
-		else if(op == FCVT_Q_P)
+		else if(op == FCVT_P_R)
 			begin
 				let out_pf <- qtop.compute.response.get();
 				excep.invalid_op = out_pf.nan_flag == 1'b1;

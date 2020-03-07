@@ -30,7 +30,6 @@ import FIFOF        :: *;
 import GetPut       :: *;
 import ClientServer :: *;
 
-import Utils :: *;
 import PtoF_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
