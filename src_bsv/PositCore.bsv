@@ -19,6 +19,7 @@ import PositToQuire_PNE_PC :: *;
 import QuireToPosit_PNE_PC :: *;
 import FloatingPoint :: *;
 
+`ifndef Quills
 // Type definitions
 typedef FloatingPoint#(11,52) FDouble;
 typedef FloatingPoint#(8,23)  FSingle;
@@ -28,8 +29,8 @@ typedef union tagged {
    FSingle S;
    Bit #(PositWidth) P;
    } FloatU deriving(Bits,Eq);
-
-typedef enum {PFDP, FCVT_P_S, FCVT_S_P, FCVT_P_Q, FCVT_Q_P} PositCmds
+`endif
+typedef enum {FMA_P, FCVT_P_S, FCVT_S_P, FCVT_P_Q, FCVT_Q_P} PositCmds
 deriving (Bits, Eq, FShow);
 
 interface PositCore_IFC;
@@ -53,9 +54,9 @@ module mkPositCore (PositCore_IFC);
 	FIFO #(Tuple4 #(FloatU, FloatU, RoundMode, PositCmds)) ffI <- mkFIFO;
 	FIFO #(Tuple2 #(FloatU, FloatingPoint::Exception)) ffO <- mkFIFO;
 	
-	rule rl_fdp(tpl_4(ffI.first) == PFDP);
+	rule rl_fdp(tpl_4(ffI.first) == FMA_P);
 		fdp.compute.request.put((InputTwoPosit{posit_inp1 : tpl_1(ffI.first).P,posit_inp2 : tpl_2(ffI.first).P}));
-		opcode.enq(PFDP);
+		opcode.enq(FMA_P);
 		ffI.deq;
 	endrule
 	
@@ -89,7 +90,7 @@ module mkPositCore (PositCore_IFC);
 		let op = opcode.first;
 		FloatingPoint::Exception excep = FloatingPoint::Exception{invalid_op : False, divide_0: False, overflow: False, underflow: False, inexact : False};
 		//FloatU posit_out;
-		if(op == PFDP)
+		if(op == FMA_P)
 			begin
 				let a <- fdp.compute.response.get();
 				FloatU posit_out = tagged P 0;
