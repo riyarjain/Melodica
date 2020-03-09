@@ -85,9 +85,6 @@ module mkAdder (Adder_IFC );
 			zero_infinity_flag : zero_infinity_flag0,
 			carry_int_frac : sum_calc_unsigned };
 		fifo_stage1_reg.enq(stage1_regf);
-	`ifdef RANDOM_PRINT
-			$display("dIn.q2_nan_flag %b nan_flag %b",dIn.q2_nan_flag,fifo_stage0_reg.nan_flag);
-		`endif
 	endrule	
 
 	//STAGE 2 -- OUTPUT	
