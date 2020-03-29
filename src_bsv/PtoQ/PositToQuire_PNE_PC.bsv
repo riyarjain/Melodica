@@ -38,14 +38,14 @@ import PtoQ_Types	:: *;
 import Extracter_Types :: *;
 
 interface PositToQuire_PNE ;
-   interface Server #(Bit#(PositWidth),Bit#(0)) compute;
+   interface Server #(Output_posit,Bit#(0)) compute;
 endinterface
 
 module mkPositToQuire_PNE #(Reg #(Bit#(QuireWidth))  rg_quire)(PositToQuire_PNE);
 
 //FIFO #(Bit#(QuireWidth)) ffO <- mkFIFO;
 FIFOF #(Bit#(0)) ffO <- mkFIFOF;
-FIFO #(Bit#(PositWidth)) ffI <- mkFIFO;
+FIFO #(Output_posit) ffI <- mkFIFO;
 PositToQuire_IFC  positToquire <- mkPositToQuire;
 rule rl_in;
 	positToquire.inoutifc.request.put(ffI.first); 
@@ -53,8 +53,8 @@ rule rl_in;
 endrule
 
 rule rl_out;
-   let qToPOut <- positToquire.inoutifc.response.get ();
-	rg_quire <= qToPOut;
+   let ptoqOut <- positToquire.inoutifc.response.get ();
+	rg_quire <= ptoqOut;
    ffO.enq(?);
 endrule
 interface compute = toGPServer (ffI,ffO);

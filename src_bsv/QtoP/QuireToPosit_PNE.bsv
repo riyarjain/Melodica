@@ -48,6 +48,8 @@ module mkQuireToPosit_PNE(QuireToPosit_PNE);
 FIFO #(Bit#(QuireWidth)) ffI <- mkFIFO;
 FIFO #(Output_posit_n) ffO <- mkFIFO;
 QuireToPosit_IFC  quireToPosit1 <- mkQuireToPosit;
+Normalizer_IFC   normalizer <- mkNormalizer;
+
 rule rl_in;
 	let in_quire = ffI.first;
 	quireToPosit1.inoutifc.request.put(Quire{sign : msb(in_quire),
@@ -57,9 +59,14 @@ rule rl_in;
 	ffI.deq;
 endrule
 
-rule rl_out;
+rule rl_connect;
    let qToPOut <- quireToPosit1.inoutifc.response.get ();
-   ffO.enq(qToPOut);
+    normalizer.inoutifc.request.put (qToPOut);
+endrule
+
+rule rl_out;
+   let normOut <- normalizer.inoutifc.response.get ();
+   ffO.enq(normOut);
 endrule
 interface compute = toGPServer (ffI,ffO);
 endmodule

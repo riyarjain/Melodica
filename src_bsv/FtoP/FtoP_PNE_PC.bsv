@@ -40,13 +40,13 @@ import Normalizer_Types	:: *;
 import Normalizer	:: *;
 
 interface FtoP_PNE ;
-   interface Server #(Bit#(FloatWidth),Output_posit_n) compute;
+   interface Server #(Bit#(FloatWidth),Input_value_n) compute;
 endinterface
 
 module mkFtoP_PNE(FtoP_PNE);
 
 FIFO #(Bit#(FloatWidth)) ffI <- mkFIFO;
-FIFO #(Output_posit_n) ffO <- mkFIFO;
+FIFO #(Input_value_n) ffO <- mkFIFO;
 FtoP_IFC  fToP <- mkFtoP_Extracter;
 rule rl_in;
 	fToP.inoutifc.request.put(ffI.first); 

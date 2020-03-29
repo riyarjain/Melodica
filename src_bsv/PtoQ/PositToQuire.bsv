@@ -35,16 +35,14 @@ import ClientServer :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Extracter_Types	:: *;
-import Extracter	:: *;
 import PtoQ_Types	:: *;
 
 interface PositToQuire_IFC;
-   interface Server #(Bit#(PositWidth),Bit#(QuireWidth)) inoutifc;
+   interface Server #(Output_posit,Bit#(QuireWidth)) inoutifc;
 endinterface
 
 module mkPositToQuire (PositToQuire_IFC );
-	Extracter_IFC  extracter <- mkExtracter;
-	FIFOF #(Bit#(PositWidth) )   fifo_input_reg <- mkFIFOF;
+	FIFOF #(Output_posit )   fifo_input_reg <- mkFIFOF;
 	FIFOF #(Bit#(QuireWidth) )  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Output_posit )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Stage1_qp )  fifo_stage1_reg <- mkFIFOF;
@@ -61,16 +59,11 @@ module mkPositToQuire (PositToQuire_IFC );
 
 	// --------
         // Pipeline stages
-	// stage_0: INPUT STAGE: extract posits
-	rule stage_0;
-		let in_posit1 = Input_posit {posit_inp : fifo_input_reg.first};
-		fifo_input_reg.deq;
-   		extracter.inoutifc.request.put (in_posit1);
-	endrule
 	// stage_1: calculate integer part of quire
 	rule stage_1;
 		//dIn reads the values from pipeline register stored from previous stage
-		let extOut <- extracter.inoutifc.response.get();
+		let extOut = fifo_input_reg.first;
+		fifo_input_reg.deq;
 		//calculate integer from scale
 		let int_frac = calculate_frac_int({1'b1,extOut.frac},extOut.scale);
 		let stage1_reg = Stage1_qp{sign : extOut.sign,

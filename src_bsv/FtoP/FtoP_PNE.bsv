@@ -48,14 +48,21 @@ module mkFtoP_PNE(FtoP_PNE);
 FIFO #(Bit#(FloatWidth)) ffI <- mkFIFO;
 FIFO #(Output_posit_n) ffO <- mkFIFO;
 FtoP_IFC  fToP <- mkFtoP_Extracter;
+Normalizer_IFC   normalizer <- mkNormalizer;
+
 rule rl_in;
 	fToP.inoutifc.request.put(ffI.first); 
 	ffI.deq;
 endrule
 
-rule rl_out;
+rule rl_connect;
    let fToPOut <- fToP.inoutifc.response.get ();
-   ffO.enq(fToPOut);
+   normalizer.inoutifc.request.put (fToPOut);
+endrule
+
+rule rl_out;
+   let normOut <- normalizer.inoutifc.response.get ();
+   ffO.enq(normOut);
 endrule
 interface compute = toGPServer (ffI,ffO);
 endmodule

@@ -57,7 +57,10 @@ typedef struct {PositType zero_infinity_flag;
 //Output_posit is the data available at the end of second pipeline
 //Output_posit consists of zero flag, infinity flag, sign of posit, scale value, fraction value
 
-//module mkPipeline_reg #(Int#() n) (Empty);
+typedef struct {Output_posit posit_inp_e1;
+		Output_posit posit_inp_e2;
+		} InputTwoExtractPosit deriving(Bits,FShow);
+
 
 interface Extracter_IFC;
    interface Server #(Input_posit,Output_posit) inoutifc;

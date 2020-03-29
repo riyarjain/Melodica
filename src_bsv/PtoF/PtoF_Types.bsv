@@ -35,7 +35,7 @@ typedef struct {Bit#(1) sign;
 		Bit#(1) truncated_frac_zero;} Stage0_pf deriving(Bits,FShow);
 
 interface PtoF_IFC ;
-   interface Server #(Input_posit,Bit#(FloatWidth)) inoutifc;
+   interface Server #(Output_posit,Bit#(FloatWidth)) inoutifc;
 endinterface
 
 

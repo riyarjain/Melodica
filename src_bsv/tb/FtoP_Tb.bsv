@@ -100,8 +100,8 @@ endrule
 rule rlGenerate (!rgGenComplete && doneSet);
 `ifdef RANDOM
    // Drive input into DUT
-   let inPosit11 = 32'b00101000001010100101010011000000;
-   //let inPosit11 = lfsr1.value();
+   //let inPosit11 = 32'b00101000001010100101010011000000;
+   let inPosit11 = lfsr1.value();
    dut.compute.request.put (truncate (inPosit11));
 
    // Bookkeeping

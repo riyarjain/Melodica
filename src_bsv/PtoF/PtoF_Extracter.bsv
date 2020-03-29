@@ -34,27 +34,21 @@ import PtoF_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Extracter_Types	:: *;
-import Extracter ::*;
+
 
 module mkPtoF_Extracter (PtoF_IFC );
 
-	Extracter_IFC   extracter <- mkExtracter;
-	FIFOF #(Input_posit)   fifo_input_reg <- mkFIFOF;
+
+	FIFOF #(Output_posit)   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Stage0_pf )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Bit#(FloatWidth))  fifo_output_reg <- mkFIFOF;
 
 	// --------
         // Pipeline stages
-	// stage_0: INPUT STAGE - Extract Posit
-	rule stage_0;
-		//interpret the posit into its fields to convert it to float
-		extracter.inoutifc.request.put (fifo_input_reg.first);
-		fifo_input_reg.deq;
-	endrule
-
 	// stage_1: INPUT STAGE
 	rule stage_1;
-		let extOut <- extracter.inoutifc.response.get ();
+		let extOut = fifo_input_reg.first;
+		fifo_input_reg.deq;
 		//get extractor output
 		//calculate scale for posits and frac shift due to restrictions on scale sizes
 		match{.scale0, .frac_change0} = fv_calculate_scale_shift_pf(extOut.scale);

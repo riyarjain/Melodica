@@ -37,20 +37,28 @@ import Posit_User_Types :: *;
 import PtoF_Extracter ::*;
 import PtoF_Types	:: *;
 import Extracter_Types	:: *;
+import Extracter ::*;
 
 interface PtoF_PNE ;
    interface Server #(Bit#(PositWidth),Bit#(FloatWidth)) compute;
 endinterface
 
 module mkPtoF_PNE(PtoF_PNE);
-
+Extracter_IFC   extracter <- mkExtracter;
 FIFO #(Bit#(FloatWidth)) ffO <- mkFIFO;
 FIFO #(Bit#(PositWidth)) ffI <- mkFIFO;
 PtoF_IFC  ptoF <- mkPtoF_Extracter;
+
+//input the two posit values
 rule rl_in;
 	let in_posit1 = Input_posit {posit_inp : ffI.first};
-	ptoF.inoutifc.request.put(in_posit1); 
+   	extracter.inoutifc.request.put (in_posit1);
 	ffI.deq;
+endrule
+
+rule rl_connect0;
+   	let extOut1 <- extracter.inoutifc.response.get();
+	ptoF.inoutifc.request.put(extOut1); 
 endrule
 
 rule rl_out;

@@ -41,13 +41,12 @@ import QtoP_Types	:: *;
 
 
 interface QuireToPosit_IFC;
-   interface Server #(Quire,Output_posit_n) inoutifc;
+   interface Server #(Quire,Input_value_n) inoutifc;
 endinterface
 
 module mkQuireToPosit (QuireToPosit_IFC );
-	Normalizer_IFC   normalizer <- mkNormalizer;
 	FIFOF #(Quire )   fifo_input_reg <- mkFIFOF;
-	FIFOF #(Output_posit_n )  fifo_output_reg <- mkFIFOF;
+	FIFOF #(Input_value_n )  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Stage0_qp )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Input_value_n )  fifo_stage1_reg <- mkFIFOF;
 	Int#(ScaleWidthPlus1) maxB,minB;
@@ -171,7 +170,7 @@ module mkQuireToPosit (QuireToPosit_IFC );
 	rule stage_2;
 		//normalizes the posit field
 		let dIn = fifo_stage1_reg.first;  fifo_stage1_reg.deq;
-		normalizer.inoutifc.request.put (Input_value_n {
+		fifo_output_reg.enq(Input_value_n {
 		sign: dIn.sign,
 	 	zero_infinity_flag: dIn.zero_infinity_flag ,
 		nan_flag: dIn.nan_flag,
@@ -181,10 +180,7 @@ module mkQuireToPosit (QuireToPosit_IFC );
 		truncated_frac_zero : dIn.truncated_frac_zero});
 	endrule
 
-	rule rl_out;
-	   let normOut <- normalizer.inoutifc.response.get ();
-	   fifo_output_reg.enq(normOut);
-	endrule
+	
 
 
 interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);

@@ -47,33 +47,22 @@ import Multiplier_Types	:: *;
 import Multiplier	:: *;
 
 interface FDP_PNE_Quire ;
-   interface Server #(InputTwoPosit, Bit#(0)) compute;
+   interface Server #(InputTwoExtractPosit, Bit#(0)) compute;
 endinterface
 
 module mkFDP_PNE_Quire #(Reg #(Bit#(QuireWidth)) rg_quire)(FDP_PNE_Quire);
 
 //FIFO #(Bit#(QuireWidth)) ffO <- mkFIFO;
 FIFOF #(Bit#(0)) ffO <- mkFIFOF;
-FIFO #(InputTwoPosit) ffI <- mkFIFO;
+FIFO #(InputTwoExtractPosit) ffI <- mkFIFO;
 //FIFO #(Bit#(QuireWidth)) fftemp <- mkFIFO;
-Extracter_IFC  extracter1 <- mkExtracter;
-Extracter_IFC  extracter2 <- mkExtracter;
 Multiplier_IFC  multiplier <- mkMultiplier;
 Adder_IFC  adder <- mkAdder;
-//input the two posit values
-rule rl_in;
-	//let in_quire = ffI.first.quire_inp;
-	let in_posit1 = Input_posit {posit_inp : ffI.first.posit_inp1};
-   	extracter1.inoutifc.request.put (in_posit1);
-   	let in_posit2 = Input_posit {posit_inp : ffI.first.posit_inp2};
-   	extracter2.inoutifc.request.put (in_posit2);
-	//fftemp.enq(in_quire);
-	ffI.deq;
-endrule
+
 //get their extracted value and semd to multiply
 rule rl_connect0;
-   	let extOut1 <- extracter1.inoutifc.response.get();
-   	let extOut2 <- extracter2.inoutifc.response.get();
+   	let extOut1 = ffI.first.posit_inp_e1;
+   	let extOut2 = ffI.first.posit_inp_e2;
 	multiplier.inoutifc.request.put (Inputs_m {
 	sign1: extOut1.sign,
 	nanflag1: 1'b0,

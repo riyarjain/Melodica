@@ -3,7 +3,6 @@ package Testbench;
 import GetPut       :: *;
 import ClientServer :: *;
 
-import Utils ::*;
 import PositCore ::*;
 import Posit_Numeric_Types :: *;
 import FloatingPoint :: *;
@@ -11,7 +10,7 @@ import FloatingPoint :: *;
 (* synthesize *)
 module mkTestbench (Empty);
 
-	PositCore_IFC pc <- mkPositCore;
+	PositCore_IFC pc <- mkPositCore(0);
 	Reg #(Bit #(5)) rg_y <- mkReg (0);
 	rule rl_gen;
 		FloatingPoint::RoundMode round_mode = Rnd_Nearest_Even;

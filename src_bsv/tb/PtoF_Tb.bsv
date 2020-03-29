@@ -49,7 +49,7 @@ endinterface
 `endif
 
 `ifdef RANDOM
-typedef 1000 Num_Tests;    // Number of random tests to be run
+typedef 100 Num_Tests;    // Number of random tests to be run
 `endif
 
 typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE

@@ -7,6 +7,9 @@ import GetPut       :: *;
 import ClientServer :: *;
 
 // Project imports
+import Extracter :: *;
+import Normalizer :: *;
+import Extracter_Types :: *;
 import Normalizer_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
@@ -53,70 +56,99 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	FtoP_PNE            ftop            <- mkFtoP_PNE;	
 	PtoF_PNE            ptof            <- mkPtoF_PNE;	
 
-	FIFO #(PositCmds) opcode <- mkFIFO;
+	Extracter_IFC  extracter1 <- mkExtracter;
+	Extracter_IFC  extracter2 <- mkExtracter;
+	Normalizer_IFC   normalizer <- mkNormalizer;
 
+	FIFO #(PositCmds) opcode <- mkFIFO;
+	FIFO #(PositCmds) opcode_in <- mkFIFO;
+	FIFO #(PositCmds) opcode_out <- mkFIFO;
 	FIFO #(Posit_Req) ffI <- mkFIFO;
 	FIFO #(Fpu_Rsp) ffO <- mkFIFO;
+	FIFO #(Bit#(FloatWidth)) ffI_f <- mkFIFO;
 	
-	rule rl_fdp(tpl_4(ffI.first) == FMA_P);
-		fdp.compute.request.put((InputTwoPosit{posit_inp1 : tpl_1(ffI.first).P,posit_inp2 : tpl_2(ffI.first).P}));
-		opcode.enq(tpl_4(ffI.first));
-		ffI.deq;
-                if (verbosity > 1)
-                   $display (  "%0d: %m: rl_fdp: "
+	rule extract_in;
+		if(tpl_4(ffI.first) == FCVT_P_S)
+			begin
+				let a = tpl_1(ffI.first).S;
+				ffI_f.enq({pack(a.sign),a.exp,a.sfd});
+			end
+		else if(tpl_4(ffI.first) == FMA_P)
+			begin
+				let in_posit1 = Input_posit {posit_inp : tpl_1(ffI.first).P};
+			   	extracter1.inoutifc.request.put (in_posit1);
+			   	let in_posit2 = Input_posit {posit_inp : tpl_2(ffI.first).P};
+			   	extracter2.inoutifc.request.put (in_posit2);
+			end
+		else if(tpl_4(ffI.first) == FCVT_S_P || tpl_4(ffI.first) == FCVT_R_P)
+			begin
+				let in_posit1 = Input_posit {posit_inp : tpl_1(ffI.first).P};
+			   	extracter1.inoutifc.request.put (in_posit1);
+			end
+		opcode_in.enq(tpl_4(ffI.first));
+		
+		if (verbosity > 1)
+                   $display (  "%0d: %m: rl_in: "
                              , cur_cycle
                              , fshow (tpl_4(ffI.first))
                              , fshow (tpl_1(ffI.first).P)
                              , fshow (tpl_2(ffI.first).P));
-	endrule
-	
-	rule rl_ptof(tpl_4(ffI.first) == FCVT_S_P);
-		ptof.compute.request.put(tpl_1(ffI.first).P);
-		opcode.enq(tpl_4(ffI.first));
 		ffI.deq;
-                if (verbosity > 1)
-                   $display (  "%0d: %m: rl_ptof: "
-                             , cur_cycle
-                             , fshow (tpl_4(ffI.first))
-                             , fshow (tpl_1(ffI.first).P));
 	endrule
 
-	rule rl_ftop(tpl_4(ffI.first) == FCVT_P_S);
-		let a = tpl_1(ffI.first).S;
-		Bit#(FloatWidth) f = {pack(a.sign),a.exp,a.sfd};
-		ftop.compute.request.put(f);
-		opcode.enq(tpl_4(ffI.first));
-		ffI.deq;
-                if (verbosity > 1)
-                   $display (  "%0d: %m: rl_ftop: "
-                             , cur_cycle
-                             , fshow (tpl_4(ffI.first))
-                             , fshow (f));
-	endrule
-
-	rule rl_ptoq(tpl_4(ffI.first) == FCVT_R_P);
-		ptoq.compute.request.put(tpl_1(ffI.first).P);
-		opcode.enq(tpl_4(ffI.first));
-		ffI.deq;
-                if (verbosity > 1)
-                   $display (  "%0d: %m: rl_ptoq: "
-                             , cur_cycle
-                             , fshow (tpl_4(ffI.first))
-                             , fshow (tpl_1(ffI.first).P));
+	rule rl_fdp(opcode_in.first == FMA_P);
+		let extOut1 <- extracter1.inoutifc.response.get();
+	   	let extOut2 <- extracter2.inoutifc.response.get();
+		fdp.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
+		opcode.enq(opcode_in.first);
+		opcode_in.deq;
+                
 	endrule
 	
-	rule rl_qtop(tpl_4(ffI.first) == FCVT_P_R);
+	rule rl_ptof(opcode_in.first == FCVT_S_P);
+		let extOut1 <- extracter1.inoutifc.response.get();
+		ptof.compute.request.put(extOut1);
+		opcode.enq(opcode_in.first);
+		opcode_in.deq;
+	endrule
+
+	rule rl_ftop(opcode_in.first == FCVT_P_S);
+		ftop.compute.request.put(ffI_f.first);
+		opcode.enq(opcode_in.first);
+		opcode_in.deq;
+		ffI_f.deq;
+	endrule
+
+	rule rl_ptoq(opcode_in.first == FCVT_R_P);
+		let extOut1 <- extracter1.inoutifc.response.get();
+		ptoq.compute.request.put(extOut1);
+		opcode.enq(opcode_in.first);
+		opcode_in.deq;
+	endrule
+	
+	rule rl_qtop(opcode_in.first == FCVT_P_R);
 		qtop.compute.request.put(?);
-		opcode.enq(tpl_4(ffI.first));
-		ffI.deq;
-                if (verbosity > 1)
-                   $display (  "%0d: %m: rl_qtop: "
-                             , cur_cycle
-                             , fshow (tpl_4(ffI.first)));
+		opcode.enq(opcode_in.first);
+		opcode_in.deq;
 	endrule
 
-	rule rl_out;
-		let op = opcode.first; opcode.deq;
+	rule rl_out1;
+		let op = opcode.first;
+		opcode_out.enq(op);
+		opcode.deq;
+		if(op == FCVT_P_S || op ==  FCVT_P_R)
+			begin
+				let out_pf <- ftop.compute.response.get();
+				normalizer.inoutifc.request.put (out_pf);				
+			end
+		else 
+                   $display (  "%0d: %m: rl_out: no normalisation required", cur_cycle, fshow(op));
+	
+                if (verbosity > 1)
+                   $display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
+	endrule
+	rule rl_out2;
+		let op = opcode_out.first; opcode_out.deq;
 		let excep = FloatingPoint::Exception{invalid_op : False, divide_0: False, overflow: False, underflow: False, inexact : False};
 		//FloatU posit_out;
 		if(op == FMA_P)
@@ -140,7 +172,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 			end
 		else if(op == FCVT_P_S)
 			begin
-				let out_pf <- ftop.compute.response.get();
+				let out_pf <- normalizer.inoutifc.response.get ();
 				excep.invalid_op = out_pf.nan_flag == 1'b1;
 				excep.overflow = out_pf.zero_infinity_flag == INF;
 				excep.underflow = out_pf.zero_infinity_flag == ZERO && out_pf.rounding;
@@ -150,7 +182,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 			end
 		else if(op == FCVT_P_R)
 			begin
-				let out_pf <- qtop.compute.response.get();
+				let out_pf <- normalizer.inoutifc.response.get ();
 				excep.invalid_op = out_pf.nan_flag == 1'b1;
 				excep.overflow = out_pf.zero_infinity_flag == INF;
 				excep.underflow = out_pf.zero_infinity_flag == ZERO && out_pf.rounding;
@@ -164,6 +196,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
                 if (verbosity > 1)
                    $display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
 	endrule
+
 interface server_core = toGPServer (ffI,ffO);
 
 endmodule

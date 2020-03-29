@@ -42,7 +42,7 @@
 # sizes.  The basic sizes are provided on the command line.
 #
 # --help will remind you of the command-line arguments.
-#COMMAND:::: ./Gen_Posit_Numeric_Types --posit-width 32 --exp-width 5 --float-width 32
+#COMMAND:::: ./Gen_Posit_Numeric_Types --posit-width 32 --exp-width 2 --float-width 32
 # ================================================================
 
 import argparse

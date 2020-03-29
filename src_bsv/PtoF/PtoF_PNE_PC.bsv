@@ -39,17 +39,16 @@ import PtoF_Types	:: *;
 import Extracter_Types	:: *;
 
 interface PtoF_PNE ;
-   interface Server #(Bit#(PositWidth),Bit#(FloatWidth)) compute;
+   interface Server #(Output_posit,Bit#(FloatWidth)) compute;
 endinterface
 
 module mkPtoF_PNE(PtoF_PNE);
 
 FIFO #(Bit#(FloatWidth)) ffO <- mkFIFO;
-FIFO #(Bit#(PositWidth)) ffI <- mkFIFO;
+FIFO #(Output_posit) ffI <- mkFIFO;
 PtoF_IFC  ptoF <- mkPtoF_Extracter;
 rule rl_in;
-	let in_posit1 = Input_posit {posit_inp : ffI.first};
-	ptoF.inoutifc.request.put(in_posit1); 
+	ptoF.inoutifc.request.put(ffI.first); 
 	ffI.deq;
 endrule
 

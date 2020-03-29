@@ -40,14 +40,14 @@ import Normalizer_Types	:: *;
 import Normalizer	:: *;
 
 interface QuireToPosit_PNE ;
-   interface Server #(Bit#(0),Output_posit_n) compute;
+   interface Server #(Bit#(0),Input_value_n) compute;
 endinterface
 
 module mkQuireToPosit_PNE #(Reg #(Bit#(QuireWidth)) rg_quire)(QuireToPosit_PNE);
 
 //FIFO #(Bit#(QuireWidth)) ffI <- mkFIFO;
 FIFOF #(Bit#(0)) ffI <- mkFIFOF;
-FIFO #(Output_posit_n) ffO <- mkFIFO;
+FIFO #(Input_value_n) ffO <- mkFIFO;
 QuireToPosit_IFC  quireToPosit1 <- mkQuireToPosit;
 rule rl_in;
 	let in_quire = rg_quire;
