@@ -1,0 +1,6 @@
+The design expect a package called Posit_User_Types. Since users may require
+different N,es combinations, create a soft-link the the
+appropriate Posit_Numeric_Types files. For example, to use 32,2
+do:
+
+ln -s Posit_Numeric_Types.32.2.bsv Posit_Numeric_Types.bsv
