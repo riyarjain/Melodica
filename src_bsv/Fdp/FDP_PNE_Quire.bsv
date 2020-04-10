@@ -41,10 +41,10 @@ import Extracter_Types	:: *;
 import Extracter	:: *;
 import Normalizer_Types	:: *;
 import Normalizer	:: *;
-import Adder_Types 	:: *;
-import Adder		:: *;
-import Multiplier_Types	:: *;
-import Multiplier	:: *;
+import Adder_Types_fdp 	:: *;
+import Adder_fdp		:: *;
+import Multiplier_Types_fdp	:: *;
+import Multiplier_fdp	:: *;
 
 interface FDP_PNE_Quire ;
    interface Server #(InputQuireTwoPosit,Bit#(QuireWidth)) compute;

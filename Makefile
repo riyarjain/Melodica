@@ -23,7 +23,7 @@ ptof: compile_ptof link_ptof link_ptof_d
 #			 -D FPGA \
 # Random or exhaustive testbench. Comment following line for exhaustive
 BSC_COMPILATION_FLAGS += \
-#		 -D RANDOM
+		 -D RANDOM
 #		 -D RANDOM_PRINT
 OBJ = .o
 

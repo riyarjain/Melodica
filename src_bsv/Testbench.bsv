@@ -26,6 +26,7 @@ module mkTestbench (Empty);
 	   rule rl_drain(rg_y < 7);
 	      let z <- pc.server_core.response.get ();
 		$display("out %b exception %b",tpl_1(z).P,tpl_2(z));
+		$finish;
 	   endrule
 
 endmodule

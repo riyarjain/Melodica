@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package Multiplier;
+package Multiplier_fdp;
 
 // --------------------------------------------------------------
 // This package defines:
@@ -30,7 +30,7 @@ import FIFOF        :: *;
 import GetPut       :: *;
 import ClientServer :: *;
 
-import Multiplier_Types :: *;
+import Multiplier_Types_fdp :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 
@@ -176,6 +176,6 @@ module mkMultiplier (Multiplier_IFC );
 interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
 endmodule
 
-endpackage: Multiplier
+endpackage: Multiplier_fdp
 
 

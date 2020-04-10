@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package Adder;
+package Adder_fdp;
 
 // --------------------------------------------------------------
 // This package defines:
@@ -31,10 +31,10 @@ import FIFOF        :: *;
 import GetPut       :: *;
 import ClientServer :: *;
 
-import Adder_Types :: *;
+import Adder_Types_fdp :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
-import Multiplier_Types ::*;
+import Multiplier_Types_fdp ::*;
 module mkAdder (Adder_IFC );
 	FIFOF #(Inputs_a )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Quire )  fifo_stage1_reg <- mkFIFOF;
@@ -100,5 +100,5 @@ module mkAdder (Adder_IFC );
  interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
 endmodule
 
-endpackage: Adder
+endpackage: Adder_fdp
 

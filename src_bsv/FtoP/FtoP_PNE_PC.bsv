@@ -37,7 +37,6 @@ import Posit_User_Types :: *;
 import FtoP_Extracter ::*;
 import FtoP_Types	:: *;
 import Normalizer_Types	:: *;
-import Normalizer	:: *;
 
 interface FtoP_PNE ;
    interface Server #(Bit#(FloatWidth),Input_value_n) compute;

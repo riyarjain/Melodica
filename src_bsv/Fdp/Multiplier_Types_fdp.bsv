@@ -18,27 +18,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package Adder_Types;
+package Multiplier_Types_fdp;
 
 import GetPut       :: *;
 import ClientServer :: *;
 import FShow :: *;
 import Posit_User_Types :: *;
 import Posit_Numeric_Types :: *;
-import Multiplier_Types ::*;
-typedef struct {Quire q1;
-		Outputs_m q2;} Inputs_a deriving(Bits,FShow);
+typedef struct {Bit#(1) sign1;
+		Bit#(1) nanflag1;
+		PositType zero_infinity_flag1;
+		Int#(ScaleWidthPlus1 ) scale1;
+		Bit#(FracWidth ) frac1;
+		Bit#(1) sign2;
+		Bit#(1) nanflag2;
+		PositType zero_infinity_flag2;
+		Int#(ScaleWidthPlus1 ) scale2;
+		Bit#(FracWidth ) frac2;} Inputs_m deriving(Bits,FShow);
 //Input_posit is the data received from user
+//Input_posit consists of zero flag, infinity flag, sign of posit, scale , fraction for 2 inputs
 
-typedef struct {Int#(QuireWidth) sum_calc;
-		Bit#(1) q2_truncated_frac_zero;
-		Bit#(1) q2_truncated_frac_notzero;
-		PositType q1_zero_infinity_flag;
-		PositType q2_zero_infinity_flag;
-		Bit#(1) q2_nan_flag;} Stage0_a deriving(Bits,FShow);
+typedef struct {Bit#(1) nan_flag;
+		PositType ziflag;
+		Bit#(1) sign;
+		Int#(ScaleWidthPlus2) scale;
+		Bit#(FracWidthPlus1Mul2) frac;} Stage0_m deriving(Bits,FShow);
 
-interface Adder_IFC ;
-   interface Server #(Inputs_a,Bit#(QuireWidth)) inoutifc;
+typedef struct {PositType zero_infinity_flag;
+		Bit#(1) nan_flag;
+		Int#(QuireWidth) quire_mul;
+		Bit#(1) truncated_frac_msb;
+		Bit#(1) truncated_frac_zero;
+		} Outputs_m deriving(Bits,FShow);
+//Output_posit is the data available at the end of second pipeline
+//Output_posit consists of zero flag, infinity flag, sign of posit, scale value, fraction value
+
+interface Multiplier_IFC;
+   interface Server #(Inputs_m,Outputs_m) inoutifc;
 endinterface
 
-endpackage: Adder_Types
+endpackage: Multiplier_Types_fdp
