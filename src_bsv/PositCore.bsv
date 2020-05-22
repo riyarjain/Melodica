@@ -1,4 +1,4 @@
-//FDP PtoQ QtoP FtoP PtoF
+//FMA PtoQ QtoP FtoP PtoF
 package PositCore;
 
 // Library imports
@@ -14,7 +14,7 @@ import Extracter_Types :: *;
 import Normalizer_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
-import FDP_PNE_Quire_PC :: *;
+import FMA_PNE_Quire_PC :: *;
 import FtoP_PNE_PC :: *;
 import PtoF_PNE_PC :: *;
 import PositToQuire_PNE_PC :: *;
@@ -51,7 +51,7 @@ endinterface
 module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 
 	Reg #(Bit#(QuireWidth))  rg_quire   <- mkReg(0);
-	FDP_PNE_Quire       fdp             <- mkFDP_PNE_Quire(rg_quire);	
+	FMA_PNE_Quire       fma             <- mkFMA_PNE_Quire(rg_quire);	
 	PositToQuire_PNE    ptoq            <- mkPositToQuire_PNE(rg_quire);
 	QuireToPosit_PNE    qtop            <- mkQuireToPosit_PNE(rg_quire);	
 	FtoP_PNE            ftop            <- mkFtoP_PNE;	
@@ -97,10 +97,10 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		ffI.deq;
 	endrule
 
-	rule rl_fdp(opcode_in.first == FMA_P);
+	rule rl_fma(opcode_in.first == FMA_P);
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
-		fdp.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
+		fma.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
                 
@@ -154,7 +154,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		//FloatU posit_out;
 		if(op == FMA_P)
 			begin
-				let a <- fdp.compute.response.get();
+				let a <- fma.compute.response.get();
 				FloatU posit_out = tagged P 0;
 				ffO.enq(tuple2(posit_out,excep));
 			end

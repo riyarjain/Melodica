@@ -6,7 +6,7 @@ default: full_clean compile link simulate
 .PHONY: compile
 compile:
 	@echo Compiling...
-	bsc -u -sim -simdir build -bdir build -info-dir build -keep-fires -aggressive-conditions -p .:%/Prelude:%/Libraries:%/Libraries/BlueNoC:./common:./Fdp:./lib:./FtoP:./QtoP:./PtoF:./PtoQ:./Adder:./Multiplier -g mkTestbench  Testbench.bsv 
+	bsc -u -sim -simdir build -bdir build -info-dir build -keep-fires -aggressive-conditions -p .:%/Prelude:%/Libraries:%/Libraries/BlueNoC:./common:./Fused_Op:./lib:./FtoP:./QtoP:./PtoF:./PtoQ:./Adder:./Multiplier -g mkTestbench  Testbench.bsv 
 	@echo Compilation finished
 
 .PHONY: link

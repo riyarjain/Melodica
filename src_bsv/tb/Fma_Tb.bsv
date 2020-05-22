@@ -1,7 +1,7 @@
 // HPC Lab, Department of Electrical Engineering, IIT Bombay
 //make compile link link_d
 //./out_d
-package Fdp_Tb;
+package Fma_Tb;
 
 // -----------------------------------------------------------------
 // This package defines:
@@ -20,9 +20,9 @@ import LFSR             :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
-import FDP_PNE_Quire ::*;
-import "BDPI" fdpAdd161 = function Bit#(QuireWidthBy2) checkoperation1 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
-import "BDPI" fdpAdd162 = function Bit#(QuireWidthBy2) checkoperation2 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
+import FMA_PNE_Quire ::*;
+import "BDPI" fmaAdd161 = function Bit#(QuireWidthBy2) checkoperation1 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
+import "BDPI" fmaAdd162 = function Bit#(QuireWidthBy2) checkoperation2 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
 `ifdef FPGA
 interface FpgaLedIfc;
 (* always_ready *)
@@ -88,7 +88,7 @@ Reg   #(Bit #(PositWidth))   rgCurOutput2    <- mkReg (0);
 Reg   #(Bool)                 rgChkComplete  <- mkReg (False);
 Reg   #(Bool)                 rgError        <- mkReg (False);
 
-FDP_PNE_Quire            dut            <- mkFDP_PNE_Quire_test;	
+FMA_PNE_Quire            dut            <- mkFMA_PNE_Quire_test;	
 Reg #(Bool) doneSet <-mkReg(False);
 // -----------------------------------------------------------------
 

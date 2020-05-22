@@ -2,10 +2,10 @@
 One-time setup for configuring the environment:
 
 1. Melodica is generic in terms of size of posits so one has to run 
-./Gen_Posit_Numeric_Types --posit-width 8 --exp-width 5
+./Gen_Posit_Numeric_Types --posit-width 8 --exp-width 5 --float-width 32
 which is available in ./src_bsv/lib/
 This will make generate the types package Posit_Numeric_Types.bsv (in this
-example for a 8,5 posit). This package contains type definitions for the
+example for a 8,5 posit and floating point value 32). This package contains type definitions for the
 various Posit sub-fields based on Posit parameter
 
 2. Melodica Uses SoftPosit to compare and check the answers
@@ -75,22 +75,51 @@ Building Instructions:
 	(the output file is out_mac which is in builds/Mac/output directory )
 	(the verilog code generated is in VerilogCode/Mac directory)
 
-	For Fused-dot-product 
+	For Fused-multiply-add 
 	Takes 2 Posits and Quire as input and gives Quire as output
 	Qutput Quire is computed by multiplying the two posits abd accumulating it into the quire 
-	To compile Fdp
-		command : make compile_fdp
-	To link Fdp files and also with softposit
-		command : make link_fdp link_fdp_d
-	To compile and link Fdp
-		command : make fdp
-	To simulate Fdp
-		command : make simulate_fdp
-	(the files build are in builds/Fdp)
-	(the output file is out_fdp which is in builds/Fdp/output directory )
-	(the verilog code generated is in VerilogCode/Fdp directory)
+	To compile Fma
+		command : make compile_fma
+	To link Fma files and also with softposit
+		command : make link_fma link_fma_d
+	To compile and link Fma
+		command : make fma
+	To simulate Fma
+		command : make simulate_fma
+	(the files build are in builds/Fused_Op/fma)
+	(the output file is out_fma which is in builds/Fused_Op/fma/output directory )
+	(the verilog code generated is in VerilogCode/Fused_Op/fma directory)
 
 	For Quire-To-Posit 
+	Takes Quire as input and gives Posit as output
+	To compile QtoP
+		command : make compile_qtop
+	To link QtoP files and also with softposit
+		command : make link_qtop link_qtop_d
+	To compile and link QtoP
+		command : make qtop
+	To simulate QtoP
+		command : make simulate_qtop
+	(the files build are in builds/QtoP)
+	(the output file is out_qtop which is in builds/QtoP/output directory )
+	(the verilog code generated is in VerilogCode/QtoP directory)
+
+
+	For Posit-To-Quire
+	Takes Posit as input and gives Quire as output 
+	To compile PtoQ
+		command : make compile_ptoq
+	To link PtoQ files and also with softposit
+		command : make link_ptoq link_ptoq_d
+	To compile and link PtoQ
+		command : make ptoq
+	To simulate PtoQ
+		command : make simulate_ptoq
+	(the files build are in builds/PtoQ)
+	(the output file is out_ptoq which is in builds/PtoQ/output directory )
+	(the verilog code generated is in VerilogCode/PtoQ directory)
+
+For Quire-To-Posit 
 	Takes Quire as input and gives Posit as output
 	To compile QtoP
 		command : make compile_qtop

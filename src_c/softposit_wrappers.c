@@ -154,7 +154,7 @@ unsigned int Posit32Tofloat(unsigned int a)
 	
 }
 
-unsigned long long fdpAdd161(unsigned long long a,unsigned long long b,unsigned int c, unsigned int d)
+unsigned long long fmaAdd161(unsigned long long a,unsigned long long b,unsigned int c, unsigned int d)
 {
 	posit16_t x,y;
 	x = castP16(c);
@@ -166,7 +166,7 @@ unsigned long long fdpAdd161(unsigned long long a,unsigned long long b,unsigned 
 	return qZ.v[0];
 }
 
-unsigned long long fdpAdd162(unsigned long long a,unsigned long long b,unsigned int c, unsigned int d)
+unsigned long long fmaAdd162(unsigned long long a,unsigned long long b,unsigned int c, unsigned int d)
 {
 	//c*d+(a,b)
 	posit16_t x,y;
@@ -178,7 +178,7 @@ unsigned long long fdpAdd162(unsigned long long a,unsigned long long b,unsigned 
 	qZ = q16_fdp_add(qZ, x, y);
 	return qZ.v[1];
 }
-unsigned long long fdpAdd8(unsigned long long a,unsigned char c, unsigned char d)
+unsigned long long fmaAdd8(unsigned long long a,unsigned char c, unsigned char d)
 {
 	//c*d+(a,b)
 	posit8_t x,y,z;
