@@ -166,7 +166,7 @@ vim Add_Tb.bsv
 #change positAdd8 to positAdd16
 #in Add_Tb.bsv
 cd ../..
-#added -v in compile and link 
+#added -v in compile and link of adder in Makefile
 make adder simulate_adder 
 
 Compiling...
