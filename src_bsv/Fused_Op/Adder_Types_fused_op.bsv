@@ -25,9 +25,10 @@ import ClientServer :: *;
 import FShow :: *;
 import Posit_User_Types :: *;
 import Posit_Numeric_Types :: *;
-import Multiplier_Types_fma ::*;
+import Common_Fused_Op :: *;
+
 typedef struct {Quire q1;
-		Outputs_m q2;} Inputs_a deriving(Bits,FShow);
+		Outputs_md q2;} Inputs_a deriving(Bits,FShow);
 //Input_posit is the data received from user
 
 typedef struct {Int#(QuireWidth) sum_calc;

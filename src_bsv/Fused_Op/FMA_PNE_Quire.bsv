@@ -45,6 +45,7 @@ import Adder_Types_fused_op 	:: *;
 import Adder_fused_op		:: *;
 import Multiplier_Types_fma	:: *;
 import Multiplier_fma	:: *;
+import Common_Fused_Op :: *;
 
 interface FMA_PNE_Quire ;
    interface Server #(InputQuireTwoPosit,Bit#(QuireWidth)) compute;
@@ -73,7 +74,7 @@ endrule
 rule rl_connect0;
    	let extOut1 <- extracter1.inoutifc.response.get();
    	let extOut2 <- extracter2.inoutifc.response.get();
-	multiplier.inoutifc.request.put (Inputs_m {
+	multiplier.inoutifc.request.put (Inputs_md {
 	sign1: extOut1.sign,
 	nanflag1: 1'b0,
  	zero_infinity_flag1: extOut1.zero_infinity_flag ,

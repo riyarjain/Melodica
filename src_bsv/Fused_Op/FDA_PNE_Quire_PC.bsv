@@ -43,6 +43,7 @@ import Adder_Types_fused_op 	:: *;
 import Adder_fused_op	:: *;
 import Divider_Types_fda	:: *;
 import Divider_fda	:: *;
+import Common_Fused_Op :: *;
 
 interface FDA_PNE_Quire ;
    interface Server #(InputTwoExtractPosit, Bit#(0)) compute;
@@ -61,7 +62,7 @@ Adder_IFC  adder <- mkAdder;
 rule rl_connect0;
    	let extOut1 = ffI.first.posit_inp_e1;
    	let extOut2 = ffI.first.posit_inp_e2;
-	divider.inoutifc.request.put (Inputs_m {
+	divider.inoutifc.request.put (Inputs_md {
 	sign1: extOut1.sign,
 	nanflag1: 1'b0,
  	zero_infinity_flag1: extOut1.zero_infinity_flag ,

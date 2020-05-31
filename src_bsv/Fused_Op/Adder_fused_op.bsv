@@ -35,6 +35,8 @@ import Adder_Types_fused_op :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Multiplier_Types_fma ::*;
+import Common_Fused_Op :: *;
+
 module mkAdder (Adder_IFC );
 	FIFOF #(Inputs_a )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Quire )  fifo_stage1_reg <- mkFIFOF;
@@ -49,7 +51,7 @@ module mkAdder (Adder_IFC );
 		//dIn reads the values from input pipeline register 
       		let dIn = fifo_input_reg.first;  fifo_input_reg.deq;
 		// now we have do signed sum of the values since the numbers are basiclly integer.fractions
-		Int#(QuireWidth) sum_calc = boundedPlus(unpack({dIn.q1.sign,dIn.q1.carry_int_frac}),dIn.q2.quire_mul);
+		Int#(QuireWidth) sum_calc = boundedPlus(unpack({dIn.q1.sign,dIn.q1.carry_int_frac}),dIn.q2.quire_md);
 		//to see if 
                 let stage0_regf = Stage0_a {
 			sum_calc : sum_calc,
@@ -60,8 +62,8 @@ module mkAdder (Adder_IFC );
 			q2_nan_flag : dIn.q2.nan_flag};
 		 fifo_stage0_reg.enq(stage0_regf);
 		`ifdef RANDOM_PRINT
-			$display("dIn.q1.sign %h dIn.q1.carry_int_frac %h",dIn.q1.sign,dIn.q1.carry_int_frac);
-			$display("dIn.q2.quire_mul %h",dIn.q2.quire_mul);
+			$display("dIn.q1.sign %b dIn.q1.carry_int_frac %b",dIn.q1.sign,dIn.q1.carry_int_frac);
+			$display("dIn.q2.quire_md %b",dIn.q2.quire_md);
 		`endif
 		
    	endrule

@@ -161,6 +161,11 @@ module mkExtracter (Extracter_IFC );
 			//carrying fraction bits fordward
 			frac : dIn.zero_infinity_flag == ZERO? unpack(fromInteger(0)):dIn.frac};
 		fifo_output_reg.enq(output_regf);
+		`ifdef RANDOM_PRINT
+			$display("zero_infinity_flag %b",output_regf.zero_infinity_flag);
+			$display("sign %b",dIn.sign);
+			$display("scale %b frac %b",output_regf.scale,output_regf.frac);
+		`endif
 	endrule	
 	
         interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);

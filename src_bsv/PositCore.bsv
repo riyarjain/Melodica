@@ -20,7 +20,7 @@ import PtoF_PNE_PC :: *;
 import PositToQuire_PNE_PC :: *;
 import QuireToPosit_PNE_PC :: *;
 import FloatingPoint :: *;
-import Cur_Cycle  :: *;
+import Utils  :: *;
 
 `ifdef QUILLS
 import FPU_Types :: *;

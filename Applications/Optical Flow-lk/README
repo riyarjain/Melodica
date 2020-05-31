@@ -1,0 +1,35 @@
+To compile:
+
+gcc -o double_out lucaskanaded.c
+./double_out
+gcc -o float_out lucaskanadef.c
+./float_out
+gcc -o posit_out_f32q24 lucaskanade_f32q24.c ../../SoftPosit/build/Linux-x86_64-GCC/softposit.a  -I../../SoftPosit/source/include -lm
+./posit_out_f32q24
+gcc -o posit_out_f32q32 lucaskanade_f32q32.c ../../SoftPosit/build/Linux-x86_64-GCC/softposit.a  -I../../SoftPosit/source/include -lm
+./posit_out_f32q32
+gcc -o posit_out_f32q16 lucaskanade_f32q16.c ../../SoftPosit/build/Linux-x86_64-GCC/softposit.a  -I../../SoftPosit/source/include -lm
+./posit_out_f32q16
+gcc -o posit_out_p24q24 lucaskanade_p24q24.c ../../SoftPosit/build/Linux-x86_64-GCC/softposit.a  -I../../SoftPosit/source/include -lm
+./posit_out_p24q24
+gcc -o posit_out_p32q32 lucaskanade_p32q32.c ../../SoftPosit/build/Linux-x86_64-GCC/softposit.a  -I../../SoftPosit/source/include -lm
+./posit_out_p32q32
+gcc -o posit_out_p16q16 lucaskanade_p16q16.c ../../SoftPosit/build/Linux-x86_64-GCC/softposit.a  -I../../SoftPosit/source/include -lm
+./posit_out_p16q16
+
+
+For sphere use img_sphere.txt in *.c files 
+For Rubik's use img_rubik.txt in *.c files 
+1st number denotes the width (in pixels), 2nd number denotes the height (in pixels), 3rd number denotes the number of images appended one after the other.
+
+the dx,dy are produced as output files generated.
+
+for normalised values, make global variable normalise = 1 
+
+The configurations that are being compared are:
+i) 32-bit singleprecision floating-point arithmetic ::: lucaskanadef.c
+ii) 32-bit singleprecision float arithmetic combined with N-bit quire arithmetic ::: lucaskanade_f32qN.c , where N = 16, 24, 32
+iii) N-bit posit arithmetic and N-bit quire arithmetic ::: lucaskanade_pNqN.c , where N = 16, 24, 32
+
+if one wants more input data, use the .bmp files available in lkt-python/data and further use bmp-to-txt.c to convert it to C
+

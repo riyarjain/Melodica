@@ -18,43 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package Divider_Types_fma;
+package Divider_Types_fda;
 
 import GetPut       :: *;
 import ClientServer :: *;
 import FShow :: *;
 import Posit_User_Types :: *;
 import Posit_Numeric_Types :: *;
-
-typedef struct {Bit#(1) sign1;
-		Bit#(1) nanflag1;
-		PositType zero_infinity_flag1;
-		Int#(ScaleWidthPlus1 ) scale1;
-		Bit#(FracWidth ) frac1;
-		Bit#(1) sign2;
-		Bit#(1) nanflag2;
-		PositType zero_infinity_flag2;
-		Int#(ScaleWidthPlus1 ) scale2;
-		Bit#(FracWidth ) frac2;} Inputs_d deriving(Bits,FShow);
-//Input_posit is the data received from user
-//Input_posit consists of zero flag, infinity flag, sign of posit, scale , fraction for 2 inputs
+import Common_Fused_Op :: *;
 
 typedef struct {Bit#(1) nan_flag;
 		PositType ziflag;
 		Bit#(1) sign;
 		Int#(ScaleWidthPlus2) scale;} Stage0_d deriving(Bits,FShow);
 
-typedef struct {PositType zero_infinity_flag;
-		Bit#(1) nan_flag;
-		Int#(QuireWidth) quire_mul;
-		Bit#(1) truncated_frac_msb;
-		Bit#(1) truncated_frac_zero;
-		} Outputs_d deriving(Bits,FShow);
 //Output_posit is the data available at the end of second pipeline
 //Output_posit consists of zero flag, infinity flag, sign of posit, scale value, fraction value
 
 interface Divider_IFC;
-   interface Server #(Inputs_d,Outputs_d) inoutifc;
+   interface Server #(Inputs_md,Outputs_md) inoutifc;
 endinterface
 
-endpackage: Divider_Types_fma
+endpackage: Divider_Types_fda

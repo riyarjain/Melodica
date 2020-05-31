@@ -66,6 +66,33 @@ unsigned int positMul32(unsigned int a, unsigned int b)
 	
 }
 
+unsigned char positDiv8(unsigned char a, unsigned char b)
+{
+	posit8_t x,y;
+	x = castP8(a);
+    	y = castP8(b);
+	return (p8_div(x,y)).v;
+	
+}
+
+unsigned int positDiv16(unsigned int a, unsigned int b)
+{
+	posit16_t x,y;
+	x = castP16(a);
+    	y = castP16(b);
+	return (p16_div(x,y)).v;
+	
+}
+
+unsigned int positDiv32(unsigned int a, unsigned int b)
+{
+	posit_2_t x,y;
+	x = castPX2(a);
+    	y = castPX2(b);
+	return (pX2_div(x,y,32)).v;
+	
+}
+
 unsigned int positMAC32(unsigned int a, unsigned int b, unsigned int c)
 {
 	posit32_t x,y,z;
@@ -191,6 +218,48 @@ unsigned long long fmaAdd8(unsigned long long a,unsigned char c, unsigned char d
 	return qZ.v;
 }
 
+unsigned long long fdaAdd8(unsigned long long a,unsigned char c, unsigned char d)
+{
+	//c*d+(a,b)
+	posit8_t x,y;
+	x = castP8(c);
+    	y = castP8(d);
+	posit8_t pZ = p8_div(x,y);
+	quire8_t qZ;
+	qZ = q8_clr(qZ);
+	qZ = castQ8(a);
+	qZ = q8_fdp_add(qZ, pZ, castP8(1));
+	return qZ.v;
+}
+
+unsigned long long fdaAdd161(unsigned long long a,unsigned long long b,unsigned int c, unsigned int d)
+{
+	unsigned int one = 1;	
+	posit16_t x,y;
+	x = castP16(c);
+    	y = castP16(d);
+	posit16_t pZ = p16_div(x,y);
+	quire16_t qZ;
+	qZ = q16_clr(qZ);
+	qZ = castQ16(a,b);
+	qZ = q16_fdp_add(qZ, pZ, castP16(one));
+	return qZ.v[0];
+}
+
+unsigned long long fdaAdd162(unsigned long long a,unsigned long long b,unsigned int c, unsigned int d)
+{
+	//c*d+(a,b)
+	unsigned int one = 1;
+	posit16_t x,y;
+	x = castP16(c);
+    	y = castP16(d);
+	posit16_t pZ = p16_div(x,y);
+	quire16_t qZ;
+	qZ = q16_clr(qZ);
+	qZ = castQ16(a,b);
+	qZ = q16_fdp_add(qZ, pZ, castP16(one));
+	return qZ.v[1];
+}
 /*
 unsigned char positSub8(unsigned char a, unsigned char b)
 {

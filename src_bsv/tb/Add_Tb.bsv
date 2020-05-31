@@ -49,11 +49,15 @@ method Bool completeWithErrors;
 endinterface
 `endif
 
-`ifdef RANDOM
+
+`ifdef RANDOM_PRINT
 typedef 10 Num_Tests;    // Number of random tests to be run
+`elsif RANDOM
+typedef 1000 Num_Tests;    // Number of random tests to be run
 `endif
 
 typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
+
 
 // -----------------------------------------------------------------
 

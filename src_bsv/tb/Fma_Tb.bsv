@@ -34,7 +34,7 @@ endinterface
 
 
 `ifdef RANDOM_PRINT
-typedef 10 Num_Tests;    // Number of random tests to be run
+typedef 1 Num_Tests;    // Number of random tests to be run
 `elsif RANDOM
 typedef 1000 Num_Tests;    // Number of random tests to be run
 `endif
@@ -110,10 +110,10 @@ rule rlGenerate (!rgGenComplete && doneSet);
    /*
    //let inPosit11 = 64'hd3703af7c4bfa67e;
    //let inPosit22 = 64'h70a14b36b12fe9c8;
-   let inPosit11 = 64'h0000000000000000;
-   let inPosit22 = 64'h0000000000000000;
-   let inPosit33 = 16'he87b;
-   let inPosit44 = 16'h0000;
+   let inPosit11 = 64'h4a49d66167828429;
+   let inPosit22 = 64'h2dcb524847eab17d;
+   let inPosit33 = 16'h2fa2;
+   let inPosit44 = 16'h86b1;
    //*/
    ///*
    Bit#(QuireWidthBy2) inPosit11 = {lfsr1.value(),lfsr11.value()};
@@ -121,6 +121,7 @@ rule rlGenerate (!rgGenComplete && doneSet);
    Bit#(PositWidth) inPosit33 = lfsr1m.value();
    Bit#(PositWidth) inPosit44 = lfsr2m.value();
    //*/
+   
    dut.compute.request.put (InputQuireTwoPosit{quire_inp : {inPosit11,inPosit22},posit_inp1 : inPosit33, posit_inp2 : inPosit44});
    // Bookkeeping
    rgCurInput <= rgCurInput + 1;

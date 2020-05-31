@@ -45,6 +45,7 @@ import Adder_Types_fused_op 	:: *;
 import Adder_fused_op		:: *;
 import Divider_Types_fda	:: *;
 import Divider_fda	:: *;
+import Common_Fused_Op :: *;
 
 interface FDA_PNE_Quire ;
    interface Server #(InputQuireTwoPosit,Bit#(QuireWidth)) compute;
@@ -73,7 +74,7 @@ endrule
 rule rl_connect0;
    	let extOut1 <- extracter1.inoutifc.response.get();
    	let extOut2 <- extracter2.inoutifc.response.get();
-	divider.inoutifc.request.put (Inputs_m {
+	divider.inoutifc.request.put (Inputs_md {
 	sign1: extOut1.sign,
 	nanflag1: 1'b0,
  	zero_infinity_flag1: extOut1.zero_infinity_flag ,

@@ -40,11 +40,14 @@ import PositToQuire_PNE ::*;
 import LFSR             :: *;
 import "BDPI" quireToPosit16  = function Bit#(PositWidth) checkoperation (Bit#(64) in1,Bit#(64) in1)	;
 
-`ifdef RANDOM
-typedef 10 Num_Tests;    // Number of random tests to be run
-`endif
-typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
 
+`ifdef RANDOM_PRINT
+typedef 10 Num_Tests;    // Number of random tests to be run
+`elsif RANDOM
+typedef 1000 Num_Tests;    // Number of random tests to be run
+`endif
+
+typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
 
 (* synthesize *)
 `ifdef FPGA

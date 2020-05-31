@@ -112,8 +112,8 @@ rule rlGenerate (!rgGenComplete && doneSet);
    //let inPosit22 = 64'h70a14b36b12fe9c8;
    let inPosit11 = 64'h0000000000000000;
    let inPosit22 = 64'h0000000000000000;
-   let inPosit33 = 16'he87b;
-   let inPosit44 = 16'h0000;
+   let inPosit33 = 16'h187b;
+   let inPosit44 = 16'h1111;
    //*/
    ///*
    Bit#(QuireWidthBy2) inPosit11 = {lfsr1.value(),lfsr11.value()};
@@ -189,7 +189,7 @@ rule rlCheck (!rgChkComplete && doneSet );
       // Detected an error
       if (rsp != {expected0,expected1}) begin
          `ifdef RANDOM
-	$display ("[%0d]::ERR::Input=%h::Input2=%h::Input3=%h::Input4=%h::Expected Output=%h::Output=%h", $time, input1_c,input2_c,input3_c,input4_c,{expected0,expected1}, rsp);
+	$display ("[%0d]::ERR::Input=%h::Input2=%h::Input3=%h::Input4=%h::Expected Output=%b::Output=%b", $time, input1_c,input2_c,input3_c,input4_c,{expected0,expected1}, rsp);
 	`else RANDOM_PRINT
 	$display ("[%0d]::ERR::Input=%b::Input2=%b::Input3=%b::Input4=%b::Expected Output=%b::Output=%b", $time, input1_c,input2_c,input3_c,input4_c,{expected0,expected1}, rsp);
 	`endif
@@ -209,7 +209,7 @@ rule rlCheck (!rgChkComplete && doneSet );
 
       // Detected an error
       if (rsp != {expected0,expected1}) begin
-	$display ("[%0d]::ERR::Input=%h::Input2=%h::Input3=%h::Input4=%h::Expected Output=%h::Output=%h", $time, input1_c,input2_c,input3_c,input4_c,{expected0,expected1}, rsp);
+	$display ("[%0d]::ERR::Input=%h::Input2=%h::Input3=%h::Input4=%h::Expected Output=%b::Output=%b", $time, input1_c,input2_c,input3_c,input4_c,{expected0,expected1}, rsp);
          rgError <= True;
 	 wrongOut <= wrongOut+1;
       end

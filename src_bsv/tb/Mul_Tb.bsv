@@ -49,8 +49,11 @@ method Bool completeWithErrors;
 endinterface
 `endif
 
-`ifdef RANDOM
+
+`ifdef RANDOM_PRINT
 typedef 1 Num_Tests;    // Number of random tests to be run
+`elsif RANDOM
+typedef 60000 Num_Tests;    // Number of random tests to be run
 `endif
 
 typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
@@ -69,8 +72,8 @@ module mkTestbench (Empty);
 // Depending on which input mode we are using, the input to the DUT will be
 // from a LFSR or from a counter. The LFSR is always sized to the maximal size
 `ifdef RANDOM
-LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_32;
-LFSR  #(Bit #(PositWidth))            lfsr2           <- mkLFSR_32;
+LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_16;
+LFSR  #(Bit #(PositWidth))            lfsr2           <- mkLFSR_16;
 Reg   #(Bool)                 rgSetup        <- mkReg (False);
 `endif
 
@@ -97,7 +100,7 @@ Reg #(Bool) doneSet <-mkReg(False);
 
 rule lfsrGenerate(!doneSet);
 `ifdef RANDOM
-	lfsr1.seed('h03);// to create different random series
+	lfsr1.seed('h13);// to create different random series
 	lfsr2.seed('h71);
 `endif
 	doneSet<= True;
@@ -106,12 +109,15 @@ endrule
 rule rlGenerate (!rgGenComplete && doneSet);
 `ifdef RANDOM
    // Drive input into DU
-   let inPosit11 = 32'b01010000000000000000000000100001;
-   let inPosit22 = 32'b11111111111111111111111111111111;
-
-
-   //let inPosit11 = lfsr1.value();
-   //let inPosit22 = 32'hffffffff;
+   ///*
+   // Drive input into DU
+   let inPosit11 = 16'b0000001001001101;
+   let inPosit22 = 16'b1111111111011001;
+   //*/
+   /*	
+   let inPosit11 = lfsr1.value();
+   let inPosit22 = lfsr2.value();
+   //*/
    dut.compute.request.put (InputTwoPosit{posit_inp1 : truncate (inPosit11),posit_inp2 : truncate (inPosit22) });
 
    // Bookkeeping

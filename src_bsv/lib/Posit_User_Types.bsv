@@ -22,10 +22,13 @@ package Posit_User_Types;
 import Posit_Numeric_Types :: *;
 
 	typedef enum {REGULAR, INF, ZERO} PositType deriving(Bits, Eq, FShow);
-	typedef TAdd#(FracWidth,FracWidth)				FracWidthMul2 		;//Frac_size_quire
-	typedef TAdd#(FracWidth,1)				        FracWidthPlus1 		;//Frac_size_quire
+	typedef TAdd#(FracWidth,FracWidth)				FracWidthMul2 		;
+	typedef TAdd#(FracWidth,1)				        FracWidthPlus1 		;
+	typedef TAdd#(FracWidth,2)				        FracWidthPlus2 		;
+	typedef TAdd#(FracWidth,3)				        FracWidthPlus3 		;
 	typedef TAdd#(FracWidthMul2,1)					FracWidthMul2Plus1	;//FracWidthMul2Plus1 = FracWidth*2 + 1
-	typedef TAdd#(FracWidthMul2Plus1,1)				FracWidthPlus1Mul2	;//FracWidthPlus1Mul2 = (FracWidth+2)*2
+	typedef TAdd#(FracWidthMul2Plus1,1)				FracWidthPlus1Mul2	;//FracWidthPlus1Mul2 = (FracWidth+1)*2
+	typedef TAdd#(FracWidthPlus1Mul2,1)				FracWidthPlus1Mul2Plus1	;//FracWidthPlus1Mul2 = (FracWidth+1)*2 + 1
 	typedef TSub#(FracWidth,1)					FracWidthMinus1 	;//FracWidthMinus1 = FracWidth - 1
 	typedef TLog#(FracWidth)					LogFracWidth		;//LogFracWidth = log(FracWidth)
 	typedef TAdd#(LogFracWidth,1)					LogFracWidthPlus1	;//LogFracWidthPlus1 = LogFracWidth + 1
@@ -79,7 +82,8 @@ import Posit_Numeric_Types :: *;
 	typedef TAdd#(FloatFracWidth,1) 					FloatFracWidthPlus1; //(FloatFracWidth-1)
 	
 
-
+	//Divider
+	typedef  FracWidthMul2Plus1						DividerQuotientBits;//Width of quotient at divider output 
 
 	typedef struct {Bit#(PositWidth) posit_inp1;
 			Bit#(PositWidth) posit_inp2;

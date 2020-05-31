@@ -2,10 +2,10 @@
 One-time setup for configuring the environment:
 
 1. Melodica is generic in terms of size of posits so one has to run 
-./Gen_Posit_Numeric_Types --posit-width 8 --exp-width 5 --float-width 32
+./Gen_Posit_Numeric_Types --posit-width 8 --exp-width 1 --float-width 32
 which is available in ./src_bsv/lib/
 This will make generate the types package Posit_Numeric_Types.bsv (in this
-example for a 8,5 posit and floating point value 32). This package contains type definitions for the
+example for a 8,1 posit and floating point value 32). This package contains type definitions for the
 various Posit sub-fields based on Posit parameter
 
 2. Melodica Uses SoftPosit to compare and check the answers

@@ -37,8 +37,8 @@ import Common_Fused_Op :: *;
 
 module mkMultiplier (Multiplier_IFC );
 	// make a FIFO to store 
-        FIFOF #(Inputs_m )   fifo_input_reg <- mkFIFOF;
-   	FIFOF #(Outputs_m )  fifo_output_reg <- mkFIFOF;
+        FIFOF #(Inputs_md )   fifo_input_reg <- mkFIFOF;
+   	FIFOF #(Outputs_md )  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Stage0_m )  fifo_stage0_reg <- mkFIFOF;
 	//This function is used to identify nan cases
 
@@ -101,7 +101,7 @@ module mkMultiplier (Multiplier_IFC );
 		`ifdef RANDOM_PRINT
 			$display("zero_infinity_flag %b",stage0_regf.ziflag);
 			$display("sign0 %b",sign0);
-			$display("scale0 %h frac0 %h",scale0,frac0);
+			$display("scale0 %b frac0 %b",scale0,frac0);
 		`endif
    	endrule
 
@@ -117,16 +117,16 @@ module mkMultiplier (Multiplier_IFC );
 		Bit#(QuireWidth) twos_complement_carry_int_frac = dIn.sign == 1'b0 ? {dIn.sign,carry,int_frac0} : {dIn.sign,twos_complement({carry,int_frac0})};
 		//taking care of corner cases for zero infinity flag
 		PositType zero_infinity_flag0 = twos_complement_carry_int_frac == 0 && dIn.ziflag == REGULAR ? ZERO :dIn.ziflag;
-		let output_regf = Outputs_m {
+		let output_regf = Outputs_md {
 		nan_flag : dIn.nan_flag,
 		//also include the case when fraction bit msb = 0
 		zero_infinity_flag : zero_infinity_flag0,
-		quire_mul : unpack(twos_complement_carry_int_frac),			
+		quire_md : unpack(twos_complement_carry_int_frac),			
 		truncated_frac_msb : truncated_frac_msb0,//zero_infinity_flag0 == ZERO ? 1'b0 : 
 		truncated_frac_zero : truncated_frac_zero0};//zero_infinity_flag0 == ZERO ? 1'b1 :
 		`ifdef RANDOM_PRINT
-			$display("int_frac0 %h carry0 %h",int_frac0,carry0);
-			$display("twos_complement_carry_int_frac %h",twos_complement_carry_int_frac);
+			$display("int_frac0 %b carry0 %b",int_frac0,carry0);
+			$display("twos_complement_carry_int_frac %b",twos_complement_carry_int_frac);
 		`endif
    		fifo_output_reg.enq(output_regf);
 	endrule

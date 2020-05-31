@@ -271,7 +271,7 @@ def generate_BSV_file (BSV_package_name, items):
                 sel (items, "PositWidth"), sel (items, "PositWidth")))
     fout.write ("// ExpWidth          = {0:2d}    (= 0x{1:02x})    (width of exponent field)\n".format (
                 sel (items, "ExpWidth"), sel (items, "ExpWidth")))
-    fout.write ("// FloatWidth          = {0:2d}    (= 0x{1:02x})    (width of exponent field)\n".format (
+    fout.write ("// FloatWidth          = {0:2d}    (= 0x{1:02x})    (bits of Floating point number)\n".format (
                 sel (items, "FloatWidth"), sel (items, "FloatWidth")))
    
 
