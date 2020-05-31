@@ -1,0 +1,2854 @@
+git clone --recursive https://gitlab.com/riyarjain78/melodica.git
+
+Cloning into 'melodica'...
+Submodule 'SoftPosit' (https://gitlab.com/cerlane/SoftPosit) registered for path 'SoftPosit'
+Cloning into '/home/riya/Documents/DDP/melodica/SoftPosit'...
+warning: redirecting to https://gitlab.com/cerlane/SoftPosit.git/
+Submodule path 'SoftPosit': checked out '32283278a8fe9a6b0e900af9a09386cc62ebe155'
+--------------------
+cd melodica/SoftPosit/build/Linux-x86_64-GCC/
+
+------------------
+make -j6 all |& tee -a ../../../../make.log
+
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_addMagsP8.o  ../../source/s_addMagsP8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_subMagsP8.o  ../../source/s_subMagsP8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_mulAddP8.o  ../../source/s_mulAddP8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_add.o  ../../source/p8_add.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_sub.o  ../../source/p8_sub.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_mul.o  ../../source/p8_mul.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_div.o  ../../source/p8_div.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_sqrt.o  ../../source/p8_sqrt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_to_p16.o  ../../source/p8_to_p16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_to_p32.o  ../../source/p8_to_p32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_to_pX2.o  ../../source/p8_to_pX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_to_i32.o  ../../source/p8_to_i32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_to_i64.o  ../../source/p8_to_i64.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_to_ui32.o  ../../source/p8_to_ui32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_to_ui64.o  ../../source/p8_to_ui64.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_roundToInt.o  ../../source/p8_roundToInt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_mulAdd.o  ../../source/p8_mulAdd.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_eq.o  ../../source/p8_eq.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_le.o  ../../source/p8_le.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p8_lt.o  ../../source/p8_lt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o quire8_fdp_add.o  ../../source/quire8_fdp_add.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o quire8_fdp_sub.o  ../../source/quire8_fdp_sub.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o ui32_to_p8.o  ../../source/ui32_to_p8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o ui64_to_p8.o  ../../source/ui64_to_p8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o i32_to_p8.o  ../../source/i32_to_p8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o i64_to_p8.o  ../../source/i64_to_p8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_addMagsP16.o  ../../source/s_addMagsP16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_subMagsP16.o  ../../source/s_subMagsP16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_mulAddP16.o  ../../source/s_mulAddP16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_to_ui32.o  ../../source/p16_to_ui32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_to_ui64.o  ../../source/p16_to_ui64.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_to_i32.o  ../../source/p16_to_i32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_to_i64.o  ../../source/p16_to_i64.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_to_p8.o  ../../source/p16_to_p8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_to_p32.o  ../../source/p16_to_p32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_to_pX2.o  ../../source/p16_to_pX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_roundToInt.o  ../../source/p16_roundToInt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_add.o  ../../source/p16_add.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_sub.o  ../../source/p16_sub.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_mul.o  ../../source/p16_mul.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_mulAdd.o  ../../source/p16_mulAdd.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_div.o  ../../source/p16_div.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_eq.o  ../../source/p16_eq.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_le.o  ../../source/p16_le.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_lt.o  ../../source/p16_lt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p16_sqrt.o  ../../source/p16_sqrt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o quire16_fdp_add.o  ../../source/quire16_fdp_add.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o quire16_fdp_sub.o  ../../source/quire16_fdp_sub.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o quire_helper.o  ../../source/quire_helper.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o ui32_to_p16.o  ../../source/ui32_to_p16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o ui64_to_p16.o  ../../source/ui64_to_p16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o i32_to_p16.o  ../../source/i32_to_p16.c
+../../source/quire_helper.c: In function ‘printBinary’:
+../../source/quire_helper.c:46:14: warning: format ‘%llu’ expects argument of type ‘long long unsigned int’, but argument 2 has type ‘uint64_t {aka long unsigned int}’ [-Wformat=]
+   printf("%llu", (number >> (bitSize-i))&1);
+           ~~~^   ~~~~~~~~~~~~~~~~~~~~~~~~~
+           %lu
+../../source/quire_helper.c: In function ‘printHex64’:
+../../source/quire_helper.c:66:16: warning: format ‘%llx’ expects argument of type ‘long long unsigned int’, but argument 2 has type ‘uint64_t {aka long unsigned int}’ [-Wformat=]
+  printf("%016llx\n", s);
+          ~~~~~~^
+          %016lx
+../../source/quire_helper.c: In function ‘printHex’:
+../../source/quire_helper.c:70:15: warning: format ‘%llx’ expects argument of type ‘long long unsigned int’, but argument 2 has type ‘uint64_t {aka long unsigned int}’ [-Wformat=]
+  printf("0x%llx\n", s);
+            ~~~^
+            %lx
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o i64_to_p16.o  ../../source/i64_to_p16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_addMagsP32.o  ../../source/s_addMagsP32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_subMagsP32.o  ../../source/s_subMagsP32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_mulAddP32.o  ../../source/s_mulAddP32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_to_ui32.o  ../../source/p32_to_ui32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_to_ui64.o  ../../source/p32_to_ui64.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_to_i32.o  ../../source/p32_to_i32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_to_i64.o  ../../source/p32_to_i64.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_to_p8.o  ../../source/p32_to_p8.c
+../../source/p32_to_i64.c: In function ‘p32_to_i64’:
+../../source/p32_to_i64.c:70:44: warning: integer constant is so large that it is unsigned
+  else if(uiA>0x7FFFAFFF) return (sign) ? (-9223372036854775808) : (0x7FFFFFFFFFFFFFFF);
+                                            ^~~~~~~~~~~~~~~~~~~
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_to_p16.o  ../../source/p32_to_p16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_to_pX2.o  ../../source/p32_to_pX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_roundToInt.o  ../../source/p32_roundToInt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_add.o  ../../source/p32_add.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_sub.o  ../../source/p32_sub.c
+../../source/p32_to_p16.c: In function ‘p32_to_p16’:
+../../source/p32_to_p16.c:91:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘int_fast16_t {aka long int}’ [-Wformat=]
+ printf("kA: %d\n", kA);
+             ~^
+             %ld
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_mul.o  ../../source/p32_mul.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_mulAdd.o  ../../source/p32_mulAdd.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_div.o  ../../source/p32_div.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_eq.o  ../../source/p32_eq.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_le.o  ../../source/p32_le.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_lt.o  ../../source/p32_lt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o p32_sqrt.o  ../../source/p32_sqrt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o quire32_fdp_add.o  ../../source/quire32_fdp_add.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o quire32_fdp_sub.o  ../../source/quire32_fdp_sub.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o ui32_to_p32.o  ../../source/ui32_to_p32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o ui64_to_p32.o  ../../source/ui64_to_p32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o i32_to_p32.o  ../../source/i32_to_p32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o i64_to_p32.o  ../../source/i64_to_p32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_approxRecipSqrt_1Ks.o  ../../source/s_approxRecipSqrt_1Ks.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertDecToPosit8.o  ../../source/c_convertDecToPosit8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertPosit8ToDec.o  ../../source/c_convertPosit8ToDec.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertDecToPosit16.o  ../../source/c_convertDecToPosit16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertPosit16ToDec.o  ../../source/c_convertPosit16ToDec.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertQuire8ToPosit8.o  ../../source/c_convertQuire8ToPosit8.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertQuire16ToPosit16.o  ../../source/c_convertQuire16ToPosit16.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertQuire32ToPosit32.o  ../../source/c_convertQuire32ToPosit32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertDecToPosit32.o  ../../source/c_convertDecToPosit32.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertPosit32ToDec.o  ../../source/c_convertPosit32ToDec.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_int.o  ../../source/c_int.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_addMagsPX2.o  ../../source/s_addMagsPX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_subMagsPX2.o  ../../source/s_subMagsPX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o s_mulAddPX2.o  ../../source/s_mulAddPX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_add.o  ../../source/pX2_add.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_sub.o  ../../source/pX2_sub.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_mul.o  ../../source/pX2_mul.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_div.o  ../../source/pX2_div.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_mulAdd.o  ../../source/pX2_mulAdd.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_roundToInt.o  ../../source/pX2_roundToInt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_sqrt.o  ../../source/pX2_sqrt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_eq.o  ../../source/pX2_eq.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_le.o  ../../source/pX2_le.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o pX2_lt.o  ../../source/pX2_lt.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o ui32_to_pX2.o  ../../source/ui32_to_pX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o ui64_to_pX2.o  ../../source/ui64_to_pX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o i32_to_pX2.o  ../../source/i32_to_pX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o i64_to_pX2.o  ../../source/i64_to_pX2.c
+gcc -c -Werror-implicit-function-declaration -DSOFTPOSIT_FAST_INT64 -DINLINE_LEVEL=5  -I. -I../../source/8086-SSE -I../../source/include -O2  -o c_convertQuireX2ToPositX2.o  ../../source/c_convertQuireX2ToPositX2.c
+ar crs softposit.a s_addMagsP8.o s_subMagsP8.o s_mulAddP8.o p8_add.o p8_sub.o p8_mul.o p8_div.o p8_sqrt.o p8_to_p16.o p8_to_p32.o p8_to_pX2.o p8_to_i32.o p8_to_i64.o p8_to_ui32.o p8_to_ui64.o p8_roundToInt.o p8_mulAdd.o p8_eq.o p8_le.o p8_lt.o quire8_fdp_add.o quire8_fdp_sub.o ui32_to_p8.o ui64_to_p8.o i32_to_p8.o i64_to_p8.o s_addMagsP16.o s_subMagsP16.o s_mulAddP16.o p16_to_ui32.o p16_to_ui64.o p16_to_i32.o p16_to_i64.o p16_to_p8.o p16_to_p32.o p16_to_pX2.o p16_roundToInt.o p16_add.o p16_sub.o p16_mul.o p16_mulAdd.o p16_div.o p16_eq.o p16_le.o p16_lt.o p16_sqrt.o quire16_fdp_add.o quire16_fdp_sub.o quire_helper.o ui32_to_p16.o ui64_to_p16.o i32_to_p16.o i64_to_p16.o s_addMagsP32.o s_subMagsP32.o s_mulAddP32.o p32_to_ui32.o p32_to_ui64.o p32_to_i32.o p32_to_i64.o p32_to_p8.o p32_to_p16.o p32_to_pX2.o p32_roundToInt.o p32_add.o p32_sub.o p32_mul.o p32_mulAdd.o p32_div.o p32_eq.o p32_le.o p32_lt.o p32_sqrt.o quire32_fdp_add.o quire32_fdp_sub.o ui32_to_p32.o ui64_to_p32.o i32_to_p32.o i64_to_p32.o s_approxRecipSqrt_1Ks.o c_convertDecToPosit8.o c_convertPosit8ToDec.o c_convertDecToPosit16.o c_convertPosit16ToDec.o c_convertQuire8ToPosit8.o c_convertQuire16ToPosit16.o c_convertQuire32ToPosit32.o c_convertDecToPosit32.o c_convertPosit32ToDec.o c_int.o s_addMagsPX2.o s_subMagsPX2.o s_mulAddPX2.o pX2_add.o pX2_sub.o pX2_mul.o pX2_div.o pX2_mulAdd.o pX2_roundToInt.o pX2_sqrt.o pX2_eq.o pX2_le.o pX2_lt.o ui32_to_pX2.o ui64_to_pX2.o i32_to_pX2.o i64_to_pX2.o c_convertQuireX2ToPositX2.o
+-----------------------------------
+
+cd ../../../src_bsv/lib/
+
+--------------
+./Gen_Posit_Numeric_Types --posit-width 16 --exp-width 1 --float-width 32
+
+Namespace(expWidth=1, floatWidth=32, pkgName='Posit_Numeric_Types', positWidth=16)
+    PositWidth:         =   16    (basic)
+    ExpWidth:           =    1    (basic)
+    FloatWidth:         =   32    (basic)
+    FloatExpWidth:      =    8    Exponent width of single precision float
+    FloatFracWidth:     =   23    Fraction width of single precision float
+    FloatBias:          =  127    Bais for single precision float
+Wrote file:  Posit_Numeric_Types.bsv
+---------------------------
+
+cd ../tb/
+vim Add_Tb.bsv 
+#change positAdd8 to positAdd16
+#in Add_Tb.bsv
+cd ../..
+#added -v in compile and link of adder in Makefile
+make adder simulate_adder 
+
+Compiling...
+mkdir -p VerilogCode/Adder builds/Adder builds/Adder builds/Adder/output
+bsc -v -u -sim -simdir builds/Adder -bdir builds/Adder -info-dir builds/Adder -D RANDOM -keep-fires -aggressive-conditions -p .:%/Prelude:%/Libraries:%/Libraries/BlueNoC:src_bsv/Adder:src_bsv/lib:src_bsv/common:src_bsv/tb  -g mkTestbench src_bsv/tb/Add_Tb.bsv 
+Bluespec Compiler, version 2018.10.beta1 (build e1df8052c, 2018-10-17)
+Copyright 2000-2014 Bluespec, Inc.
+Parts copyright 2002, The University Court of the University of Glasgow.
+Parts copyright 1982-1999 Lennart Augustsson, Thomas Johnsson,
+    Chalmers University of Technology.
+Parts copyright 1999-2000, Daan Leijen.
+Parts copyright 1991, 1999 Free Software Foundation, Inc.
+Parts copyright 1995-2014, Regents of the University of Colorado.
+Parts copyright 2010, Don Stewart.
+All rights reserved.
+See documentation for license details.
+
+Invoking command line:
+bsc -v -u -sim -simdir builds/Adder -bdir builds/Adder -info-dir builds/Adder -D RANDOM -keep-fires -aggressive-conditions -p .:%/Prelude:%/Libraries:%/Libraries/BlueNoC:src_bsv/Adder:src_bsv/lib:src_bsv/common:src_bsv/tb -g mkTestbench src_bsv/tb/Add_Tb.bsv
+
+starting license
+license done
+ elapsed time: CPU 0.03s, real 0.03s
+
+checking package dependencies
+starting depend
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.08s, real 0.08s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.16s, real 0.16s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+depend done
+ elapsed time: CPU 0.93s, real 0.93s
+
+compiling src_bsv/lib/Posit_Numeric_Types.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting imports
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Prelude.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/PreludeBSV.bo
+imports done
+ elapsed time: CPU 0.62s, real 0.62s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.09s, real 0.09s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.06s, real 0.06s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.15s, real 0.15s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting binary
+binary done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.06s, real 0.06s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.02s, real 0.02s
+
+modules: []
+
+starting writeBin
+Compiled package file created: builds/Adder/Posit_Numeric_Types.bo
+writeBin done
+ elapsed time: CPU 0.08s, real 0.08s
+
+compiling src_bsv/lib/Posit_User_Types.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting imports
+read builds/Adder/Posit_Numeric_Types.bo
+imports done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.06s, real 0.06s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.09s, real 0.09s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.06s, real 0.06s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.23s, real 0.23s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting binary
+binary done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.06s, real 0.06s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.01s, real 0.01s
+
+modules: []
+
+starting writeBin
+Compiled package file created: builds/Adder/Posit_User_Types.bo
+writeBin done
+ elapsed time: CPU 0.04s, real 0.04s
+
+compiling src_bsv/lib/Normalizer_Types.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting imports
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/GetPut.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/FIFOF_.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/FIFOF.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/FIFO.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Inout.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/List.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Array.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Clocks.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/ListN.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Vector.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Connectable.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/ClientServer.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Counter.bo
+read builds/Adder/Posit_User_Types.bo
+imports done
+ elapsed time: CPU 0.85s, real 0.85s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.22s, real 0.22s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.09s, real 0.09s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.16s, real 0.16s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.40s, real 0.40s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.06s, real 0.06s
+
+starting binary
+binary done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.12s, real 0.12s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.15s, real 0.15s
+
+modules: []
+
+starting writeBin
+Compiled package file created: builds/Adder/Normalizer_Types.bo
+writeBin done
+ elapsed time: CPU 0.07s, real 0.07s
+
+compiling src_bsv/lib/Extracter_Types.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting imports
+imports done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.09s, real 0.09s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.09s, real 0.09s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.29s, real 0.29s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting binary
+binary done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.12s, real 0.12s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.03s, real 0.03s
+
+modules: []
+
+starting writeBin
+Compiled package file created: builds/Adder/Extracter_Types.bo
+writeBin done
+ elapsed time: CPU 0.05s, real 0.05s
+
+compiling src_bsv/Adder/Adder_Types.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting imports
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/FShow.bo
+imports done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.19s, real 0.19s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.09s, real 0.09s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.17s, real 0.17s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.38s, real 0.38s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting binary
+binary done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.12s, real 0.12s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.04s, real 0.04s
+
+modules: []
+
+starting writeBin
+Compiled package file created: builds/Adder/Adder_Types.bo
+writeBin done
+ elapsed time: CPU 0.16s, real 0.16s
+
+compiling src_bsv/common/Utils.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting imports
+imports done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting binary
+binary done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.06s, real 0.06s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.00s, real 0.00s
+
+modules: []
+
+starting writeBin
+Compiled package file created: builds/Adder/Utils.bo
+writeBin done
+ elapsed time: CPU 0.00s, real 0.00s
+
+compiling src_bsv/lib/Extracter.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.09s, real 0.09s
+
+starting imports
+read builds/Adder/Extracter_Types.bo
+imports done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.23s, real 0.23s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting binary
+binary done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.24s, real 0.24s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.03s, real 0.03s
+
+modules: []
+
+starting writeBin
+Compiled package file created: builds/Adder/Extracter.bo
+writeBin done
+ elapsed time: CPU 0.05s, real 0.05s
+
+compiling src_bsv/lib/Normalizer.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.15s, real 0.15s
+
+starting imports
+read builds/Adder/Normalizer_Types.bo
+imports done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.47s, real 0.47s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.06s, real 0.06s
+
+starting binary
+binary done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.06s, real 0.06s
+
+modules: []
+
+starting writeBin
+Compiled package file created: builds/Adder/Normalizer.bo
+writeBin done
+ elapsed time: CPU 0.10s, real 0.10s
+
+compiling src_bsv/Adder/Adder.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting parsed
+Warning: "src_bsv/Adder/Adder.bsv", line 76, column 17: (P0042)
+  Assignment to `scale_shift' missing from some paths
+parsed done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting imports
+read builds/Adder/Utils.bo
+read builds/Adder/Adder_Types.bo
+imports done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.33s, real 0.33s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting binary
+binary done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.03s, real 0.03s
+
+modules: []
+
+starting writeBin
+Compiled package file created: builds/Adder/Adder.bo
+writeBin done
+ elapsed time: CPU 0.06s, real 0.06s
+
+compiling src_bsv/Adder/PNE.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting imports
+read builds/Adder/Extracter.bo
+read builds/Adder/Normalizer.bo
+read builds/Adder/Adder.bo
+imports done
+ elapsed time: CPU 0.08s, real 0.08s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.14s, real 0.14s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting binary
+binary done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.25s, real 0.25s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.01s, real 0.01s
+
+modules: [mkPNE_test]
+
+*****
+code generation for mkPNE_test starts
+starting expanded
+types OK
+expanded done
+ elapsed time: CPU 2.54s, real 2.54s
+
+starting inlineFmt
+types OK
+inlineFmt done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting inline
+types OK
+inline done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting transform
+types OK
+transform done
+ elapsed time: CPU 0.18s, real 0.18s
+
+starting splitIf
+types OK
+splitIf done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting lift
+types OK
+lift done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting transform
+types OK
+transform done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting iparams
+iparams done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting idroprules
+idroprules done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATS
+types OK
+ATS done
+ elapsed time: CPU 0.13s, real 0.13s
+
+starting ATSperfspec
+types OK
+ATSperfspec done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATSsplice
+types OK
+ATSsplice done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATSclean
+types OK
+ATSclean done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpLambdaCalculus
+dumpLambdaCalculus done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpSAL
+dumpSAL done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting pathsPreSched
+pathsPreSched done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting schedule
+schedule done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting resources
+resources done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting vschedinfo
+vschedinfo done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting scheduledefs
+scheduledefs done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpschedule
+dumpschedule done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting checkproofs
+checkproofs done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting pathsPostSched
+pathsPostSched done
+ elapsed time: CPU 0.19s, real 0.19s
+
+starting noinline
+noinline done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting addSchedAssumps
+types OK
+addSchedAssumps done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting removeAssumps
+types OK
+removeAssumps done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dropundet
+dropundet done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting writeABin
+Elaborated module file created: builds/Adder/mkPNE_test.ba
+writeABin done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting wrappergen
+wrappergen done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting wrappercomp
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+internal done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting fixup
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+wrappercomp done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting writeBin
+Compiled package file created: builds/Adder/PNE.bo
+writeBin done
+ elapsed time: CPU 0.05s, real 0.05s
+
+compiling src_bsv/tb/Add_Tb.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting imports
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/LFSR.bo
+read builds/Adder/PNE.bo
+imports done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.18s, real 0.18s
+
+starting genforeign
+Foreign import file created: builds/Adder/positAdd16.ba
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting binary
+binary done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.13s, real 0.13s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.02s, real 0.02s
+
+modules: [mkTestbench]
+
+*****
+code generation for mkTestbench starts
+starting expanded
+types OK
+expanded done
+ elapsed time: CPU 0.18s, real 0.18s
+
+starting inlineFmt
+types OK
+inlineFmt done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting inline
+types OK
+inline done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting transform
+types OK
+transform done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting splitIf
+types OK
+splitIf done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting lift
+types OK
+lift done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting transform
+types OK
+transform done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting iparams
+iparams done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting idroprules
+idroprules done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATS
+types OK
+ATS done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting ATSperfspec
+types OK
+ATSperfspec done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATSsplice
+types OK
+ATSsplice done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATSclean
+types OK
+ATSclean done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpLambdaCalculus
+dumpLambdaCalculus done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpSAL
+dumpSAL done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting pathsPreSched
+pathsPreSched done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting schedule
+schedule done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting resources
+resources done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vschedinfo
+vschedinfo done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting scheduledefs
+scheduledefs done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpschedule
+dumpschedule done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting checkproofs
+checkproofs done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting pathsPostSched
+pathsPostSched done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting noinline
+noinline done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting addSchedAssumps
+types OK
+addSchedAssumps done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting removeAssumps
+types OK
+removeAssumps done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dropundet
+dropundet done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting writeABin
+Elaborated module file created: builds/Adder/mkTestbench.ba
+writeABin done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting wrappergen
+wrappergen done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting wrappercomp
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+internal done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting fixup
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+wrappercomp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting writeBin
+Compiled package file created: builds/Adder/Add_Tb.bo
+writeBin done
+ elapsed time: CPU 0.06s, real 0.06s
+
+All packages are up to date.
+total
+ elapsed time: CPU 18.26s, real 18.28s
+
+bsc -v -u -elab -verilog -simdir builds/Adder -bdir builds/Adder -info-dir builds/Adder -vdir VerilogCode/Adder -D RANDOM -keep-fires -aggressive-conditions -p .:%/Prelude:%/Libraries:%/Libraries/BlueNoC:src_bsv/Adder:src_bsv/lib:src_bsv/common:src_bsv/tb  -g mkTestbench  src_bsv/tb/Add_Tb.bsv
+Bluespec Compiler, version 2018.10.beta1 (build e1df8052c, 2018-10-17)
+Copyright 2000-2014 Bluespec, Inc.
+Parts copyright 2002, The University Court of the University of Glasgow.
+Parts copyright 1982-1999 Lennart Augustsson, Thomas Johnsson,
+    Chalmers University of Technology.
+Parts copyright 1999-2000, Daan Leijen.
+Parts copyright 1991, 1999 Free Software Foundation, Inc.
+Parts copyright 1995-2014, Regents of the University of Colorado.
+Parts copyright 2010, Don Stewart.
+All rights reserved.
+See documentation for license details.
+
+Invoking command line:
+bsc -v -u -elab -verilog -simdir builds/Adder -bdir builds/Adder -info-dir builds/Adder -vdir VerilogCode/Adder -D RANDOM -keep-fires -aggressive-conditions -p .:%/Prelude:%/Libraries:%/Libraries/BlueNoC:src_bsv/Adder:src_bsv/lib:src_bsv/common:src_bsv/tb -g mkTestbench src_bsv/tb/Add_Tb.bsv
+
+starting license
+license done
+ elapsed time: CPU 0.03s, real 0.03s
+
+checking package dependencies
+starting depend
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.08s, real 0.08s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.16s, real 0.16s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.00s, real 0.00s
+
+depend done
+ elapsed time: CPU 0.92s, real 0.92s
+
+compiling src_bsv/Adder/PNE.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting imports
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Prelude.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/PreludeBSV.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/ClientServer.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Counter.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/FIFOF_.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/FIFOF.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/FIFO.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Inout.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/List.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Array.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Clocks.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/ListN.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Vector.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/Connectable.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/GetPut.bo
+read builds/Adder/Extracter_Types.bo
+read builds/Adder/Posit_Numeric_Types.bo
+read builds/Adder/Posit_User_Types.bo
+read builds/Adder/Extracter.bo
+read builds/Adder/Normalizer_Types.bo
+read builds/Adder/Normalizer.bo
+read builds/Adder/Adder_Types.bo
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/FShow.bo
+read builds/Adder/Adder.bo
+read builds/Adder/Utils.bo
+imports done
+ elapsed time: CPU 1.84s, real 1.84s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.15s, real 0.15s
+
+starting genforeign
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting binary
+binary done
+ elapsed time: CPU 0.06s, real 0.06s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.13s, real 0.13s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.01s, real 0.01s
+
+modules: [mkPNE_test]
+
+*****
+code generation for mkPNE_test starts
+starting expanded
+types OK
+expanded done
+ elapsed time: CPU 2.63s, real 2.63s
+
+starting inlineFmt
+types OK
+inlineFmt done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting inline
+types OK
+inline done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting transform
+types OK
+transform done
+ elapsed time: CPU 0.19s, real 0.19s
+
+starting splitIf
+types OK
+splitIf done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting lift
+types OK
+lift done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting transform
+types OK
+transform done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting iparams
+iparams done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting idroprules
+idroprules done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATS
+types OK
+ATS done
+ elapsed time: CPU 0.12s, real 0.12s
+
+starting ATSperfspec
+types OK
+ATSperfspec done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATSsplice
+types OK
+ATSsplice done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATSclean
+types OK
+ATSclean done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpLambdaCalculus
+dumpLambdaCalculus done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpSAL
+dumpSAL done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting pathsPreSched
+pathsPreSched done
+ elapsed time: CPU 0.19s, real 0.19s
+
+starting schedule
+schedule done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting resources
+resources done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting vschedinfo
+vschedinfo done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting scheduledefs
+scheduledefs done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpschedule
+dumpschedule done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting checkproofs
+checkproofs done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting pathsPostSched
+pathsPostSched done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting noinline
+noinline done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting addSchedAssumps
+types OK
+addSchedAssumps done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting removeAssumps
+types OK
+removeAssumps done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dropundet
+dropundet done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting foreignMap
+foreignMap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting astate
+astate done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting rwire
+types OK
+rwire done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting creg
+types OK
+creg done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting renameio
+types OK
+renameio done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting adropdefs
+types OK
+adropdefs done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting aopt
+types OK
+aopt done
+ elapsed time: CPU 0.64s, real 0.64s
+
+starting synthesize
+types OK
+signals OK
+synthesize done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting veriquirks
+types OK
+veriquirks done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting finalcleanup
+types OK
+finalcleanup done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting IOproperties
+IOproperties done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting verilog
+verilog done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting verilogDollar
+verilogDollar done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting writeVerilog
+Verilog file created: VerilogCode/Adder/mkPNE_test.v
+writeVerilog done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting writeABin
+Elaborated module file created: builds/Adder/mkPNE_test.ba
+writeABin done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting wrappergen
+wrappergen done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting wrappercomp
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+internal done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting fixup
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+wrappercomp done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting writeBin
+Compiled package file created: builds/Adder/PNE.bo
+writeBin done
+ elapsed time: CPU 0.05s, real 0.05s
+
+compiling src_bsv/tb/Add_Tb.bsv
+starting cpp
+cpp done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vpp
+vpp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting bsvlex
+bsvlex done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting parsed
+parsed done
+ elapsed time: CPU 0.05s, real 0.05s
+
+starting imports
+read /opt/bsc/Bluespec-2018.10.beta1/lib/Prelude/LFSR.bo
+read builds/Adder/PNE.bo
+imports done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting opparse
+opparse done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting genfuncwrap
+genfuncwrap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genwrap
+genwrap done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting deriving
+deriving done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.11s, real 0.11s
+
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.23s, real 0.23s
+
+starting convinst
+convinst done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.17s, real 0.17s
+
+starting genforeign
+Foreign import file created: builds/Adder/positAdd16.ba
+genforeign done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting genVPI
+VPI wrapper files created: VerilogCode/Adder/vpi_wrapper_positAdd16.{c,h}
+genVPI done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+types OK
+internal done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting binary
+binary done
+ elapsed time: CPU 0.04s, real 0.04s
+
+starting symbols
+symbols done
+ elapsed time: CPU 0.13s, real 0.13s
+
+starting fixup
+types OK
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting isimplify
+types OK
+isimplify done
+ elapsed time: CPU 0.02s, real 0.02s
+
+modules: [mkTestbench]
+
+*****
+code generation for mkTestbench starts
+starting expanded
+types OK
+expanded done
+ elapsed time: CPU 0.18s, real 0.18s
+
+starting inlineFmt
+types OK
+inlineFmt done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting inline
+types OK
+inline done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting transform
+types OK
+transform done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting splitIf
+types OK
+splitIf done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting lift
+types OK
+lift done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting transform
+types OK
+transform done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting iparams
+iparams done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting idroprules
+idroprules done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATS
+types OK
+ATS done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting ATSperfspec
+types OK
+ATSperfspec done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATSsplice
+types OK
+ATSsplice done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting ATSclean
+types OK
+ATSclean done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpLambdaCalculus
+dumpLambdaCalculus done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpSAL
+dumpSAL done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting pathsPreSched
+pathsPreSched done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting schedule
+schedule done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting resources
+resources done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting vschedinfo
+vschedinfo done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting scheduledefs
+scheduledefs done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dumpschedule
+dumpschedule done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting checkproofs
+checkproofs done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting pathsPostSched
+pathsPostSched done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting noinline
+noinline done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting addSchedAssumps
+types OK
+addSchedAssumps done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting removeAssumps
+types OK
+removeAssumps done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting dropundet
+dropundet done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting foreignMap
+read builds/Adder/positAdd16.ba
+foreignMap done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting astate
+astate done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting rwire
+types OK
+rwire done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting creg
+types OK
+creg done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting renameio
+types OK
+renameio done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting adropdefs
+types OK
+adropdefs done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting aopt
+types OK
+aopt done
+ elapsed time: CPU 0.10s, real 0.10s
+
+starting synthesize
+types OK
+signals OK
+synthesize done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting veriquirks
+types OK
+veriquirks done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting finalcleanup
+types OK
+finalcleanup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting IOproperties
+IOproperties done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting verilog
+verilog done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting verilogDollar
+verilogDollar done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting writeVerilog
+Verilog file created: VerilogCode/Adder/mkTestbench.v
+writeVerilog done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting writeABin
+Elaborated module file created: builds/Adder/mkTestbench.ba
+writeABin done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting wrappergen
+wrappergen done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting wrappercomp
+starting ctxreduce
+ctxreduce done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting typecheck
+typecheck done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simplified
+simplified done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting internal
+internal done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting fixup
+fixup done
+ elapsed time: CPU 0.00s, real 0.00s
+
+wrappercomp done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting writeBin
+Compiled package file created: builds/Adder/Add_Tb.bo
+writeBin done
+ elapsed time: CPU 0.06s, real 0.06s
+
+All packages are up to date.
+total
+ elapsed time: CPU 9.73s, real 9.73s
+
+Compilation finished
+Linking...
+bsc -v -e mkTestbench -sim -o builds/Adder/output/out -simdir builds/Adder -p .:%/Prelude:%/Libraries:%/Libraries/BlueNoC:src_bsv/Adder:src_bsv/lib:src_bsv/common:src_bsv/tb  -bdir builds/Adder -keep-fires -aggressive-conditions  -Xc -lm -Xc -I./SoftPosit/source/include -Xc++ -D_GLIBCXX_USE_CXX11_ABI=0 ./src_c/softposit_wrappers.c  
+Bluespec Compiler, version 2018.10.beta1 (build e1df8052c, 2018-10-17)
+Copyright 2000-2014 Bluespec, Inc.
+Parts copyright 2002, The University Court of the University of Glasgow.
+Parts copyright 1982-1999 Lennart Augustsson, Thomas Johnsson,
+    Chalmers University of Technology.
+Parts copyright 1999-2000, Daan Leijen.
+Parts copyright 1991, 1999 Free Software Foundation, Inc.
+Parts copyright 1995-2014, Regents of the University of Colorado.
+Parts copyright 2010, Don Stewart.
+All rights reserved.
+See documentation for license details.
+
+Invoking command line:
+bsc -v -e mkTestbench -sim -o builds/Adder/output/out -simdir builds/Adder -p .:%/Prelude:%/Libraries:%/Libraries/BlueNoC:src_bsv/Adder:src_bsv/lib:src_bsv/common:src_bsv/tb -bdir builds/Adder -keep-fires -aggressive-conditions -Xc -lm -Xc -I./SoftPosit/source/include -Xc++ -D_GLIBCXX_USE_CXX11_ABI=0 ./src_c/softposit_wrappers.c
+
+starting license
+license done
+ elapsed time: CPU 0.03s, real 0.03s
+
+confirm C files exist
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting readelab
+readelab done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simExpand
+read builds/Adder/mkTestbench.ba
+read builds/Adder/positAdd16.ba
+read builds/Adder/mkPNE_test.ba
+simExpand done
+ elapsed time: CPU 0.12s, real 0.12s
+
+starting simDepend
+simDepend done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting simPackageOpt
+simPackageOpt done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting simMakeCBlocks
+simMakeCBlocks done
+ elapsed time: CPU 0.02s, real 0.02s
+
+starting simCOpt
+simCOpt done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting simBlocksToC
+starting writeC
+writeC done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting writeC
+writeC done
+ elapsed time: CPU 0.03s, real 0.03s
+
+starting writeC
+writeC done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting writeC
+writeC done
+ elapsed time: CPU 0.09s, real 0.09s
+
+starting writeC
+writeC done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting writeC
+writeC done
+ elapsed time: CPU 0.01s, real 0.01s
+
+starting writeC
+writeC done
+ elapsed time: CPU 0.00s, real 0.00s
+
+simBlocksToC done
+ elapsed time: CPU 0.14s, real 0.14s
+
+starting genSystemC
+genSystemC done
+ elapsed time: CPU 0.00s, real 0.00s
+
+starting bluesimcompile
+exec: c++ -O3  -Wall -Wno-unused -D_FILE_OFFSET_BITS=64 "-D_GLIBCXX_USE_CXX11_ABI=0" -I"/opt/bsc/Bluespec-2018.10.beta1/lib"/Bluesim -Wno-uninitialized -fpermissive -fPIC -c -o "builds/Adder/mkTestbench.o" "builds/Adder/mkTestbench.cxx"
+Bluesim object created: builds/Adder/mkTestbench.{h,o}
+exec: c++ -O3  -Wall -Wno-unused -D_FILE_OFFSET_BITS=64 "-D_GLIBCXX_USE_CXX11_ABI=0" -I"/opt/bsc/Bluespec-2018.10.beta1/lib"/Bluesim -Wno-uninitialized -fpermissive -fPIC -c -o "builds/Adder/mkPNE_test.o" "builds/Adder/mkPNE_test.cxx"
+Bluesim object created: builds/Adder/mkPNE_test.{h,o}
+exec: c++ -O3  -Wall -Wno-unused -D_FILE_OFFSET_BITS=64 "-D_GLIBCXX_USE_CXX11_ABI=0" -I"/opt/bsc/Bluespec-2018.10.beta1/lib"/Bluesim -Wno-uninitialized -fpermissive -fPIC -c -o "builds/Adder/model_mkTestbench.o" "builds/Adder/model_mkTestbench.cxx"
+Bluesim object created: builds/Adder/model_mkTestbench.{h,o}
+compile generated C++ files
+ elapsed time: CPU 0.01s, real 9.81s
+
+exec: cc -O3  -Wall -Wno-unused -D_FILE_OFFSET_BITS=64 "-lm" "-I./SoftPosit/source/include" -fpermissive -fPIC -c -o "./src_c/softposit_wrappers.o" "./src_c/softposit_wrappers.c"
+cc1: warning: command line option ‘-fpermissive’ is valid for C++/ObjC++ but not for C
+User object created: ./src_c/softposit_wrappers.o
+compile user-provided C/C++ files
+ elapsed time: CPU 0.00s, real 0.20s
+
+bluesimcompile done
+ elapsed time: CPU 0.01s, real 10.01s
+
+starting bluesimlink
+linking
+exec: c++ -O3  -Wall -Wno-unused -D_FILE_OFFSET_BITS=64 -shared -fPIC -Wl,-Bsymbolic -Wl,--version-script="/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/bs_linux_export_map.txt" -o builds/Adder/output/out.so "builds/Adder/mkTestbench.o" "builds/Adder/mkPNE_test.o" "./src_c/softposit_wrappers.o" "builds/Adder/model_mkTestbench.o" "/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64/libbskernel.a" "/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64/libbsprim.a" -lm
+exec: strip -x builds/Adder/output/out.so
+Simulation shared library created: builds/Adder/output/out.so
+Simulation executable created: builds/Adder/output/out
+bluesimlink done
+ elapsed time: CPU 0.00s, real 0.36s
+
+total
+ elapsed time: CPU 0.36s, real 10.71s
+
+Linking finished
+Linking for distributable Bluesim (without Bluetcl driver)
+c++ -static -D_GLIBCXX_USE_CXX11_ABI=0 -DNEW_MODEL_MKFOO=new_MODEL_mkTestbench -DMODEL_MKFOO_H=\"model_mkTestbench.h\" -I/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim -L/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64 -L./SoftPosit/build/Linux-x86_64-GCC -O3  \
+	-Ibuilds/Adder \
+	-o builds/Adder/output/out_adder \
+	./BSV_Additional_Libs/C++/bluesim_main.cxx \
+	builds/Adder/*.o \
+	./SoftPosit/build/Linux-x86_64-GCC/s_addMagsP8.o ./SoftPosit/build/Linux-x86_64-GCC/s_subMagsP8.o ./SoftPosit/build/Linux-x86_64-GCC/s_mulAddP8.o ./SoftPosit/build/Linux-x86_64-GCC/p8_add.o ./SoftPosit/build/Linux-x86_64-GCC/p8_sub.o ./SoftPosit/build/Linux-x86_64-GCC/p8_mul.o ./SoftPosit/build/Linux-x86_64-GCC/p8_div.o ./SoftPosit/build/Linux-x86_64-GCC/p8_sqrt.o ./SoftPosit/build/Linux-x86_64-GCC/p8_to_p16.o ./SoftPosit/build/Linux-x86_64-GCC/p8_to_p32.o ./SoftPosit/build/Linux-x86_64-GCC/p8_to_pX2.o ./SoftPosit/build/Linux-x86_64-GCC/p8_to_i32.o ./SoftPosit/build/Linux-x86_64-GCC/p8_to_i64.o ./SoftPosit/build/Linux-x86_64-GCC/p8_to_ui32.o ./SoftPosit/build/Linux-x86_64-GCC/p8_to_ui64.o ./SoftPosit/build/Linux-x86_64-GCC/p8_roundToInt.o ./SoftPosit/build/Linux-x86_64-GCC/p8_mulAdd.o ./SoftPosit/build/Linux-x86_64-GCC/p8_eq.o ./SoftPosit/build/Linux-x86_64-GCC/p8_le.o ./SoftPosit/build/Linux-x86_64-GCC/p8_lt.o ./SoftPosit/build/Linux-x86_64-GCC/quire8_fdp_add.o ./SoftPosit/build/Linux-x86_64-GCC/quire8_fdp_sub.o ./SoftPosit/build/Linux-x86_64-GCC/ui32_to_p8.o ./SoftPosit/build/Linux-x86_64-GCC/ui64_to_p8.o ./SoftPosit/build/Linux-x86_64-GCC/i32_to_p8.o ./SoftPosit/build/Linux-x86_64-GCC/i64_to_p8.o ./SoftPosit/build/Linux-x86_64-GCC/s_addMagsP16.o ./SoftPosit/build/Linux-x86_64-GCC/s_subMagsP16.o ./SoftPosit/build/Linux-x86_64-GCC/s_mulAddP16.o ./SoftPosit/build/Linux-x86_64-GCC/p16_to_ui32.o ./SoftPosit/build/Linux-x86_64-GCC/p16_to_ui64.o ./SoftPosit/build/Linux-x86_64-GCC/p16_to_i32.o ./SoftPosit/build/Linux-x86_64-GCC/p16_to_i64.o ./SoftPosit/build/Linux-x86_64-GCC/p16_to_p8.o ./SoftPosit/build/Linux-x86_64-GCC/p16_to_p32.o ./SoftPosit/build/Linux-x86_64-GCC/p16_to_pX2.o ./SoftPosit/build/Linux-x86_64-GCC/p16_roundToInt.o ./SoftPosit/build/Linux-x86_64-GCC/p16_add.o ./SoftPosit/build/Linux-x86_64-GCC/p16_sub.o ./SoftPosit/build/Linux-x86_64-GCC/p16_mul.o ./SoftPosit/build/Linux-x86_64-GCC/p16_mulAdd.o ./SoftPosit/build/Linux-x86_64-GCC/p16_div.o ./SoftPosit/build/Linux-x86_64-GCC/p16_eq.o ./SoftPosit/build/Linux-x86_64-GCC/p16_le.o ./SoftPosit/build/Linux-x86_64-GCC/p16_lt.o ./SoftPosit/build/Linux-x86_64-GCC/p16_sqrt.o ./SoftPosit/build/Linux-x86_64-GCC/quire16_fdp_add.o ./SoftPosit/build/Linux-x86_64-GCC/quire16_fdp_sub.o ./SoftPosit/build/Linux-x86_64-GCC/quire_helper.o ./SoftPosit/build/Linux-x86_64-GCC/ui32_to_p16.o ./SoftPosit/build/Linux-x86_64-GCC/ui64_to_p16.o ./SoftPosit/build/Linux-x86_64-GCC/i32_to_p16.o ./SoftPosit/build/Linux-x86_64-GCC/i64_to_p16.o ./SoftPosit/build/Linux-x86_64-GCC/s_addMagsP32.o ./SoftPosit/build/Linux-x86_64-GCC/s_subMagsP32.o ./SoftPosit/build/Linux-x86_64-GCC/s_mulAddP32.o ./SoftPosit/build/Linux-x86_64-GCC/p32_to_ui32.o ./SoftPosit/build/Linux-x86_64-GCC/p32_to_ui64.o ./SoftPosit/build/Linux-x86_64-GCC/p32_to_i32.o ./SoftPosit/build/Linux-x86_64-GCC/p32_to_i64.o ./SoftPosit/build/Linux-x86_64-GCC/p32_to_p8.o ./SoftPosit/build/Linux-x86_64-GCC/p32_to_p16.o ./SoftPosit/build/Linux-x86_64-GCC/p32_to_pX2.o ./SoftPosit/build/Linux-x86_64-GCC/p32_roundToInt.o ./SoftPosit/build/Linux-x86_64-GCC/p32_add.o ./SoftPosit/build/Linux-x86_64-GCC/p32_sub.o ./SoftPosit/build/Linux-x86_64-GCC/p32_mul.o ./SoftPosit/build/Linux-x86_64-GCC/p32_mulAdd.o ./SoftPosit/build/Linux-x86_64-GCC/p32_div.o ./SoftPosit/build/Linux-x86_64-GCC/p32_eq.o ./SoftPosit/build/Linux-x86_64-GCC/p32_le.o ./SoftPosit/build/Linux-x86_64-GCC/p32_lt.o ./SoftPosit/build/Linux-x86_64-GCC/p32_sqrt.o ./SoftPosit/build/Linux-x86_64-GCC/quire32_fdp_add.o ./SoftPosit/build/Linux-x86_64-GCC/quire32_fdp_sub.o ./SoftPosit/build/Linux-x86_64-GCC/ui32_to_p32.o ./SoftPosit/build/Linux-x86_64-GCC/ui64_to_p32.o ./SoftPosit/build/Linux-x86_64-GCC/i32_to_p32.o ./SoftPosit/build/Linux-x86_64-GCC/i64_to_p32.o ./SoftPosit/build/Linux-x86_64-GCC/s_approxRecipSqrt_1Ks.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertDecToPosit8.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertPosit8ToDec.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertDecToPosit16.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertPosit16ToDec.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertQuire8ToPosit8.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertQuire16ToPosit16.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertQuire32ToPosit32.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertDecToPosit32.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertPosit32ToDec.o ./SoftPosit/build/Linux-x86_64-GCC/c_int.o ./SoftPosit/build/Linux-x86_64-GCC/s_addMagsPX2.o ./SoftPosit/build/Linux-x86_64-GCC/s_subMagsPX2.o ./SoftPosit/build/Linux-x86_64-GCC/s_mulAddPX2.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_add.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_sub.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_mul.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_div.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_mulAdd.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_roundToInt.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_sqrt.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_eq.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_le.o ./SoftPosit/build/Linux-x86_64-GCC/pX2_lt.o ./SoftPosit/build/Linux-x86_64-GCC/ui32_to_pX2.o ./SoftPosit/build/Linux-x86_64-GCC/ui64_to_pX2.o ./SoftPosit/build/Linux-x86_64-GCC/i32_to_pX2.o ./SoftPosit/build/Linux-x86_64-GCC/i64_to_pX2.o ./SoftPosit/build/Linux-x86_64-GCC/c_convertQuireX2ToPositX2.o  \
+	./src_c/softposit_wrappers.o \
+	-static-libgcc \
+	-static-libstdc++ \
+	-lbskernel -lbsprim \
+	-lpthread
+/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64/libbskernel.a(bsim_ccore.o): In function `vnXXt6':
+(.text+0x5c91a): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64/libbskernel.a(bsim_ccore.o): In function `sVa6MF':
+(.text+0x5c8be): warning: Using 'getgrnam_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64/libbskernel.a(bsim_ccore.o): In function `cAHmRt':
+(.text+0x5c97f): warning: Using 'getpwnam_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64/libbskernel.a(bsim_ccore.o): In function `a_jTr_':
+(.text+0x5c9e8): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64/libbskernel.a(bsim_ccore.o): In function `hROW7o':
+(.text+0x5c7f2): warning: Using 'gethostbyaddr_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64/libbskernel.a(bsim_ccore.o): In function `ndHqVr':
+(.text+0x5c76c): warning: Using 'gethostbyname_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/opt/bsc/Bluespec-2018.10.beta1/lib/Bluesim/g++4_64/libbskernel.a(bsim_ccore.o): In function `kMjz6y':
+(.text+0x5c859): warning: Using 'getservbyname_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+Linking finished for distributable Bluesim (without Bluetcl driver)
+Simulation...
+./builds/Adder/output/out_adder 
+         0
+[280]::INF::No errors found.
+Simulation finished
