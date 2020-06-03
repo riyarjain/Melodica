@@ -161,32 +161,51 @@ module mkNormalizer (Normalizer_IFC);
         //we bound the sum of k and expo to maximum if it exceeds
         // k + shift expo depending on available bits
         UInt#(PositWidthMinus1) uint_k_expo = boundedPlus(unpack(k) , unpack(extend(expo_masked)<<shift0));
-	Bit#(FracWidth) frac = truncate({(n_2_k == 0?1'b0:1'b1),dIn.frac}>>shift_new0);
+                let stage1_regf = Stage1_n {
+            //carrying sign bit forward
+            sign : dIn.sign ,
+            //carrying zero and infinity flag forward
+            zero_infinity_flag : dIn.zero_infinity_flag,
+            //carrying nan flag forward
+            nan_flag : dIn.nan_flag,
+            //carrying fraction field forward
+            frac : truncate({(n_2_k == 0?1'b0:1'b1),dIn.frac}>>shift_new0),//1'b0 for now may have to condition it later to (1'b1 for n_2_k >0)
             //combining the regime and exponent field
-         Bit#(PositWidthMinus1) k_expo = pack(uint_k_expo);
+            k_expo : pack(uint_k_expo),
+            //this gives the shift in the number of bits for the exponent field
+            shift_1 : shift0,
             // see the case where there is no available space to accomodate exponent and the there is no shift in fraction snce all frac bits will be lost
-         Bit#(1) flag_endcase = pack(n_2_k == 0 && shift_new0 == 0); 
+            flag_endcase : pack(n_2_k == 0 && shift_new0 == 0), 
             //carrying forward msb of truncated fraction bits
             //if there is no shift in fraction msb remains but if there is change we have to use the last bit of the frac bits lost
-            Bit#(1) truncated_frac_msb = shift_new0 == 0 ? dIn.truncated_frac_msb : dIn.frac[shift_new0-1];
+            truncated_frac_msb : shift_new0 == 0 ? dIn.truncated_frac_msb : dIn.frac[shift_new0-1],
             //carrying forward truncated_frac_zero
             //if there is no shift in truncated_frac_zero remains but if there is a shift we have to see the new rounded frac bits, old truncated_frac_msb and old truncated_frac_zero
-            Bit#(1) truncated_frac_zero = shift_new0 == 0 ? dIn.truncated_frac_zero :(shift_new0 == fromInteger(1) ?  dIn.truncated_frac_zero & (~dIn.truncated_frac_msb) : dIn.truncated_frac_zero & (~dIn.truncated_frac_msb) & ((unpack(dIn.frac[shift_new0-2:0]) ==  0)? 1'b1 : 1'b0));
+            truncated_frac_zero : shift_new0 == 0 ? dIn.truncated_frac_zero :(shift_new0 == fromInteger(1) ?  dIn.truncated_frac_zero & (~dIn.truncated_frac_msb) : dIn.truncated_frac_zero & (~dIn.truncated_frac_msb) & ((unpack(dIn.frac[shift_new0-2:0]) ==  0)? 1'b1 : 1'b0)) };
             `ifdef RANDOM_PRINT
-            $display("shift0 %b shift_new0 %b expo_new %b dIn.frac %b n_2_k %b expo %b truncated_frac_msb %b truncated_frac_zero %b ",shift0, shift_new0, expo_masked,dIn.frac,n_2_k,expo,truncated_frac_msb,truncated_frac_zero);
+            $display("shift0 %b shift_new0 %b expo_new %b dIn.frac %b n_2_k %b expo %b truncated_frac_msb %b truncated_frac_zero %b ",shift0, shift_new0, expo_masked,dIn.frac,n_2_k,expo,stage1_regf.truncated_frac_msb,dIn.truncated_frac_zero);
             $display("k %b",k);
             $display("no_of_bit_k %b",no_of_bit_k);
             `endif
+        fifo_stage1_reg.enq(stage1_regf);
 
+    endrule
+
+    // ------------
+    // calculate rounding
+    // combine regime, exponent, fraction
+    rule stage_1;
+        //dIn reads the values from pipeline register stored from previous stage
+        let dIn = fifo_stage1_reg.first;  fifo_stage1_reg.deq;
         //shift_2 gives the shift in fraction bits
-        let shift_2 = fromInteger(valueOf(FracWidth))-shift0;
+        let shift_2 = fromInteger(valueOf(FracWidth))-dIn.shift_1;
         //expo_even tells if exponent field's lsb is 0/1; see this only if #frac bits = 0; in other cases it is 1
         // see if we have even expo or odd expo
-        Bit#(1) expo_even = (shift0 == 0 ? ~(k_expo[0]) : 1'b1);
+        Bit#(1) expo_even = (dIn.shift_1 == 0 ? ~(dIn.k_expo[0]) : 1'b1);
         // in rounding a few bits will be lost so depending on the bits lost we round the number 
         //flag_prev_truncate tells if the last bit lost is from truncated frac or the present frac
         //require it to round the number to nearest value
-        Bit#(1) flag_prev_truncate = ((shift_2) == 0) ? truncated_frac_msb : (frac[shift_2-1]);
+        Bit#(1) flag_prev_truncate = ((shift_2) == 0) ? dIn.truncated_frac_msb : (dIn.frac[shift_2-1]);
 
         // flag_equidistant tells if it is equidistant from the
         // posits that can be represented
@@ -201,36 +220,36 @@ module mkNormalizer (Normalizer_IFC);
             //a) more than 1 (shift_2>1): then the msb lost(flag_prev_truncate) should be 1, all other bits truncated due to the shifting should be 0s & other bits that need to be ensured to be 0 include truncated_frac_msb should be 0 & truncated_frac_zero should be 1 and finally only is the last fraction bit being used is 1 then only we have to add 1 and round it to even  
             //b) is equal to 1(shift_2 ==1): then the msb lost(flag_prev_truncate) should be 1 & other bits that need to be ensured to be 0 include truncated_frac_msb that should be 0 & truncated_frac_zero that should be 1 and finally only is the last fraction bit being used is 1 then only we have to add 1 and round it to even 
             //c) is equal to 0(shift_2 ==0): then the msb lost(flag_prev_truncate which is also equal to truncated_frac_msb) should be 1 & other bits that need to be ensured to be 0 include truncated_frac_zero that should be 1 and finally only is the last fraction bit being used is 1 then only we have to add 1 and round it to even  
-            //d) all bits(shift0 == 0): then the msb lost(flag_prev_truncate which is also equal to truncated_frac_msb) should be 1 & other bits that need to be ensured to be 0 include truncated_frac_zero that should be 1 and finally since all fraction bits are lost then the last bit in the number will be exponent bit so we have to check if that is even or not and so decide the rounding bit 
+            //d) all bits(shift_1 == 0): then the msb lost(flag_prev_truncate which is also equal to truncated_frac_msb) should be 1 & other bits that need to be ensured to be 0 include truncated_frac_zero that should be 1 and finally since all fraction bits are lost then the last bit in the number will be exponent bit so we have to check if that is even or not and so decide the rounding bit 
         //case2: flag_endcase states if all expo(other than when es = 0) and frac bits are being truncated we check if the flag_prev_truncate is 0  
         //case3: when k_expo is all 1s and all frac bits are being truncated and frac and all other bits are 0 it will be equidistant even if expo bits is zero (other than when es = 0)
 
         Bit#(1) flag_equidistant = 1'b0;
 	if(shift_2>= 0)
-		if(frac[shift_2] == 1'b0 && flag_prev_truncate == 1'b1 && truncated_frac_zero == 1'b1 && expo_even == 1'b1)
+		if(dIn.frac[shift_2] == 1'b0 && flag_prev_truncate == 1'b1 && dIn.truncated_frac_zero == 1'b1 && expo_even == 1'b1)
 			if(shift_2 == 0)
 				flag_equidistant = 1'b1;
-			else if(shift_2 == 1 && truncated_frac_msb == 1'b0 )
+			else if(shift_2 == 1 && dIn.truncated_frac_msb == 1'b0 )
 				flag_equidistant = 1'b1;
-			else if(shift_2>=2 && unpack(frac[shift_2-2:0]) ==  0 && truncated_frac_msb == 1'b0)
+			else if(shift_2>=2 && unpack(dIn.frac[shift_2-2:0]) ==  0 && dIn.truncated_frac_msb == 1'b0)
 				flag_equidistant = 1'b1;
-	else if(flag_endcase == 1'b1 && flag_prev_truncate == 1'b1 && (es_int != 0)) 
+	else if(dIn.flag_endcase == 1'b1 && flag_prev_truncate == 1'b1 && (es_int != 0)) 
 		flag_equidistant = 1'b1;
-	else if(k_expo == '1 && shift0 == 0 && frac ==  0 && truncated_frac_zero == 1'b1 &&  truncated_frac_msb == 1'b0 && (es_int != 0))
+	else if(dIn.k_expo == '1 && dIn.shift_1 == 0 && dIn.frac ==  0 && dIn.truncated_frac_zero == 1'b1 &&  dIn.truncated_frac_msb == 1'b0 && (es_int != 0))
 		flag_equidistant = 1'b1;
 	else
 		flag_equidistant = 1'b0;
 
         //we bound the sum of k expo and frac to maximum if it exceeds
         //k_expo + shifted fraction bits + if the prev truncated bit is 1/0 - if the number is equidistant
-        UInt#(PositWidthMinus1) uint_k_expo_frac = boundedPlus(unpack(k_expo +(extend(frac)>>(shift_2))-extend(flag_equidistant)),unpack(extend(flag_prev_truncate)));
+        UInt#(PositWidthMinus1) uint_k_expo_frac = boundedPlus(unpack(dIn.k_expo +(extend(dIn.frac)>>(shift_2))-extend(flag_equidistant)),unpack(extend(flag_prev_truncate)));
         uint_k_expo_frac = uint_k_expo_frac + extend(uint_k_expo_frac == 0 && flag_equidistant == 0 ?1'b1:1'b0);
         
 	Bool rounding = (flag_prev_truncate - flag_equidistant == 1'b1 || uint_k_expo_frac == 0 && flag_equidistant == 0);
         `ifdef RANDOM_PRINT
         $display("dIn.sign %b",dIn.sign);
-        $display("k_expo %b frac %b uint_k_expo_frac %b flag_endcase %b",k_expo,frac,uint_k_expo_frac,flag_endcase);
-        $display(" shift0 %b shift_2 %b flag_prev_truncate %b flag_equidistant %b",shift0,shift_2,flag_prev_truncate,flag_equidistant);
+        $display("dIn.k_expo %b dIn.frac %b uint_k_expo_frac %b dIn.flag_endcase %b",dIn.k_expo,dIn.frac,uint_k_expo_frac,dIn.flag_endcase);
+        $display(" dIn.shift_1 %b shift_2 %b flag_prev_truncate %b flag_equidistant %b",dIn.shift_1,shift_2,flag_prev_truncate,flag_equidistant);
         $display(" dIn.zero_infinity_flag %b",dIn.zero_infinity_flag);
         `endif
         let output_regf = Output_posit_n {

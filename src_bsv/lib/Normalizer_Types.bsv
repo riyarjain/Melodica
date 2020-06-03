@@ -40,7 +40,6 @@ typedef struct {Bit#(1) sign;
 		Bit#(PositWidthMinus1) k;
 		Bit#(ExpWidth) expo;
 		Bit#(FracWidth) frac;
-		UInt#(BitsPerPositWidth) no_of_bit_k;
 		Bit#(1) truncated_frac_msb;
 		Bit#(1) truncated_frac_zero;} Stage0_n deriving(Bits,FShow);
 //Stage0_n consists of sign of posit, zero and infinity flag, NaN flag, regime field, exponent field, fraction field, number of bits in regime field
@@ -49,7 +48,6 @@ typedef struct {Bit#(1) sign;
 		Bit#(1) nan_flag;
 		Bit#(PositWidthMinus1) k_expo;
 		Bit#(FracWidth) frac;
-		UInt#(BitsPerPositWidth) no_of_bit_k;
 		UInt#(BitsPerPositWidth) shift_1;
 		Bit#(1) flag_endcase;
 		Bit#(1) truncated_frac_msb;
