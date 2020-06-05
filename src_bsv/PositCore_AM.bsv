@@ -1,5 +1,5 @@
 //ADD SUB MUL DIV FMA FDA FMS FDS PtoQ QtoP FtoP PtoF
-package PositCore;
+package PositCore_AM;
 
 // Library imports
 import FIFOF        :: *;
@@ -75,7 +75,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	FIFO #(Posit_Req) ffI <- mkFIFO;
 	FIFO #(Fpu_Rsp) ffO <- mkFIFO;
 	FIFO #(Bit#(FloatWidth)) ffI_f <- mkFIFO;
-	
+//Send posit values for extraction	
 	rule extract_in;
 		if(tpl_4(ffI.first) == FCVT_P_S)
 			begin
@@ -86,7 +86,9 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 			begin
 				let in_posit1 = Input_posit {posit_inp : tpl_1(ffI.first).P};
 			   	extracter1.inoutifc.request.put (in_posit1);
-			   	let in_posit2 = Input_posit {posit_inp : tpl_2(ffI.first).P};
+					let in_posit2 = Input_posit {posit_inp : tpl_2(ffI.first).P};
+				if(tpl_4(ffI.first) == FMS_P || tpl_4(ffI.first) == FDS_P || tpl_4(ffI.first) == FSUB_P)
+					in_posit2 = Input_posit {posit_inp : twos_complement(tpl_2(ffI.first).P)};
 			   	extracter2.inoutifc.request.put (in_posit2);
 			end
 		else if(tpl_4(ffI.first) == FCVT_S_P || tpl_4(ffI.first) == FCVT_R_P)
@@ -104,14 +106,11 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
                              , fshow (tpl_2(ffI.first).P));
 		ffI.deq;
 	endrule
-
+//depending on opcode send the extracted values to respective pipelines
 	rule rl_fma(opcode_in.first == FMA_P || opcode_in.first == FMS_P );
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
-		if(opcode_in.first == FMA_P )
 		fma.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
-		else(opcode_in.first == FMS_P )
-			fma.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : twos_complement(extOut1), posit_inp_e2 : extOut1}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
                 
@@ -120,10 +119,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	rule rl_fda(opcode_in.first == FDA_P || opcode_in.first == FDS_P );
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
-		if(opcode_in.first == FDA_P )
-			fda.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
-		else(opcode_in.first == FDS_P )
-			fda.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : twos_complement(extOut1), posit_inp_e2 : extOut1}));
+		fda.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
                 
@@ -159,10 +155,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	rule rl_add(opcode_in.first == FADD_P || opcode_in.first == FSUB_P );
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
-		if(opcode_in.first == FADD_P )
-			add.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
-		else if(opcode_in.first == FSUB_P )
-			add.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : twos_complement(extOut1)}));	
+		add.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
                 
@@ -171,7 +164,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	rule rl_mul(opcode_in.first == FMUL_P);
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
-		mul.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
+		mul.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
                 
@@ -180,12 +173,12 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	rule rl_div(opcode_in.first == FDIV_P);
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
-		div.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
+		div.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
-                
-	endrule
 
+	endrule
+//normalize the values that are got as outputs from the operation pipelines
 	rule rl_out1;
 		let op = opcode.first;
 		opcode_out.enq(op);
@@ -210,7 +203,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 				let out_pf <- div.compute.response.get();
 				normalizer.inoutifc.request.put (out_pf);				
 			end
-		else if(op == FADD_P || FSUB_P)
+		else if(op == FADD_P || op == FSUB_P)
 			begin
 				let out_pf <- add.compute.response.get();
 				normalizer.inoutifc.request.put (out_pf);				
@@ -222,6 +215,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
                    $display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
 	endrule
 
+//arrange the values as required to be sent out of the positcore
 	rule rl_out2;
 		let op = opcode_out.first; opcode_out.deq;
 		let excep = FloatingPoint::Exception{invalid_op : False, divide_0: False, overflow: False, underflow: False, inexact : False};

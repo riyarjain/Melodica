@@ -42,8 +42,6 @@ interface Div_PNE ;
    interface Server #(InputTwoExtractPosit,Input_value_n) compute;
 endinterface
 
-
-
 //
 // Module definition
 module mkDiv_PNE (Div_PNE );
@@ -55,7 +53,7 @@ Divider_IFC  divider <- mkDivider;
 rule rl_connect0;
    let extOut1 = ffI.first.posit_inp_e1;
    let extOut2 = ffI.first.posit_inp_e2;
-   divider.inoutifc.request.put (Inputs_m {
+   divider.inoutifc.request.put (Inputs_d {
 	sign1: extOut1.sign,
 	nanflag1: 1'b0,
  	zero_infinity_flag1: extOut1.zero_infinity_flag ,

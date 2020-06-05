@@ -1,4 +1,4 @@
-package IntDivide;
+package IntDivide_generic;
 
 import FIFO        :: *;
 import GetPut       :: *;
@@ -118,4 +118,4 @@ interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
 
 endmodule
 
-endpackage: IntDivide
+endpackage: IntDivide_generic

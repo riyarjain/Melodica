@@ -241,7 +241,9 @@ module mkNormalizer (Normalizer_IFC);
             zero_infinity_flag : dIn.zero_infinity_flag,
 	    rounding : rounding};
         fifo_output_reg.enq(output_regf);
-
+	`ifdef RANDOM_PRINT
+        $display("output_norm %b",output_regf);
+        `endif
     endrule    
     
     interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);

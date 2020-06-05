@@ -33,7 +33,7 @@ import ClientServer :: *;
 import Divider_Types_fda :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
-import IntDivide ::*;
+import IntDivide_generic ::*;
 import Common_Fused_Op :: *;
 
 module mkDivider (Divider_IFC );
