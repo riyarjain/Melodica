@@ -1,4 +1,4 @@
-//FMA PtoQ QtoP FtoP PtoF
+//FMA FDA PtoQ QtoP FtoP PtoF
 package PositCore;
 
 // Library imports
@@ -15,6 +15,7 @@ import Normalizer_Types :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import FMA_PNE_Quire_PC :: *;
+import FDA_PNE_Quire_PC :: *;
 import FtoP_PNE_PC :: *;
 import PtoF_PNE_PC :: *;
 import PositToQuire_PNE_PC :: *;
@@ -38,7 +39,7 @@ typedef union tagged {
 typedef Tuple2#( FloatU, FloatingPoint::Exception )       Fpu_Rsp;
 `endif
 
-typedef enum {FMA_P, FCVT_P_S, FCVT_S_P, FCVT_P_R, FCVT_R_P} PositCmds
+typedef enum {FMA_P, FDA_P, FMS_P, FDS_P, FCVT_P_S, FCVT_S_P, FCVT_P_R, FCVT_R_P} PositCmds
 deriving (Bits, Eq, FShow);
 
 typedef Tuple4 #(FloatU, FloatU, RoundMode, PositCmds) Posit_Req;
@@ -51,7 +52,8 @@ endinterface
 module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 
 	Reg #(Bit#(QuireWidth))  rg_quire   <- mkReg(0);
-	FMA_PNE_Quire       fma             <- mkFMA_PNE_Quire(rg_quire);	
+	FMA_PNE_Quire       fma             <- mkFMA_PNE_Quire(rg_quire);
+	FDA_PNE_Quire       fda             <- mkFDA_PNE_Quire(rg_quire);		
 	PositToQuire_PNE    ptoq            <- mkPositToQuire_PNE(rg_quire);
 	QuireToPosit_PNE    qtop            <- mkQuireToPosit_PNE(rg_quire);	
 	FtoP_PNE            ftop            <- mkFtoP_PNE;	
@@ -74,11 +76,13 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 				let a = tpl_1(ffI.first).S;
 				ffI_f.enq({pack(a.sign),a.exp,a.sfd});
 			end
-		else if(tpl_4(ffI.first) == FMA_P)
+		else if(tpl_4(ffI.first) == FDA_P || tpl_4(ffI.first) == FDS_P || tpl_4(ffI.first) == FMS_P || tpl_4(ffI.first) == FMA_P)
 			begin
 				let in_posit1 = Input_posit {posit_inp : tpl_1(ffI.first).P};
 			   	extracter1.inoutifc.request.put (in_posit1);
-			   	let in_posit2 = Input_posit {posit_inp : tpl_2(ffI.first).P};
+				let in_posit2 = Input_posit {posit_inp : tpl_2(ffI.first).P};
+				if(tpl_4(ffI.first) == FMS_P || tpl_4(ffI.first) == FDS_P)
+					in_posit2 = Input_posit {posit_inp : twos_complement(tpl_2(ffI.first).P)};
 			   	extracter2.inoutifc.request.put (in_posit2);
 			end
 		else if(tpl_4(ffI.first) == FCVT_S_P || tpl_4(ffI.first) == FCVT_R_P)
@@ -97,10 +101,18 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		ffI.deq;
 	endrule
 
-	rule rl_fma(opcode_in.first == FMA_P);
+	rule rl_fma(opcode_in.first == FMA_P || opcode_in.first == FMS_P );
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
-		fma.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
+		fma.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
+		opcode.enq(opcode_in.first);
+		opcode_in.deq;
+	endrule
+
+	rule rl_fda(opcode_in.first == FDA_P || opcode_in.first == FDS_P );
+		let extOut1 <- extracter1.inoutifc.response.get();
+	   	let extOut2 <- extracter2.inoutifc.response.get();
+		fda.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
                 
@@ -137,9 +149,14 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		let op = opcode.first;
 		opcode_out.enq(op);
 		opcode.deq;
-		if(op == FCVT_P_S || op ==  FCVT_P_R)
+		if(op == FCVT_P_S )
 			begin
 				let out_pf <- ftop.compute.response.get();
+				normalizer.inoutifc.request.put (out_pf);				
+			end
+		else if( op ==  FCVT_P_R)
+			begin
+				let out_pf <- qtop.compute.response.get();
 				normalizer.inoutifc.request.put (out_pf);				
 			end
 		else 
@@ -152,9 +169,15 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		let op = opcode_out.first; opcode_out.deq;
 		let excep = FloatingPoint::Exception{invalid_op : False, divide_0: False, overflow: False, underflow: False, inexact : False};
 		//FloatU posit_out;
-		if(op == FMA_P)
+		if(op == FMA_P ||op == FMS_P)
 			begin
 				let a <- fma.compute.response.get();
+				FloatU posit_out = tagged P 0;
+				ffO.enq(tuple2(posit_out,excep));
+			end
+		else if(op == FDA_P ||op == FDS_P  )
+			begin
+				let a <- fda.compute.response.get();
 				FloatU posit_out = tagged P 0;
 				ffO.enq(tuple2(posit_out,excep));
 			end
@@ -193,9 +216,12 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 			end
 		else 
                    $display (  "%0d: %m: rl_out: Error Illegal Opcode", cur_cycle, fshow(op));
-	
+			
                 if (verbosity > 1)
-                   $display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
+			begin
+                   		$display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
+				$display("QUIREout %h",rg_quire);
+			end
 	endrule
 
 interface server_core = toGPServer (ffI,ffO);

@@ -86,7 +86,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 			begin
 				let in_posit1 = Input_posit {posit_inp : tpl_1(ffI.first).P};
 			   	extracter1.inoutifc.request.put (in_posit1);
-					let in_posit2 = Input_posit {posit_inp : tpl_2(ffI.first).P};
+				let in_posit2 = Input_posit {posit_inp : tpl_2(ffI.first).P};
 				if(tpl_4(ffI.first) == FMS_P || tpl_4(ffI.first) == FDS_P || tpl_4(ffI.first) == FSUB_P)
 					in_posit2 = Input_posit {posit_inp : twos_complement(tpl_2(ffI.first).P)};
 			   	extracter2.inoutifc.request.put (in_posit2);
@@ -106,6 +106,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
                              , fshow (tpl_2(ffI.first).P));
 		ffI.deq;
 	endrule
+
 //depending on opcode send the extracted values to respective pipelines
 	rule rl_fma(opcode_in.first == FMA_P || opcode_in.first == FMS_P );
 		let extOut1 <- extracter1.inoutifc.response.get();
@@ -113,7 +114,6 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		fma.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
-                
 	endrule
 
 	rule rl_fda(opcode_in.first == FDA_P || opcode_in.first == FDS_P );
@@ -167,7 +167,6 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		mul.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
-                
 	endrule
 
 	rule rl_div(opcode_in.first == FDIV_P);
@@ -176,8 +175,8 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		div.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
-
 	endrule
+
 //normalize the values that are got as outputs from the operation pipelines
 	rule rl_out1;
 		let op = opcode.first;
@@ -209,10 +208,10 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 				normalizer.inoutifc.request.put (out_pf);				
 			end
 		else 
-                   $display (  "%0d: %m: rl_out: no normalisation required", cur_cycle, fshow(op));
+                   $display (  "%0d: %m: rl_norm: no normalisation required", cur_cycle, fshow(op));
 	
                 if (verbosity > 1)
-                   $display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
+                   $display (  "%0d: %m: rl_norm: ", cur_cycle, fshow(op));
 	endrule
 
 //arrange the values as required to be sent out of the positcore
@@ -220,15 +219,15 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		let op = opcode_out.first; opcode_out.deq;
 		let excep = FloatingPoint::Exception{invalid_op : False, divide_0: False, overflow: False, underflow: False, inexact : False};
 		//FloatU posit_out;
-		if(op == FMA_P ||op == FMS_P  )
+		if(op == FMA_P ||op == FMS_P)
 			begin
 				let a <- fma.compute.response.get();
 				FloatU posit_out = tagged P 0;
 				ffO.enq(tuple2(posit_out,excep));
 			end
-		if(op == FDA_P ||op == FDS_P  )
+		else if(op == FDA_P ||op == FDS_P  )
 			begin
-				let a <- fma.compute.response.get();
+				let a <- fda.compute.response.get();
 				FloatU posit_out = tagged P 0;
 				ffO.enq(tuple2(posit_out,excep));
 			end
@@ -247,7 +246,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 			end
 		else if(op == FCVT_P_S || op ==  FCVT_P_R || op == FSUB_P || op == FADD_P || op == FMUL_P || op == FDIV_P )
 			begin
-				let out_pf <- normalizer.inoutifc.response.get ();
+				let out_pf <- normalizer.inoutifc.response.get();
 				excep.invalid_op = out_pf.nan_flag == 1'b1;
 				excep.overflow = out_pf.zero_infinity_flag == INF;
 				excep.underflow = out_pf.zero_infinity_flag == ZERO && out_pf.rounding;
@@ -257,9 +256,12 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 			end
 		else 
                    $display (  "%0d: %m: rl_out: Error Illegal Opcode", cur_cycle, fshow(op));
-	
+			
                 if (verbosity > 1)
-                   $display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
+			begin
+                   		$display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
+				$display("QUIREout %h",rg_quire);
+			end
 	endrule
 
 interface server_core = toGPServer (ffI,ffO);

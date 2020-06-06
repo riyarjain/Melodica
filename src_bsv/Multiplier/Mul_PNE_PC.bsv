@@ -66,6 +66,7 @@ rule rl_connect0;
  	zero_infinity_flag2: extOut2.zero_infinity_flag ,
 	scale2 : extOut2.scale,
 	frac2 : extOut2.frac});
+	ffI.deq;
 endrule
 
 rule rl_connect2;

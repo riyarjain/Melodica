@@ -39,8 +39,8 @@ import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Extracter_Types	:: *;
 import Normalizer_Types	:: *;
-import Adder_Types_fused_op 	:: *;
-import Adder_fused_op	:: *;
+import Adder_Types_fused_op_PC 	:: *;
+import Adder_fused_op_PC	:: *;
 import Multiplier_Types_fma	:: *;
 import Multiplier_fma	:: *;
 import Common_Fused_Op :: *;
@@ -56,8 +56,8 @@ FIFOF #(Bit#(0)) ffO <- mkFIFOF;
 FIFO #(InputTwoExtractPosit) ffI <- mkFIFO;
 //FIFO #(Bit#(QuireWidth)) fftemp <- mkFIFO;
 Multiplier_IFC  multiplier <- mkMultiplier;
-Adder_IFC  adder <- mkAdder;
-
+Adder_IFC  adder <- mkAdder(rg_quire);
+Reg #(Bit#(1)) check_quire <- mkReg(0);
 //get their extracted value and semd to multiply
 rule rl_connect0;
    	let extOut1 = ffI.first.posit_inp_e1;
@@ -73,25 +73,23 @@ rule rl_connect0;
  	zero_infinity_flag2: extOut2.zero_infinity_flag ,
 	scale2 : extOut2.scale,
 	frac2 : extOut2.frac});
+	ffI.deq;
 	// the fraction and scale are extended since operation is on quire
 	//using signed extension for scale value
 	//fraction value is normally extended but also shifted to maked the MSB the highest valued fraction bit
 endrule
 //get the multiply pipeline output and send to adder pipeline
-rule rl_connect1;
+rule rl_connect1(check_quire == 1'b0);
    	let mulOut <- multiplier.inoutifc.response.get();
-   	let in_quire = rg_quire;
-
-	adder.inoutifc.request.put(Inputs_a{q1 : Quire{sign : msb(in_quire),
-						    zero_infinity_flag : REGULAR,
-						    nan_flag : 1'b0,
-						    carry_int_frac : in_quire[valueOf(QuireWidthMinus2):0]} , q2 : mulOut}); 
+	adder.inoutifc.request.put(Inputs_a{q2 : mulOut});
+	check_quire <= 1'b1; 
 endrule
 //get output from adder pipeline and send to Testbench
 rule rl_out;
 	let addOut <- adder.inoutifc.response.get();
-	rg_quire <= addOut;
+	check_quire <= 1'b0;
 	ffO.enq(?);
+
 endrule
 interface compute = toGPServer (ffI,ffO);
 endmodule
