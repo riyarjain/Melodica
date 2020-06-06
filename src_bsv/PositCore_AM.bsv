@@ -55,6 +55,7 @@ endinterface
 module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 
 	Reg #(Bit#(QuireWidth))  rg_quire   <- mkReg(0);
+	Reg #(Bit#(1))  rg_quire_busy   <- mkReg(0);
 	FMA_PNE_Quire       fma             <- mkFMA_PNE_Quire(rg_quire);
 	FDA_PNE_Quire       fda             <- mkFDA_PNE_Quire(rg_quire);		
 	PositToQuire_PNE    ptoq            <- mkPositToQuire_PNE(rg_quire);
@@ -108,21 +109,22 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	endrule
 
 //depending on opcode send the extracted values to respective pipelines
-	rule rl_fma(opcode_in.first == FMA_P || opcode_in.first == FMS_P );
+	rule rl_fma((opcode_in.first == FMA_P || opcode_in.first == FMS_P) && rg_quire_busy == 1'b0);
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
 		fma.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
+		rg_quire_busy <= 1'b1;
 	endrule
 
-	rule rl_fda(opcode_in.first == FDA_P || opcode_in.first == FDS_P );
+	rule rl_fda((opcode_in.first == FDA_P || opcode_in.first == FDS_P) && rg_quire_busy == 1'b0);
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
 		fda.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut1}));
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
-                
+		rg_quire_busy <= 1'b1;                
 	endrule
 	
 	rule rl_ptof(opcode_in.first == FCVT_S_P);
@@ -139,17 +141,19 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		ffI_f.deq;
 	endrule
 
-	rule rl_ptoq(opcode_in.first == FCVT_R_P);
+	rule rl_ptoq(opcode_in.first == FCVT_R_P && rg_quire_busy == 1'b0);
 		let extOut1 <- extracter1.inoutifc.response.get();
 		ptoq.compute.request.put(extOut1);
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
+		rg_quire_busy <= 1'b1;
 	endrule
 	
-	rule rl_qtop(opcode_in.first == FCVT_P_R);
+	rule rl_qtop(opcode_in.first == FCVT_P_R && rg_quire_busy == 1'b0);
 		qtop.compute.request.put(?);
 		opcode.enq(opcode_in.first);
 		opcode_in.deq;
+		rg_quire_busy <= 1'b1;
 	endrule
 
 	rule rl_add(opcode_in.first == FADD_P || opcode_in.first == FSUB_P );
@@ -178,7 +182,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	endrule
 
 //normalize the values that are got as outputs from the operation pipelines
-	rule rl_out1;
+	rule rl_norm;
 		let op = opcode.first;
 		opcode_out.enq(op);
 		opcode.deq;
@@ -190,7 +194,8 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		else if(op ==  FCVT_P_R )
 			begin
 				let out_pf <- qtop.compute.response.get();
-				normalizer.inoutifc.request.put (out_pf);				
+				normalizer.inoutifc.request.put (out_pf);
+				rg_quire_busy <= 1'b0;				
 			end
 		else if(op == FMUL_P )
 			begin
@@ -224,18 +229,21 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 				let a <- fma.compute.response.get();
 				FloatU posit_out = tagged P 0;
 				ffO.enq(tuple2(posit_out,excep));
+				rg_quire_busy <= 1'b0;
 			end
 		else if(op == FDA_P ||op == FDS_P  )
 			begin
 				let a <- fda.compute.response.get();
 				FloatU posit_out = tagged P 0;
 				ffO.enq(tuple2(posit_out,excep));
+				rg_quire_busy <= 1'b0;
 			end
 		else if(op == FCVT_R_P)
 			begin
 				let a <- ptoq.compute.response.get();
 				FloatU posit_out = tagged P 0;
 				ffO.enq(tuple2(posit_out,excep));
+				rg_quire_busy <= 1'b0;
 			end
 		else if(op == FCVT_S_P)
 			begin

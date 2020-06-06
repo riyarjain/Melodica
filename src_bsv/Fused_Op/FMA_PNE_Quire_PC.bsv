@@ -79,15 +79,13 @@ rule rl_connect0;
 	//fraction value is normally extended but also shifted to maked the MSB the highest valued fraction bit
 endrule
 //get the multiply pipeline output and send to adder pipeline
-rule rl_connect1(check_quire == 1'b0);
+rule rl_connect1;
    	let mulOut <- multiplier.inoutifc.response.get();
 	adder.inoutifc.request.put(Inputs_a{q2 : mulOut});
-	check_quire <= 1'b1; 
 endrule
 //get output from adder pipeline and send to Testbench
 rule rl_out;
 	let addOut <- adder.inoutifc.response.get();
-	check_quire <= 1'b0;
 	ffO.enq(?);
 
 endrule

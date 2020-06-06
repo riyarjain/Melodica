@@ -58,7 +58,6 @@ typedef 1000 Num_Tests;    // Number of random tests to be run
 
 typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
 
-typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
 
 // -----------------------------------------------------------------
 

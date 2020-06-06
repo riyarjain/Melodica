@@ -34,7 +34,7 @@ import ClientServer :: *;
 
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
-import QuireToPosit ::*;
+import QuireToPosit_PC ::*;
 import QtoP_Types	:: *;
 import Normalizer_Types	:: *;
 import Normalizer	:: *;
@@ -48,13 +48,10 @@ module mkQuireToPosit_PNE #(Reg #(Bit#(QuireWidth)) rg_quire)(QuireToPosit_PNE);
 //FIFO #(Bit#(QuireWidth)) ffI <- mkFIFO;
 FIFOF #(Bit#(0)) ffI <- mkFIFOF;
 FIFO #(Input_value_n) ffO <- mkFIFO;
-QuireToPosit_IFC  quireToPosit1 <- mkQuireToPosit;
+QuireToPosit_IFC  quireToPosit1 <- mkQuireToPosit(rg_quire);
 rule rl_in;
 	let in_quire = rg_quire;
-	quireToPosit1.inoutifc.request.put(Quire{sign : msb(in_quire),
-						    zero_infinity_flag : REGULAR,
-						    nan_flag : 1'b0,
-						    carry_int_frac : in_quire[valueOf(QuireWidthMinus2):0]}); 
+	quireToPosit1.inoutifc.request.put(?); 
 	ffI.deq;
 endrule
 

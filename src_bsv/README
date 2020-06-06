@@ -1,0 +1,4 @@
+
+PositCore.bsv has FMA FMS FDA FDS PtoQ QtoP FtoP PtoF operations.
+PositCore_AM.bsv has ADD SUB MUL DIV FMA FDA FMS FDS PtoQ QtoP FtoP PtoF operations.
+PositCore.bsv will be compiled by default. If one wants to compile PositCore_AM.bsv, one has to add PositCore_AM flag to BSC_COMPILATION_FLAGS in the Makefile.

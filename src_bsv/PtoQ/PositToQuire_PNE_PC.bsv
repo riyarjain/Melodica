@@ -33,7 +33,7 @@ import ClientServer :: *;
 
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
-import PositToQuire ::*;
+import PositToQuire_PC ::*;
 import PtoQ_Types	:: *;
 import Extracter_Types :: *;
 
@@ -46,7 +46,7 @@ module mkPositToQuire_PNE #(Reg #(Bit#(QuireWidth))  rg_quire)(PositToQuire_PNE)
 //FIFO #(Bit#(QuireWidth)) ffO <- mkFIFO;
 FIFOF #(Bit#(0)) ffO <- mkFIFOF;
 FIFO #(Output_posit) ffI <- mkFIFO;
-PositToQuire_IFC  positToquire <- mkPositToQuire;
+PositToQuire_IFC  positToquire <- mkPositToQuire(rg_quire);
 rule rl_in;
 	positToquire.inoutifc.request.put(ffI.first); 
 	ffI.deq;
@@ -54,7 +54,6 @@ endrule
 
 rule rl_out;
    let ptoqOut <- positToquire.inoutifc.response.get ();
-	rg_quire <= ptoqOut;
    ffO.enq(?);
 endrule
 interface compute = toGPServer (ffI,ffO);
