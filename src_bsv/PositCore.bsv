@@ -4,6 +4,7 @@ package PositCore;
 // Library imports
 import FIFOF        :: *;
 import FIFO        :: *;
+import SpecialFIFOs :: *;
 import GetPut       :: *;
 import ClientServer :: *;
 
@@ -64,14 +65,22 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	Extracter_IFC  extracter2 <- mkExtracter;
 	Normalizer_IFC   normalizer <- mkNormalizer;
 
-	FIFO #(PositCmds) opcode <- mkFIFO;
-	FIFO #(PositCmds) opcode_in <- mkFIFO;
-	FIFO #(PositCmds) opcode_out <- mkFIFO;
+
+        // Bypass FIFO as opcodes can be bypassed for the FCVT_P_S
+        // case effectively merging rules extract_in and rl_ftop
+	FIFO #(PositCmds) opcode_in <- mkBypassFIFO;
+	FIFO #(Bit#(FloatWidth)) ffI_f <- mkBypassFIFO;
+
+	FIFO #(PositCmds) opcode_norm <- mkFIFO1;
+        FIFO #(Bool) need_normalize <- mkFIFO1;
+
+	FIFO #(PositCmds) opcode_out <- mkFIFO1;
+
 	FIFO #(Posit_Req) ffI <- mkFIFO;
 	FIFO #(Fpu_Rsp) ffO <- mkFIFO;
-	FIFO #(Bit#(FloatWidth)) ffI_f <- mkFIFO;
 
-//Send posit values for extraction		
+
+        // Send posit values for extraction		
 	rule extract_in;
 		if(tpl_4(ffI.first) == FCVT_P_S)
 			begin
@@ -95,19 +104,19 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		opcode_in.enq(tpl_4(ffI.first));
 		
 		if (verbosity > 1)
-                   $display (  "%0d: %m: rl_in: "
+                   $display (  "%0d: %m: rl_extract_in: "
                              , cur_cycle
                              , fshow (tpl_4(ffI.first))
                              , fshow (tpl_1(ffI.first).P)
                              , fshow (tpl_2(ffI.first).P));
 		ffI.deq;
 	endrule
-//depending on opcode send the extracted values to respective pipelines
+        // depending on opcode_in send the extracted values to respective pipelines
 	rule rl_fma((opcode_in.first == FMA_P || opcode_in.first == FMS_P) && rg_quire_busy == 1'b0);
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
 		fma.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
-		opcode.enq(opcode_in.first);
+		opcode_out.enq(opcode_in.first);
 		opcode_in.deq;
 		rg_quire_busy <= 1'b1;
 	endrule
@@ -116,7 +125,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		let extOut1 <- extracter1.inoutifc.response.get();
 	   	let extOut2 <- extracter2.inoutifc.response.get();
 		fda.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
-		opcode.enq(opcode_in.first);
+		opcode_out.enq(opcode_in.first);
 		opcode_in.deq;
 		rg_quire_busy <= 1'b1;                
 	endrule
@@ -124,13 +133,13 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	rule rl_ptof(opcode_in.first == FCVT_S_P);
 		let extOut1 <- extracter1.inoutifc.response.get();
 		ptof.compute.request.put(extOut1);
-		opcode.enq(opcode_in.first);
+		opcode_out.enq(opcode_in.first);
 		opcode_in.deq;
 	endrule
 
 	rule rl_ftop(opcode_in.first == FCVT_P_S);
 		ftop.compute.request.put(ffI_f.first);
-		opcode.enq(opcode_in.first);
+		opcode_norm.enq(opcode_in.first);
 		opcode_in.deq;
 		ffI_f.deq;
 	endrule
@@ -138,40 +147,43 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	rule rl_ptoq(opcode_in.first == FCVT_R_P && rg_quire_busy == 1'b0);
 		let extOut1 <- extracter1.inoutifc.response.get();
 		ptoq.compute.request.put(extOut1);
-		opcode.enq(opcode_in.first);
+		opcode_out.enq(opcode_in.first);
 		opcode_in.deq;
 		rg_quire_busy <= 1'b1;
 	endrule
 	
 	rule rl_qtop(opcode_in.first == FCVT_P_R && rg_quire_busy == 1'b0);
 		qtop.compute.request.put(?);
-		opcode.enq(opcode_in.first);
+		opcode_norm.enq(opcode_in.first);
 		opcode_in.deq;
 		rg_quire_busy <= 1'b1;
 	endrule
-//normalize the values that are got as outputs from the operation pipelines
+
+        // normalize the values that are got as outputs from the operation pipelines
 	rule rl_norm;
-		let op = opcode.first;
+		let op = opcode_norm.first;
 		opcode_out.enq(op);
-		opcode.deq;
+		opcode_norm.deq;
 		if(op == FCVT_P_S )
 			begin
 				let out_pf <- ftop.compute.response.get();
 				normalizer.inoutifc.request.put (out_pf);				
+                                if (verbosity > 1)
+                                   $display ("%0d: %m: rl_norm: ", cur_cycle, fshow(op));
 			end
 		else if( op ==  FCVT_P_R)
 			begin
 				let out_pf <- qtop.compute.response.get();
 				normalizer.inoutifc.request.put (out_pf);
 				rg_quire_busy <= 1'b0;				
+                                if (verbosity > 1)
+                                   $display ("%0d: %m: rl_norm: ", cur_cycle, fshow(op));
 			end
-		else 
-                   $display (  "%0d: %m: rl_out: no normalisation required", cur_cycle, fshow(op));
+		else
+                   $display (  "%0d: %m: rl_norm: Error Illegal Opcode", cur_cycle, fshow(op));
 	
-                if (verbosity > 1)
-                   $display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
 	endrule
-	rule rl_out2;
+	rule rl_out;
 		let op = opcode_out.first; opcode_out.deq;
 		let excep = FloatingPoint::Exception{invalid_op : False, divide_0: False, overflow: False, underflow: False, inexact : False};
 		//FloatU posit_out;
@@ -228,8 +240,8 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 			
                 if (verbosity > 1)
 			begin
-                   		$display (  "%0d: %m: rl_out: ", cur_cycle, fshow(op));
-				$display("QUIREout %h",rg_quire);
+                   		$display ("%0d: %m: rl_out: ", cur_cycle, fshow(op));
+				$display ("  QUIRE: %h",rg_quire);
 			end
 	endrule
 
