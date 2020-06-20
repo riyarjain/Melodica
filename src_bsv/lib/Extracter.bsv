@@ -38,7 +38,6 @@ import Posit_User_Types :: *;
 
 module mkExtracter (Extracter_IFC );
 	// make a FIFO to store data at the end of each stage of the pipeline, and also for input and outputs
-	FIFOF #(Input_posit )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Output_posit )  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Stage0 )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Stage1 )  fifo_stage1_reg <- mkFIFOF;
@@ -81,8 +80,13 @@ module mkExtracter (Extracter_IFC );
 
 	// stage_0: INPUT STAGE. Checks for special cases. 
 	rule stage_0;
+	endrule	
+
+   interface Server inoutifc;
+      interface Put request;
+         method Action put (Input_posit p);
 		//dIn reads the values from input pipeline register 
-      		let dIn = fifo_input_reg.first;  fifo_input_reg.deq;
+      		let dIn = p;
 		//output 10 for zero, 01 for infinity, 00 if none
 		let zero_infinity_flag = fv_special_case(dIn.posit_inp);
 		//sign bit is 0 when posit is positive else 1 when posit is negative
@@ -126,9 +130,10 @@ module mkExtracter (Extracter_IFC );
 			$display("sign %b",sign);
 			$display("scale %b frac %b",output_regf.scale,output_regf.frac);
 		`endif
-	endrule	
-
-interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
+         endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
 endmodule
 
 endpackage: Extracter
