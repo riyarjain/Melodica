@@ -45,14 +45,7 @@ endinterface
 module mkPositToQuire_PNE(PositToQuire_PNE);
 Extracter_IFC   extracter <- mkExtracter;
 FIFO #(Bit#(QuireWidth)) ffO <- mkFIFO;
-FIFO #(Bit#(PositWidth)) ffI <- mkFIFO;
 PositToQuire_IFC  positToquire <- mkPositToQuire;
-
-rule rl_in;
-	let in_posit1 = Input_posit {posit_inp : ffI.first};
-   	extracter.inoutifc.request.put (in_posit1);
-	ffI.deq;
-endrule
 
 rule rl_connect0;
    	let extOut1 <- extracter.inoutifc.response.get();
@@ -63,7 +56,16 @@ rule rl_out;
    let pToqOut <- positToquire.inoutifc.response.get ();
    ffO.enq(pToqOut);
 endrule
-interface compute = toGPServer (ffI,ffO);
+interface Server compute;
+      interface Put request;
+         method Action put (Bit#(PositWidth) p);
+		let in_posit1 = Input_posit {posit_inp : p};
+   		extracter.inoutifc.request.put (in_posit1);
+         endmethod
+      endinterface
+   interface Get response = toGet (ffO);
+endinterface
+
 endmodule
 
 (* synthesize *)

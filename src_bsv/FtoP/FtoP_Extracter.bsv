@@ -38,7 +38,6 @@ import Normalizer_Types	:: *;
 import Normalizer ::*;
 
 module mkFtoP_Extracter (FtoP_IFC );
-	FIFOF #(Bit#(FloatWidth) )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Stage0_fp )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Input_value_n )  fifo_output_reg <- mkFIFOF;
 	// function checks if float is nan if exponent = 11..11, fraction > 00...000
@@ -61,9 +60,30 @@ module mkFtoP_Extracter (FtoP_IFC );
 	// --------
         // Pipeline stages
 	// stage_0: INPUT STAGE, interpret float and calculate exponent and frac 
-	rule stage_0;
+	// stage_1: truncate frac bits	
+	rule stage_1;
 		//dIn reads the values from input pipeline register 
-      		let dIn = fifo_input_reg.first;  fifo_input_reg.deq;
+		let dIn = fifo_stage0_reg.first;  fifo_stage0_reg.deq;
+		//add hidden bit
+		Bit#(FracWidthPlus1) frac = {1,dIn.frac}; 
+		//if the truncated bits are zero or not 
+		//if frac change < 0 then frac bits lost but if >0 then basically frac is maximum since scale is already maximum 
+		let truncated_frac_zero = dIn.frac_change < 0 ? pack(unpack(frac[abs(dIn.frac_change):0]) ==  0): (dIn.frac_change == 0 ?1'b1: 1'b0);					
+		fifo_output_reg.enq(Input_value_n {
+		sign: dIn.sign,
+	 	zero_infinity_flag: dIn.zero_infinity_flag ,
+		nan_flag: dIn.nan_flag,
+		scale : pack(dIn.scale) ,
+		frac : dIn.frac_change < 0 ?truncate(frac>>abs(dIn.frac_change)+1): (dIn.frac_change == 0 ? truncate(frac) : '1),
+		truncated_frac_msb : dIn.frac_change < 0 ? frac[abs(dIn.frac_change)+1]: (dIn.frac_change == 0 ?dIn.truncated_frac_msb: 1'b1),
+		truncated_frac_zero : ~dIn.truncated_frac_msb & dIn.truncated_frac_zero & truncated_frac_zero});
+	endrule
+
+interface Server inoutifc;
+      interface Put request;
+         method Action put (Bit#(FloatWidth) p);
+		//dIn reads the values from input pipeline register 
+      		let dIn = p;
 		//get sign, exponent and fraction bits
 		Bit#(FloatExpWidth) expo_f_unsigned = (dIn[valueOf(FloatExpoBegin):valueOf(FloatFracWidth)]);
 		Int#(FloatExpWidthPlus1) expo_f = unpack({0,expo_f_unsigned});
@@ -95,28 +115,11 @@ module mkFtoP_Extracter (FtoP_IFC );
 		$display("");
 	`endif
 		fifo_stage0_reg.enq(stage0_regf);
-	endrule
 
-	// stage_1: truncate frac bits	
-	rule stage_1;
-		//dIn reads the values from input pipeline register 
-		let dIn = fifo_stage0_reg.first;  fifo_stage0_reg.deq;
-		//add hidden bit
-		Bit#(FracWidthPlus1) frac = {1,dIn.frac}; 
-		//if the truncated bits are zero or not 
-		//if frac change < 0 then frac bits lost but if >0 then basically frac is maximum since scale is already maximum 
-		let truncated_frac_zero = dIn.frac_change < 0 ? pack(unpack(frac[abs(dIn.frac_change):0]) ==  0): (dIn.frac_change == 0 ?1'b1: 1'b0);					
-		fifo_output_reg.enq(Input_value_n {
-		sign: dIn.sign,
-	 	zero_infinity_flag: dIn.zero_infinity_flag ,
-		nan_flag: dIn.nan_flag,
-		scale : pack(dIn.scale) ,
-		frac : dIn.frac_change < 0 ?truncate(frac>>abs(dIn.frac_change)+1): (dIn.frac_change == 0 ? truncate(frac) : '1),
-		truncated_frac_msb : dIn.frac_change < 0 ? frac[abs(dIn.frac_change)+1]: (dIn.frac_change == 0 ?dIn.truncated_frac_msb: 1'b1),
-		truncated_frac_zero : ~dIn.truncated_frac_msb & dIn.truncated_frac_zero & truncated_frac_zero});
-	endrule
-
-interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
+   endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
 endmodule
 
 endpackage: FtoP_Extracter

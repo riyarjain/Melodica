@@ -52,13 +52,13 @@ module mkExtracter (Extracter_IFC );
 
 	function PositType fv_special_case(Bit#(PositWidth) x);
 	// a checks if all bits other than MSB are 0, if thery are a = 0 else a = 1
-		Bit#(1) a = (unpack(x[n_int-2:0]) ==  0 ? 1'b0 : 1'b1);
+		Bit#(1) a = ((x<<1) ==  0 ? 1'b0 : 1'b1);
 		//Check for MSB
 		
-		if (a == 1'b0 && x[n_int-1] == 1'b0) 
+		if (a == 1'b0 && msb(x) == 1'b0) 
 			// return 10 if all bits are 0
 			return ZERO;
-		else if(a == 1'b0 && x[n_int-1] == 1'b1) 
+		else if(a == 1'b0 && msb(x) == 1'b1) 
 			//return 01 if MSB is 1 and other 0
 			return INF;
 		else return REGULAR;
@@ -78,10 +78,6 @@ module mkExtracter (Extracter_IFC );
 		return mask;
 	endfunction
 
-	// stage_0: INPUT STAGE. Checks for special cases. 
-	rule stage_0;
-	endrule	
-
    interface Server inoutifc;
       interface Put request;
          method Action put (Input_posit p);
@@ -92,7 +88,8 @@ module mkExtracter (Extracter_IFC );
 		//sign bit is 0 when posit is positive else 1 when posit is negative
 		let sign = dIn.posit_inp[n_int-1];
 			//new input stage0 is got after removing the sign bit and finding its two's complement if posit is negative from input posit
-		Bit#(PositWidthMinus1) new_inp = (sign == 0 ? dIn.posit_inp[n_int-2 : 0] : twos_complement(dIn.posit_inp[n_int-2 : 0]));
+		Bit#(PositWidthMinus1) new_inp1 = truncate(dIn.posit_inp);
+		Bit#(PositWidthMinus1) new_inp = (sign == 0 ? new_inp1 : twos_complement(new_inp1));
 
 		//gives the number of leading ones in new input
 		let lead_one_no = countZerosMSB(~(new_inp));

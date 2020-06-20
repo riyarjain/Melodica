@@ -39,39 +39,11 @@ import Extracter_Types	:: *;
 module mkPtoF_Extracter (PtoF_IFC );
 
 
-	FIFOF #(Output_posit)   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Stage0_pf )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Bit#(FloatWidth))  fifo_output_reg <- mkFIFOF;
 
 	// --------
         // Pipeline stages
-	// stage_1: INPUT STAGE
-	rule stage_1;
-		let extOut = fifo_input_reg.first;
-		fifo_input_reg.deq;
-		//get extractor output
-		//calculate scale for posits and frac shift due to restrictions on scale sizes
-		match{.scale0, .frac_change0} = fv_calculate_scale_shift_pf(extOut.scale);
-		//calculate fraction shifts and truncated bits
-		match{.frac0,.truncated_frac_msb0,.truncated_frac_zero0} = fv_calculate_frac_pf(extOut.frac);
-		let stage0_regf = Stage0_pf {
-			//carrying sign bit fordward
-			sign : extOut.sign ,
-			//carrying zero and infinity flag forward
-                        zero_infinity_flag : extOut.zero_infinity_flag ,
-			//scale = k_scale + exponent field (base 2)
-			scale : scale0,
-			//carrying fraction bits fordward
-			frac_change : frac_change0,
-			frac : frac0,
-			truncated_frac_msb : truncated_frac_msb0,
-			truncated_frac_zero : truncated_frac_zero0};
-		`ifdef RANDOM_PRINT
-			$display("sign %b extOut.scale %b extOut.frac %b",extOut.sign,extOut.scale,extOut.frac);
-			$display("frac0 %b scale0 %b frac_change0 %b ",frac0,scale0,frac_change0);
-		`endif
-		fifo_stage0_reg.enq(stage0_regf);	
-	endrule
 
 	rule stage_2;
 		let dIn = fifo_stage0_reg.first;  fifo_stage0_reg.deq;
@@ -104,7 +76,36 @@ module mkPtoF_Extracter (PtoF_IFC );
 	
 	endrule
 	
-	interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
+interface Server inoutifc;
+      interface Put request;
+         method Action put (Output_posit p);
+		let extOut = p;
+		//get extractor output
+		//calculate scale for posits and frac shift due to restrictions on scale sizes
+		match{.scale0, .frac_change0} = fv_calculate_scale_shift_pf(extOut.scale);
+		//calculate fraction shifts and truncated bits
+		match{.frac0,.truncated_frac_msb0,.truncated_frac_zero0} = fv_calculate_frac_pf(extOut.frac);
+		let stage0_regf = Stage0_pf {
+			//carrying sign bit fordward
+			sign : extOut.sign ,
+			//carrying zero and infinity flag forward
+                        zero_infinity_flag : extOut.zero_infinity_flag ,
+			//scale = k_scale + exponent field (base 2)
+			scale : scale0,
+			//carrying fraction bits fordward
+			frac_change : frac_change0,
+			frac : frac0,
+			truncated_frac_msb : truncated_frac_msb0,
+			truncated_frac_zero : truncated_frac_zero0};
+		`ifdef RANDOM_PRINT
+			$display("sign %b extOut.scale %b extOut.frac %b",extOut.sign,extOut.scale,extOut.frac);
+			$display("frac0 %b scale0 %b frac_change0 %b ",frac0,scale0,frac_change0);
+		`endif
+		fifo_stage0_reg.enq(stage0_regf);	
 
+   	endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
 endmodule
 endpackage: PtoF_Extracter

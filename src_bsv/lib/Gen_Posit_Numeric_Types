@@ -42,7 +42,7 @@
 # sizes.  The basic sizes are provided on the command line.
 #
 # --help will remind you of the command-line arguments.
-#COMMAND:::: ./Gen_Posit_Numeric_Types --posit-width 32 --exp-width 2 --float-width 32
+#COMMAND:::: ./Gen_Posit_Numeric_Types --posit-width 64 --exp-width 3 --float-width 32
 # ================================================================
 
 import argparse
@@ -302,7 +302,8 @@ def generate_BSV_file (BSV_package_name, items):
     if sel2(items, "FloatFracWidth") >= sel2(items, "FracWidth"):
     	fout.write ("	let a_frac_truncate = valueOf(FloatFracWidthMinusFracWidth);\n" +
 	                "	Bit#(1) truncated_frac_msb = a_frac_truncate > 0 ? frac[a_frac_truncate-1]:1'b0;\n" +
-	                "	Bit#(1) truncated_frac_zero = a_frac_truncate > 1 ? pack(unpack(frac[a_frac_truncate-2:0]) ==  0):1'b1;\n" +
+	                "	Bit#(TSub#(FloatFracWidthMinusFracWidth,1)) frac_truncate_zero = truncate(frac);\n" +
+	                "	Bit#(1) truncated_frac_zero = a_frac_truncate > 1 ? pack(frac_truncate_zero ==  0):1'b1;\n" +
 	                "	return tuple3(frac[valueOf(FloatFracWidthMinus1):a_frac_truncate],truncated_frac_msb,truncated_frac_zero);\n")
     else:
     	fout.write ("	Bit#(FracWidth) frac_extend={frac,'0}; \n" +
@@ -316,7 +317,8 @@ def generate_BSV_file (BSV_package_name, items):
     if sel2(items, "FloatFracWidth") <= sel2(items, "FracWidth"):
     	fout.write ("	let a_frac_truncate = valueOf(FracWidthMinusFloatFracWidth);\n" +
 	                "	Bit#(1) truncated_frac_msb = a_frac_truncate > 0 ? frac[a_frac_truncate-1]:1'b0;\n" +
-	                "	Bit#(1) truncated_frac_zero = a_frac_truncate > 1 ? pack(unpack(frac[a_frac_truncate-2:0]) ==  0):1'b1;\n" +
+	                "	Bit#(TSub#(FracWidthMinusFloatFracWidth,1)) frac_truncate_zero = truncate(frac);\n" +
+	                "	Bit#(1) truncated_frac_zero = a_frac_truncate > 1 ? pack(frac_truncate_zero ==  0):1'b1;\n" +
 	                "	return tuple3(frac[valueOf(FracWidthMinus1):a_frac_truncate],truncated_frac_msb,truncated_frac_zero);\n")
     else:
     	fout.write ("	Bit#(FracWidth) frac_extend= frac[valueOf(FracWidthMinus1):0]; \n" +

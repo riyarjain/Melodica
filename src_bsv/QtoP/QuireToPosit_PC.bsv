@@ -45,7 +45,6 @@ interface QuireToPosit_IFC;
 endinterface
 
 module mkQuireToPosit #(Reg #(Bit#(QuireWidth))  rg_quire) (QuireToPosit_IFC );
-	FIFOF #(Bit#(0))   fifo_input_reg <- mkFIFOF;
 	FIFOF #(Input_value_n )  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Stage0_qp )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Input_value_n )  fifo_stage1_reg <- mkFIFOF;
@@ -100,29 +99,6 @@ module mkQuireToPosit #(Reg #(Bit#(QuireWidth))  rg_quire) (QuireToPosit_IFC );
 
 	// --------
         // Pipeline stages
-	// stage_0: INPUT STAGE, scale nan ziflag calculation
-	rule stage_0;
-      		fifo_input_reg.deq;
-		//depending on sign inteprets the rest for the bits
-		Bit#(QuireWidthMinus1) carry_int_frac = rg_quire[valueOf(QuireWidthMinus2):0];
-		Bit#(CarryWidthPlusIntWidthPlusFracWidthQuire) twos_complement_carry_int_frac = msb(rg_quire) == 1'b0 ? carry_int_frac : twos_complement(carry_int_frac);
-		//checking underflow/overflow
-		Bit#(LogCarryWidthPlusIntWidthPlusFracWidthQuire) msbZeros = pack(countZerosMSB(twos_complement_carry_int_frac));
-		//checulating scale based on the carry and int bits
-		Int#(LogCarryWidthPlusIntWidthPlusFracWidthQuirePlus1) scale_temp = boundedMinus(fromInteger(valueof(CarryWidthPlusIntWidthQuire)), (unpack(extend(msbZeros))+1));
-		Bit#(1) all_bits_0 = (carry_int_frac == 0)?1'b1:1'b0;
-		let stage0_regf = Stage0_qp {
-			sign : msb(rg_quire),
-			nan_flag : check_for_nan(msb(rg_quire),all_bits_0,1'b0),
-			zero_infinity_flag : check_for_zi(REGULAR,msb(rg_quire),all_bits_0),
-			scale : calculate_scale_shift(scale_temp),//calculates the scale
-			carry_int_frac : twos_complement_carry_int_frac};
-		fifo_stage0_reg.enq(stage0_regf);
-		`ifdef RANDOM_PRINT
-			$display("sign %b scale %b carry_int_frac %b",stage0_regf.sign,stage0_regf.scale,stage0_regf.carry_int_frac);
-		`endif
-   	endrule
-
 	// stage_1: frac calculate
 	rule stage_1;
 		//dIn reads the values from pipeline register stored from previous stage
@@ -183,6 +159,33 @@ module mkQuireToPosit #(Reg #(Bit#(QuireWidth))  rg_quire) (QuireToPosit_IFC );
 	
 
 
-interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
+interface Server inoutifc;
+      interface Put request;
+         method Action put (Bit#(0) p);
+		// stage_0: INPUT STAGE, scale nan ziflag calculation
+		//depending on sign inteprets the rest for the bits
+		Bit#(QuireWidthMinus1) carry_int_frac = rg_quire[valueOf(QuireWidthMinus2):0];
+		Bit#(CarryWidthPlusIntWidthPlusFracWidthQuire) twos_complement_carry_int_frac = msb(rg_quire) == 1'b0 ? carry_int_frac : twos_complement(carry_int_frac);
+		//checking underflow/overflow
+		Bit#(LogCarryWidthPlusIntWidthPlusFracWidthQuire) msbZeros = pack(countZerosMSB(twos_complement_carry_int_frac));
+		//checulating scale based on the carry and int bits
+		Int#(LogCarryWidthPlusIntWidthPlusFracWidthQuirePlus1) scale_temp = boundedMinus(fromInteger(valueof(CarryWidthPlusIntWidthQuire)), (unpack(extend(msbZeros))+1));
+		Bit#(1) all_bits_0 = (carry_int_frac == 0)?1'b1:1'b0;
+		let stage0_regf = Stage0_qp {
+			sign : msb(rg_quire),
+			nan_flag : check_for_nan(msb(rg_quire),all_bits_0,1'b0),
+			zero_infinity_flag : check_for_zi(REGULAR,msb(rg_quire),all_bits_0),
+			scale : calculate_scale_shift(scale_temp),//calculates the scale
+			carry_int_frac : twos_complement_carry_int_frac};
+		fifo_stage0_reg.enq(stage0_regf);
+		`ifdef RANDOM_PRINT
+			$display("sign %b scale %b carry_int_frac %b",stage0_regf.sign,stage0_regf.scale,stage0_regf.carry_int_frac);
+		`endif
+   	endrule
+
+   	endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
 endmodule
 endpackage: QuireToPosit_PC

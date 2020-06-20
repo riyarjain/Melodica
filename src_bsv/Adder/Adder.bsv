@@ -37,7 +37,6 @@ import Posit_User_Types :: *;
 
 module mkAdder (Adder_IFC );
 	// make a FIFO to store data at the end of each stage of the pipeline, and also for input and outputs
-	FIFOF #(Inputs_a )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Outputs_a )  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Stage0_a )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Stage1_a )  fifo_stage1_reg <- mkFIFOF;
@@ -141,25 +140,6 @@ module mkAdder (Adder_IFC );
 
  	// --------
         // Pipeline stages
-	// stage_0: INPUT STAGE
-	rule stage_0;
-		//dIn reads the values from input pipeline register 
-      		let dIn = fifo_input_reg.first;  fifo_input_reg.deq;
-		// data to be stored in stored in fifo that will be used in stage 0
-                let stage0_regf = Stage0_a {
-			nan_flag : fv_check_for_nan(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2,dIn.nanflag1,dIn.nanflag2),
-			zero_infinity_flag : fv_check_for_z_i(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2),
-			sign1 : dIn.sign1,
-			scale1 : dIn.scale1,
-			frac1 : extend(dIn.frac1)<<valueOf(FracWidth),
-			sign2 : dIn.sign2,
-			scale2 : dIn.scale2,
-			frac2 : extend(dIn.frac2)<<valueOf(FracWidth),
-			zero_flag : dIn.zero_infinity_flag1 == ZERO ? 2'b01 : ( dIn.zero_infinity_flag2 == ZERO ? 2'b10 : 2'b00)};
-   		fifo_stage0_reg.enq(stage0_regf);
-		//$display(" dIn.frac1 %b dIn.frac2 %b",dIn.frac1,dIn.frac2);
-   	endrule
-
 
 	// STAGE 1: Calculating scale and addition of scale
 	rule stage_1;
@@ -193,7 +173,8 @@ module mkAdder (Adder_IFC );
 		// data to be stored in stored in fifo that will be used in output
 		// for zero infinity flag: have to recheck the output after the computations
 		// number = zero if hidden bit  = 0
-		// number = infinity 1st bit of scale = 1 		
+		// number = infinity 1st bit of scale = 1 
+		Bit#(FracWidthMinus1) frac_truncate_zero = truncate(frac0);		
 		let output_regf = Outputs_a {
 			nan_flag : dIn.nan_flag,
 			zero_infinity_flag : (((msb(frac0) == 1'b0) && dIn.zero_infinity_flag == REGULAR) ? ZERO :dIn.zero_infinity_flag),
@@ -201,7 +182,7 @@ module mkAdder (Adder_IFC );
 			sign : sign0,
 			frac : truncate(frac0>>valueOf(FracWidth)),
 			truncated_frac_msb : frac0[valueOf(FracWidthMinus1)],
-			truncated_frac_zero : ((unpack(frac0[valueOf(TSub#(FracWidthMinus1,1)):0]) ==  0)? 1'b1 : 1'b0)};
+			truncated_frac_zero : ((frac_truncate_zero ==  0)? 1'b1 : 1'b0)};
 		`ifdef RANDOM_PRINT
 		//$display("frac %b dIn.frac1 %b dIn.frac2 %b",frac0,dIn.frac1,dIn.frac2);
 		//$display("scale0 %b",scale0);
@@ -209,9 +190,29 @@ module mkAdder (Adder_IFC );
 		`endif
 		fifo_output_reg.enq(output_regf);
 	endrule	
-	
-        interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
+interface Server inoutifc;
+      interface Put request;
+         method Action put (Inputs_a p);
+//dIn reads the values from input pipeline register 
+      		let dIn = p;
+		// data to be stored in stored in fifo that will be used in stage 0
+                let stage0_regf = Stage0_a {
+			nan_flag : fv_check_for_nan(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2,dIn.nanflag1,dIn.nanflag2),
+			zero_infinity_flag : fv_check_for_z_i(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2),
+			sign1 : dIn.sign1,
+			scale1 : dIn.scale1,
+			frac1 : extend(dIn.frac1)<<valueOf(FracWidth),
+			sign2 : dIn.sign2,
+			scale2 : dIn.scale2,
+			frac2 : extend(dIn.frac2)<<valueOf(FracWidth),
+			zero_flag : dIn.zero_infinity_flag1 == ZERO ? 2'b01 : ( dIn.zero_infinity_flag2 == ZERO ? 2'b10 : 2'b00)};
+   		fifo_stage0_reg.enq(stage0_regf);
+		//$display(" dIn.frac1 %b dIn.frac2 %b",dIn.frac1,dIn.frac2);
+   endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
 endmodule
-
+	
 endpackage: Adder
 

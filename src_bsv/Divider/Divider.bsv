@@ -37,7 +37,6 @@ import IntDivide ::*;
 
 module mkDivider (Divider_IFC );
 	// make a FIFO to store 
-        FIFOF #(Inputs_d )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Outputs_d )  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Stage0_d )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Stage1_d )  fifo_stage1_reg <- mkFIFOF;
@@ -112,28 +111,6 @@ module mkDivider (Divider_IFC );
 	
 	// --------
         // Pipeline stages
-	// stage_0: INPUT STAGE and fraction calculation
-	rule stage_0;
-		//dIn reads the values from input pipeline register 
-      		let dIn = fifo_input_reg.first;  fifo_input_reg.deq;
-		// data to be stored in stored in fifo that will be used in stage 0
-		//to see what the hidden bit of each fraction bit will be thus sending that bit for product
-		let zero_flag = dIn.zero_infinity_flag1 == ZERO ? 2'b01 : ( dIn.zero_infinity_flag2 == ZERO ? 2'b10 : 2'b11);
-		// calling function to get product of fractions
-		intDivide.inoutifc.request.put (Input_intdiv{numerator : {zero_flag[1],dIn.frac1},denominator : {zero_flag[0],dIn.frac2}});
-		//calling function to get sum of scale
-		//taking care of corner cases for zero infinity flag
-		let ziflag = fv_check_for_z_i(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2);
-                let stage0_regf = Stage0_d {
-			//taking care of corner cases for nan flag 
-			nanflag : fv_check_for_nan(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2,dIn.nanflag1,dIn.nanflag2),
-			//also include the case when fraction bit msb = 0
-			ziflag : ziflag,
-			sign : dIn.sign1 ^ dIn.sign2,
-			scale1 : dIn.scale1,
-			scale2 : dIn.scale2};
-   		fifo_stage0_reg.enq(stage0_regf);
-   	endrule
 	
 	//stage_1: scale calculation
 	rule stage_1;
@@ -189,7 +166,35 @@ module mkDivider (Divider_IFC );
 			$display("truncated_frac_msb %b truncated_frac_zero %b",output_regf.truncated_frac_msb,output_regf.truncated_frac_zero);
 		`endif
    	endrule
-interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
+
+
+interface Server inoutifc;
+      interface Put request;
+         method Action put (Inputs_d p);
+		//dIn reads the values from input pipeline register 
+      		let dIn = p;
+		// data to be stored in stored in fifo that will be used in stage 0
+		//to see what the hidden bit of each fraction bit will be thus sending that bit for product
+		let zero_flag = dIn.zero_infinity_flag1 == ZERO ? 2'b01 : ( dIn.zero_infinity_flag2 == ZERO ? 2'b10 : 2'b11);
+		// calling function to get product of fractions
+		intDivide.inoutifc.request.put (Input_intdiv{numerator : {zero_flag[1],dIn.frac1},denominator : {zero_flag[0],dIn.frac2}});
+		//calling function to get sum of scale
+		//taking care of corner cases for zero infinity flag
+		let ziflag = fv_check_for_z_i(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2);
+                let stage0_regf = Stage0_d {
+			//taking care of corner cases for nan flag 
+			nanflag : fv_check_for_nan(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2,dIn.nanflag1,dIn.nanflag2),
+			//also include the case when fraction bit msb = 0
+			ziflag : ziflag,
+			sign : dIn.sign1 ^ dIn.sign2,
+			scale1 : dIn.scale1,
+			scale2 : dIn.scale2};
+   		fifo_stage0_reg.enq(stage0_regf);
+
+   endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
 endmodule
 
 endpackage: Divider

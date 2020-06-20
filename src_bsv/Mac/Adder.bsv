@@ -37,7 +37,6 @@ import Posit_User_Types :: *;
 
 module mkAdder (Adder_IFC );
 	// make a FIFO to store data at the end of each stage of the pipeline, and also for input and outputs
-	FIFOF #(Inputs_a )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Outputs_a )  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Stage0_a )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Stage1_a )  fifo_stage1_reg <- mkFIFOF;
@@ -206,31 +205,6 @@ module mkAdder (Adder_IFC );
 
 	// --------
         // Pipeline stages
-	// stage_0: INPUT STAGE
-	rule stage_0;
-		//dIn reads the values from input pipeline register 
-      		let dIn = fifo_input_reg.first;  fifo_input_reg.deq;
-		// data to be stored in stored in fifo that will be used in stage 0
-                let stage0_regf = Stage0_a {
-			nan_flag : fv_check_for_nan(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2,dIn.nanflag1,dIn.nanflag2),
-			zero_infinity_flag : fv_check_for_z_i(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2),
-			sign1 : dIn.sign1,
-			scale1 : dIn.scale1,
-			frac1 : dIn.frac1,// fraction already has the hidden bit in the quire
-			round_frac_f1 : dIn.round_frac_f1,
-			sign2 : dIn.sign2,
-			scale2 : dIn.scale2,
-			frac2 : extend({1'b1,dIn.frac2})<<valueOf(FracWidthMul4MinusFracWidthMinus1),//adding the hidden bit and extendng
-			round_frac_f2 : dIn.round_frac_f2,
-			zero_flag : dIn.zero_infinity_flag1 == ZERO ? 2'b01 : ( dIn.zero_infinity_flag2 == ZERO ? 2'b10 : 2'b00)};
-   		fifo_stage0_reg.enq(stage0_regf);
-		`ifdef RANDOM_PRINT
-		$display(" dIn.frac1 %b dIn.frac2 %b",dIn.frac1,dIn.frac2);
-		$display(" dIn.scale1 %b dIn.scale2 %b",dIn.scale1,dIn.scale2);
-		`endif
-   	endrule
-
-
 	// STAGE 1: Calculating scale
 	rule stage_1;
 		//dIn reads the values from pipeline register stored from previous stage
@@ -291,7 +265,34 @@ module mkAdder (Adder_IFC );
 		fifo_output_reg.enq(output_regf);
 	endrule	
 		
-        interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
+interface Server inoutifc;
+      interface Put request;
+         method Action put (Inputs_a p);
+	//dIn reads the values from input pipeline register 
+      		let dIn = p;
+		// data to be stored in stored in fifo that will be used in stage 0
+                let stage0_regf = Stage0_a {
+			nan_flag : fv_check_for_nan(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2,dIn.nanflag1,dIn.nanflag2),
+			zero_infinity_flag : fv_check_for_z_i(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2),
+			sign1 : dIn.sign1,
+			scale1 : dIn.scale1,
+			frac1 : dIn.frac1,// fraction already has the hidden bit in the quire
+			round_frac_f1 : dIn.round_frac_f1,
+			sign2 : dIn.sign2,
+			scale2 : dIn.scale2,
+			frac2 : extend({1'b1,dIn.frac2})<<valueOf(FracWidthMul4MinusFracWidthMinus1),//adding the hidden bit and extendng
+			round_frac_f2 : dIn.round_frac_f2,
+			zero_flag : dIn.zero_infinity_flag1 == ZERO ? 2'b01 : ( dIn.zero_infinity_flag2 == ZERO ? 2'b10 : 2'b00)};
+   		fifo_stage0_reg.enq(stage0_regf);
+		`ifdef RANDOM_PRINT
+		$display(" dIn.frac1 %b dIn.frac2 %b",dIn.frac1,dIn.frac2);
+		$display(" dIn.scale1 %b dIn.scale2 %b",dIn.scale1,dIn.scale2);
+		`endif
+
+   endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
 endmodule
 
 endpackage: Adder

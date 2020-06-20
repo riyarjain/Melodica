@@ -29,7 +29,6 @@ typedef enum { Div_START, Div_LOOP1, Div_LOOP2, Div_DONE} DivState
 
 module mkIntDivide (IntDivide);
 
-	FIFO #(Input_intdiv) fifo_input_reg <- mkFIFO;
 	FIFO #(Output_intdiv) fifo_output_reg <- mkFIFO;
 
 	Reg #(DivState)  rg_state     <- mkReg (Div_START);
@@ -39,9 +38,51 @@ module mkIntDivide (IntDivide);
 	Reg #(Bit #(Quo_bits))  rg_n         <- mkRegU;
 	Reg #(Bit #(Quo_bits))  rg_quo       <- mkRegU;
 
-	rule rl_start_div_by_zero (rg_state == Div_START || rg_state == Div_DONE );
 
-		let dIn = fifo_input_reg.first;
+	rule rl_loop1 (rg_state == Div_LOOP1);
+		if (rg_denom2 <= (rg_numer >> 1))
+			begin
+				rg_denom2 <= rg_denom2 << 1;
+				rg_n <= rg_n << 1;
+      			end
+      		else
+	 		rg_state <= Div_LOOP2;
+	endrule
+
+	rule rl_loop2 (rg_state == Div_LOOP2);
+		if (rg_numer < zeroExtend(rg_denom))
+			begin
+				rg_state <= Div_DONE;
+				let quo = rg_quo;
+				let rem = rg_numer;
+				Bit#(Rem_bits) rem_truncate= truncate(rem);
+				fifo_output_reg.enq(Output_intdiv{quotient : quo,
+								  truncated_frac_msb : msb(rem_truncate),				  								  	   truncated_frac_zero : pack((rem_truncate<<1) == 0)});
+			`ifdef RANDOM_PRINT
+			$display("Division complete");
+			`endif	
+			end
+      		else if (rg_numer >= rg_denom2)
+			begin
+				rg_numer <= rg_numer - rg_denom2;
+				rg_quo <= rg_quo + rg_n;
+			end
+		else
+			begin
+				rg_denom2 <= rg_denom2 >> 1;
+				rg_n <= rg_n >> 1;
+			end
+		`ifdef RANDOM_PRINT
+			$display("rg_numer %b",rg_numer);
+			$display("rg_denom %b",rg_denom);
+			$display("rg_quo %h",rg_quo);
+		`endif	
+	endrule
+
+interface Server inoutifc;
+      interface Put request;
+         method Action put (Input_intdiv p) if(rg_state == Div_START || rg_state == Div_DONE );
+		let dIn = p;
 		let numer = dIn.numerator;	
 		let denom = dIn.denominator;
 		if(denom == 0)
@@ -65,57 +106,17 @@ module mkIntDivide (IntDivide);
 				rg_n         <= 1;
 				rg_state     <= Div_LOOP1;
 			end
-		fifo_input_reg.deq;
 		`ifdef RANDOM_PRINT
 			$display("rg_numer %b",rg_numer);
 			$display("rg_denom %b",rg_denom);
 			$display("rg_quo %h",rg_quo);
 		`endif	
-	endrule
 
-	rule rl_loop1 (rg_state == Div_LOOP1);
-		if (rg_denom2 <= (rg_numer >> 1))
-			begin
-				rg_denom2 <= rg_denom2 << 1;
-				rg_n <= rg_n << 1;
-      			end
-      		else
-	 		rg_state <= Div_LOOP2;
-	endrule
-
-	rule rl_loop2 (rg_state == Div_LOOP2);
-		if (rg_numer < zeroExtend(rg_denom))
-			begin
-				rg_state <= Div_DONE;
-				let quo = rg_quo;
-				let rem = rg_numer;
-				Bit#(Rem_bits) rem_truncate= truncate(rem);
-				fifo_output_reg.enq(Output_intdiv{quotient : quo,
-								  truncated_frac_msb : msb(rem_truncate),
-								  truncated_frac_zero : pack(unpack(rem_truncate[valueOf(Rem_bits)-2:0]) == 0)});
-			`ifdef RANDOM_PRINT
-			$display("Division complete");
-			`endif	
-			end
-      		else if (rg_numer >= rg_denom2)
-			begin
-				rg_numer <= rg_numer - rg_denom2;
-				rg_quo <= rg_quo + rg_n;
-			end
-		else
-			begin
-				rg_denom2 <= rg_denom2 >> 1;
-				rg_n <= rg_n >> 1;
-			end
-		`ifdef RANDOM_PRINT
-			$display("rg_numer %b",rg_numer);
-			$display("rg_denom %b",rg_denom);
-			$display("rg_quo %h",rg_quo);
-		`endif	
-	endrule
-
-interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
-
+   endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
 endmodule
+
 
 endpackage: IntDivide_generic

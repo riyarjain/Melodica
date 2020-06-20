@@ -45,18 +45,20 @@ endinterface
 module mkPtoF_PNE(PtoF_PNE);
 
 FIFO #(Bit#(FloatWidth)) ffO <- mkFIFO;
-FIFO #(Output_posit) ffI <- mkFIFO;
 PtoF_IFC  ptoF <- mkPtoF_Extracter;
-rule rl_in;
-	ptoF.inoutifc.request.put(ffI.first); 
-	ffI.deq;
-endrule
 
 rule rl_out;
    let ptoFOut <- ptoF.inoutifc.response.get ();
    ffO.enq(ptoFOut);
 endrule
-interface compute = toGPServer (ffI,ffO);
+interface Server compute;
+      interface Put request;
+         method Action put (Output_posit p);
+		ptoF.inoutifc.request.put(p); 
+         endmethod
+      endinterface
+   interface Get response = toGet (ffO);
+endinterface
 endmodule
 
 endpackage: PtoF_PNE_PC

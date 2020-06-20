@@ -46,20 +46,21 @@ endinterface
 module mkQuireToPosit_PNE #(Reg #(Bit#(QuireWidth)) rg_quire)(QuireToPosit_PNE);
 
 //FIFO #(Bit#(QuireWidth)) ffI <- mkFIFO;
-FIFOF #(Bit#(0)) ffI <- mkFIFOF;
 FIFO #(Input_value_n) ffO <- mkFIFO;
 QuireToPosit_IFC  quireToPosit1 <- mkQuireToPosit(rg_quire);
-rule rl_in;
-	let in_quire = rg_quire;
-	quireToPosit1.inoutifc.request.put(?); 
-	ffI.deq;
-endrule
-
 rule rl_out;
    let qToPOut <- quireToPosit1.inoutifc.response.get ();
    ffO.enq(qToPOut);
 endrule
-interface compute = toGPServer (ffI,ffO);
+interface Server compute;
+      interface Put request;
+         method Action put (Bit#(0) p);
+		let in_quire = rg_quire;
+		quireToPosit1.inoutifc.request.put(?); 
+         endmethod
+      endinterface
+   interface Get response = toGet (ffO);
+endinterface
 endmodule
 
 

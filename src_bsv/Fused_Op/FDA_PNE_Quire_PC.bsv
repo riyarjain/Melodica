@@ -53,31 +53,11 @@ module mkFDA_PNE_Quire #(Reg #(Bit#(QuireWidth)) rg_quire)(FDA_PNE_Quire);
 
 //FIFO #(Bit#(QuireWidth)) ffO <- mkFIFO;
 FIFOF #(Bit#(0)) ffO <- mkFIFOF;
-FIFO #(InputTwoExtractPosit) ffI <- mkFIFO;
 //FIFO #(Bit#(QuireWidth)) fftemp <- mkFIFO;
 Divider_IFC  divider <- mkDivider;
 Adder_IFC  adder <- mkAdder(rg_quire);
 Reg #(Bit#(1)) check_quire <- mkReg(0);
-//get their extracted value and semd to multiply
-rule rl_connect0;
-   	let extOut1 = ffI.first.posit_inp_e1;
-   	let extOut2 = ffI.first.posit_inp_e2;
-	divider.inoutifc.request.put (Inputs_md {
-	sign1: extOut1.sign,
-	nanflag1: 1'b0,
- 	zero_infinity_flag1: extOut1.zero_infinity_flag ,
-	scale1 : extOut1.scale,
-	frac1 : extOut1.frac,
-	sign2: extOut2.sign,
-	nanflag2: 1'b0,
- 	zero_infinity_flag2: extOut2.zero_infinity_flag ,
-	scale2 : extOut2.scale,
-	frac2 : extOut2.frac});
-	ffI.deq;
-	// the fraction and scale are extended since operation is on quire
-	//using signed extension for scale value
-	//fraction value is normally extended but also shifted to maked the MSB the highest valued fraction bit
-endrule
+
 //get the multiply pipeline output and send to adder pipeline
 rule rl_connect1;
    	let divOut <- divider.inoutifc.response.get();
@@ -88,7 +68,29 @@ rule rl_out;
 	let addOut <- adder.inoutifc.response.get();
 	ffO.enq(?);
 endrule
-interface compute = toGPServer (ffI,ffO);
+interface Server compute;
+      interface Put request;
+         method Action put (InputTwoExtractPosit p);
+		let extOut1 = p.posit_inp_e1;
+	   	let extOut2 = p.posit_inp_e2;
+		divider.inoutifc.request.put (Inputs_md {
+		sign1: extOut1.sign,
+		nanflag1: 1'b0,
+	 	zero_infinity_flag1: extOut1.zero_infinity_flag ,
+		scale1 : extOut1.scale,
+		frac1 : extOut1.frac,
+		sign2: extOut2.sign,
+		nanflag2: 1'b0,
+	 	zero_infinity_flag2: extOut2.zero_infinity_flag ,
+		scale2 : extOut2.scale,
+		frac2 : extOut2.frac});
+		// the fraction and scale are extended since operation is on quire
+		//using signed extension for scale value
+		//fraction value is normally extended but also shifted to maked the MSB the highest valued fraction bit
+         endmethod
+      endinterface
+   interface Get response = toGet (ffO);
+endinterface
 endmodule
 
 endpackage: FDA_PNE_Quire_PC

@@ -39,7 +39,7 @@ import PNE              :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
-import "BDPI" positAdd8  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+import "BDPI" positAdd16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
 `ifdef FPGA
 interface FpgaLedIfc;
 (* always_ready *)

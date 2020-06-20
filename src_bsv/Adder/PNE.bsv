@@ -50,7 +50,6 @@ endinterface
 //
 // Module definition
 module mkPNE (PNE );
-FIFO #(InputTwoPosit) ffI <- mkFIFO;
 FIFO #(Output_posit_n) ffO <- mkFIFO;
 FIFO #(Output_posit) ffm <- mkFIFO;
 // Extractor
@@ -59,14 +58,6 @@ Extracter_IFC  extracter2 <- mkExtracter;
 Adder_IFC  adder1 <- mkAdder;
 Normalizer_IFC   normalizer <- mkNormalizer;
 
-
-rule rl_in;
-   let in_posit1 = Input_posit {posit_inp : ffI.first.posit_inp1};
-   extracter1.inoutifc.request.put (in_posit1);
-   let in_posit2 = Input_posit {posit_inp : ffI.first.posit_inp2};
-   extracter2.inoutifc.request.put (in_posit2);
- ffI.deq;
-endrule
 
 rule rl_connect0;
 
@@ -104,7 +95,17 @@ rule rl_out;
 endrule
 
 
-interface compute = toGPServer (ffI,ffO);
+interface Server compute;
+      interface Put request;
+         method Action put (InputTwoPosit p);
+		let in_posit1 = Input_posit {posit_inp : p.posit_inp1};
+   		extracter1.inoutifc.request.put (in_posit1);
+   		let in_posit2 = Input_posit {posit_inp : p.posit_inp2};
+   		extracter2.inoutifc.request.put (in_posit2);
+         endmethod
+      endinterface
+      interface Get response = toGet (ffO);
+   endinterface
 
 
 endmodule

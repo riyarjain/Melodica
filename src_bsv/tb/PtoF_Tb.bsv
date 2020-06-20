@@ -71,7 +71,7 @@ module mkTestbench (Empty);
 // Depending on which input mode we are using, the input to the DUT will be
 // from a LFSR or from a counter. The LFSR is always sized to the maximal size
 `ifdef RANDOM
-LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_32;
+LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_16;
 Reg   #(Bool)                 rgSetup        <- mkReg (False);
 `endif
 

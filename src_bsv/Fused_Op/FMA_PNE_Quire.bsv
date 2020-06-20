@@ -54,22 +54,11 @@ endinterface
 module mkFMA_PNE_Quire(FMA_PNE_Quire);
 
 FIFO #(Bit#(QuireWidth)) ffO <- mkFIFO;
-FIFO #(InputQuireTwoPosit) ffI <- mkFIFO;
 FIFO #(Bit#(QuireWidth)) fftemp <- mkFIFO;
 Extracter_IFC  extracter1 <- mkExtracter;
 Extracter_IFC  extracter2 <- mkExtracter;
 Multiplier_IFC  multiplier <- mkMultiplier;
 Adder_IFC  adder <- mkAdder;
-//input the two posit values
-rule rl_in;
-	let in_quire = ffI.first.quire_inp;
-	let in_posit1 = Input_posit {posit_inp : ffI.first.posit_inp1};
-   	extracter1.inoutifc.request.put (in_posit1);
-   	let in_posit2 = Input_posit {posit_inp : ffI.first.posit_inp2};
-   	extracter2.inoutifc.request.put (in_posit2);
-	fftemp.enq(in_quire);
-	ffI.deq;
-endrule
 //get their extracted value and semd to multiply
 rule rl_connect0;
    	let extOut1 <- extracter1.inoutifc.response.get();
@@ -105,7 +94,19 @@ rule rl_out;
 	let addOut <- adder.inoutifc.response.get ();
 		ffO.enq(addOut);
 endrule
-interface compute = toGPServer (ffI,ffO);
+interface Server compute;
+      interface Put request;
+         method Action put (InputQuireTwoPosit p);
+		let in_quire = p.quire_inp;
+		let in_posit1 = Input_posit {posit_inp : p.posit_inp1};
+	   	extracter1.inoutifc.request.put (in_posit1);
+	   	let in_posit2 = Input_posit {posit_inp : p.posit_inp2};
+	   	extracter2.inoutifc.request.put (in_posit2);
+		fftemp.enq(in_quire);
+         endmethod
+      endinterface
+   interface Get response = toGet (ffO);
+endinterface
 endmodule
 
 (* synthesize *)

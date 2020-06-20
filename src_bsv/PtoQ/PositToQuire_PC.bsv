@@ -42,7 +42,6 @@ interface PositToQuire_IFC;
 endinterface
 
 module mkPositToQuire #(Reg #(Bit#(QuireWidth))  rg_quire) (PositToQuire_IFC );
-	FIFOF #(Output_posit )   fifo_input_reg <- mkFIFOF;
 	FIFOF #(Bit#(0))  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Output_posit )  fifo_stage0_reg <- mkFIFOF;
 	FIFOF #(Stage1_qp )  fifo_stage1_reg <- mkFIFOF;
@@ -59,19 +58,6 @@ module mkPositToQuire #(Reg #(Bit#(QuireWidth))  rg_quire) (PositToQuire_IFC );
 
 	// --------
         // Pipeline stages
-	// stage_1: calculate integer part of quire
-	rule stage_1;
-		//dIn reads the values from pipeline register stored from previous stage
-		let extOut = fifo_input_reg.first;
-		fifo_input_reg.deq;
-		//calculate integer from scale
-		let int_frac = calculate_frac_int({1'b1,extOut.frac},extOut.scale);
-		let stage1_reg = Stage1_qp{sign : extOut.sign,
-					   int_frac : int_frac,
-					   zero_infinity_flag : extOut.zero_infinity_flag};
-		fifo_stage1_reg.enq(stage1_reg);
-	endrule
-	
 	// stage_2 : check special cases 
 	rule stage_2;
 		let dIn = fifo_stage1_reg.first;  fifo_stage1_reg.deq;
@@ -92,6 +78,22 @@ module mkPositToQuire #(Reg #(Bit#(QuireWidth))  rg_quire) (PositToQuire_IFC );
 	endrule
 
 
-interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
+interface Server inoutifc;
+      interface Put request;
+         method Action put (Output_posit p);
+		// stage_1: calculate integer part of quire
+		//dIn reads the values from pipeline register stored from previous stage
+		let extOut = p;
+		//calculate integer from scale
+		let int_frac = calculate_frac_int({1'b1,extOut.frac},extOut.scale);
+		let stage1_reg = Stage1_qp{sign : extOut.sign,
+					   int_frac : int_frac,
+					   zero_infinity_flag : extOut.zero_infinity_flag};
+		fifo_stage1_reg.enq(stage1_reg);
+
+   	endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
 endmodule
 endpackage: PositToQuire_PC

@@ -45,27 +45,10 @@ endinterface
 //
 // Module definition
 module mkDiv_PNE (Div_PNE );
-FIFO #(InputTwoExtractPosit) ffI <- mkFIFO;
 FIFO #(Input_value_n) ffO <- mkFIFO;
 // Extractor
 Divider_IFC  divider <- mkDivider;
 
-rule rl_connect0;
-   let extOut1 = ffI.first.posit_inp_e1;
-   let extOut2 = ffI.first.posit_inp_e2;
-   divider.inoutifc.request.put (Inputs_d {
-	sign1: extOut1.sign,
-	nanflag1: 1'b0,
- 	zero_infinity_flag1: extOut1.zero_infinity_flag ,
-	scale1 : extOut1.scale,
-	frac1 : extOut1.frac,
-	sign2: extOut2.sign,
-	nanflag2: 1'b0,
- 	zero_infinity_flag2: extOut2.zero_infinity_flag ,
-	scale2 : extOut2.scale,
-	frac2 : extOut2.frac});
-	ffI.deq;
-endrule
 
 rule rl_connect2;
    let divOut <- divider.inoutifc.response.get();
@@ -79,7 +62,26 @@ rule rl_connect2;
 	truncated_frac_zero : divOut.truncated_frac_zero});
 endrule
 
-interface compute = toGPServer (ffI,ffO);
+interface Server compute;
+      interface Put request;
+         method Action put (InputTwoExtractPosit p);
+		let extOut1 = p.posit_inp_e1;
+		   let extOut2 = p.first.posit_inp_e2;
+		   divider.inoutifc.request.put (Inputs_d {
+			sign1: extOut1.sign,
+			nanflag1: 1'b0,
+		 	zero_infinity_flag1: extOut1.zero_infinity_flag ,
+			scale1 : extOut1.scale,
+			frac1 : extOut1.frac,
+			sign2: extOut2.sign,
+			nanflag2: 1'b0,
+		 	zero_infinity_flag2: extOut2.zero_infinity_flag ,
+			scale2 : extOut2.scale,
+			frac2 : extOut2.frac});
+         endmethod
+      endinterface
+      interface Get response = toGet (ffO);
+   endinterface
 
 endmodule
 endpackage

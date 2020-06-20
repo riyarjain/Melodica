@@ -45,15 +45,10 @@ endinterface
 
 module mkFtoP_PNE(FtoP_PNE);
 
-FIFO #(Bit#(FloatWidth)) ffI <- mkFIFO;
 FIFO #(Output_posit_n) ffO <- mkFIFO;
 FtoP_IFC  fToP <- mkFtoP_Extracter;
 Normalizer_IFC   normalizer <- mkNormalizer;
 
-rule rl_in;
-	fToP.inoutifc.request.put(ffI.first); 
-	ffI.deq;
-endrule
 
 rule rl_connect;
    let fToPOut <- fToP.inoutifc.response.get ();
@@ -64,7 +59,15 @@ rule rl_out;
    let normOut <- normalizer.inoutifc.response.get ();
    ffO.enq(normOut);
 endrule
-interface compute = toGPServer (ffI,ffO);
+interface Server compute;
+      interface Put request;
+         method Action put (Bit#(FloatWidth) p);
+			fToP.inoutifc.request.put(p); 
+         endmethod
+      endinterface
+   interface Get response = toGet (ffO);
+endinterface
+
 endmodule
 
 (* synthesize *)

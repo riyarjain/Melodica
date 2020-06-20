@@ -37,7 +37,6 @@ import Posit_User_Types :: *;
 
 module mkMultiplier (Multiplier_IFC );
 	// make a FIFO to store 
-        FIFOF #(Inputs_m )   fifo_input_reg <- mkFIFOF;
    	FIFOF #(Outputs_m )  fifo_output_reg <- mkFIFOF;
 	FIFOF #(Stage0_m )  fifo_stage0_reg <- mkFIFOF;
 	//This function is used to identify nan cases
@@ -126,34 +125,6 @@ module mkMultiplier (Multiplier_IFC );
 
 	// --------
         // Pipeline stages
-	// stage_0: INPUT STAGE and fraction calculation
-	rule stage_0;
-		//dIn reads the values from input pipeline register 
-      		let dIn = fifo_input_reg.first;  fifo_input_reg.deq;
-		// data to be stored in stored in fifo that will be used in stage 0
-		//to see what the hidden bit of each fraction bit will be thus sending that bit for product
-		let zero_flag = dIn.zero_infinity_flag1 == ZERO ? 2'b01 : ( dIn.zero_infinity_flag2 == ZERO ? 2'b10 : 2'b11);
-		// calling function to get product of fractions
-		match{ .sign0, .frac0, .fracshift0} = fv_calculate_product_frac(dIn.sign1,dIn.sign2,{zero_flag[1],dIn.frac1},{zero_flag[0],dIn.frac2});
-
-		//taking care of corner cases for zero infinity flag
-		let ziflag = fv_check_for_z_i(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2);
-                let stage0_regf = Stage0_m {
-			//taking care of corner cases for nan flag 
-			nanflag : fv_check_for_nan(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2,dIn.nanflag1,dIn.nanflag2),
-			//also include the case when fraction bit msb = 0
-			ziflag : ziflag,
-			sign : sign0,
-			scale1 : dIn.scale1,
-			scale2 : dIn.scale2,
-			frac : frac0,
-			fracshift : fracshift0};
-		`ifdef RANDOM_PRINT
-		$display("frac1 %b frac2 %b scale1 %b scale2 %b",dIn.frac1,dIn.frac2,dIn.scale1,dIn.scale2);
-		`endif
-   		fifo_stage0_reg.enq(stage0_regf);
-   	endrule
-
 	//stage_1: scale calculation
 	rule stage_1;
 		//dIn reads the values from input pipeline register 
@@ -185,9 +156,39 @@ module mkMultiplier (Multiplier_IFC );
 		`endif   	
 	endrule
 
-interface inoutifc = toGPServer (fifo_input_reg, fifo_output_reg);
-endmodule
+interface Server inoutifc;
+      interface Put request;
+         method Action put (Inputs_m p);
+		// stage_0: INPUT STAGE and fraction calculation
+		//dIn reads the values from input pipeline register 
+      		let dIn = p;
+		// data to be stored in stored in fifo that will be used in stage 0
+		//to see what the hidden bit of each fraction bit will be thus sending that bit for product
+		let zero_flag = dIn.zero_infinity_flag1 == ZERO ? 2'b01 : ( dIn.zero_infinity_flag2 == ZERO ? 2'b10 : 2'b11);
+		// calling function to get product of fractions
+		match{ .sign0, .frac0, .fracshift0} = fv_calculate_product_frac(dIn.sign1,dIn.sign2,{zero_flag[1],dIn.frac1},{zero_flag[0],dIn.frac2});
 
+		//taking care of corner cases for zero infinity flag
+		let ziflag = fv_check_for_z_i(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2);
+                let stage0_regf = Stage0_m {
+			//taking care of corner cases for nan flag 
+			nanflag : fv_check_for_nan(dIn.zero_infinity_flag1,dIn.zero_infinity_flag2,dIn.nanflag1,dIn.nanflag2),
+			//also include the case when fraction bit msb = 0
+			ziflag : ziflag,
+			sign : sign0,
+			scale1 : dIn.scale1,
+			scale2 : dIn.scale2,
+			frac : frac0,
+			fracshift : fracshift0};
+		`ifdef RANDOM_PRINT
+		$display("frac1 %b frac2 %b scale1 %b scale2 %b",dIn.frac1,dIn.frac2,dIn.scale1,dIn.scale2);
+		`endif
+   		fifo_stage0_reg.enq(stage0_regf);
+   endmethod
+      endinterface
+      interface Get response = toGet (fifo_output_reg);
+   endinterface
+endmodule
 endpackage: Multiplier
 
 

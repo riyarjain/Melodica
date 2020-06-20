@@ -45,18 +45,20 @@ module mkPositToQuire_PNE #(Reg #(Bit#(QuireWidth))  rg_quire)(PositToQuire_PNE)
 
 //FIFO #(Bit#(QuireWidth)) ffO <- mkFIFO;
 FIFOF #(Bit#(0)) ffO <- mkFIFOF;
-FIFO #(Output_posit) ffI <- mkFIFO;
 PositToQuire_IFC  positToquire <- mkPositToQuire(rg_quire);
-rule rl_in;
-	positToquire.inoutifc.request.put(ffI.first); 
-	ffI.deq;
-endrule
-
 rule rl_out;
    let ptoqOut <- positToquire.inoutifc.response.get ();
    ffO.enq(?);
 endrule
-interface compute = toGPServer (ffI,ffO);
+interface Server compute;
+      interface Put request;
+         method Action put (Output_posit p);
+		positToquire.inoutifc.request.put(p); 
+         endmethod
+      endinterface
+   interface Get response = toGet (ffO);
+endinterface
+
 endmodule
 
 endpackage: PositToQuire_PNE_PC
