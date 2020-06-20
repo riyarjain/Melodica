@@ -21,6 +21,11 @@ import FtoP_PNE_PC :: *;
 import PtoF_PNE_PC :: *;
 import PositToQuire_PNE_PC :: *;
 import QuireToPosit_PNE_PC :: *;
+`ifdef BASIC_OPS
+import Add_PNE_PC :: *;
+import Mul_PNE_PC :: *;
+import Div_PNE_PC :: *;
+`endif
 import FloatingPoint :: *;
 import Utils  :: *;
 
@@ -39,8 +44,11 @@ typedef union tagged {
 
 typedef Tuple2#( FloatU, FloatingPoint::Exception )       Fpu_Rsp;
 `endif
-
+`ifdef BASIC_OPS
+typedef enum {FMA_P, FDA_P, FMS_P, FDS_P, FCVT_P_S, FCVT_S_P, FCVT_P_R, FCVT_R_P, FADD_P, FSUB_P, FMUL_P , FDIV_P} PositCmds
+`else
 typedef enum {FMA_P, FDA_P, FMS_P, FDS_P, FCVT_P_S, FCVT_S_P, FCVT_P_R, FCVT_R_P} PositCmds
+`endif
 deriving (Bits, Eq, FShow);
 
 typedef Tuple4 #(FloatU, FloatU, RoundMode, PositCmds) Posit_Req;
@@ -60,6 +68,12 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 	QuireToPosit_PNE    qtop            <- mkQuireToPosit_PNE(rg_quire);	
 	FtoP_PNE            ftop            <- mkFtoP_PNE;	
 	PtoF_PNE            ptof            <- mkPtoF_PNE;	
+
+`ifdef BASIC_OPS
+	Mul_PNE             mul            <- mkMul_PNE;
+	Div_PNE             div            <- mkDiv_PNE;		
+	Add_PNE             add            <- mkAdd_PNE;	
+`endif
 
 	Extracter_IFC  extracter1 <- mkExtracter;
 	Extracter_IFC  extracter2 <- mkExtracter;
@@ -87,12 +101,20 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 				let a = tpl_1(ffI.first).S;
 				ffI_f.enq({pack(a.sign),a.exp,a.sfd});
 			end
+`ifdef BASIC_OPS
+		else if(tpl_4(ffI.first) == FDA_P || tpl_4(ffI.first) == FDS_P || tpl_4(ffI.first) == FMS_P || tpl_4(ffI.first) == FMA_P || tpl_4(ffI.first) == FMUL_P || tpl_4(ffI.first) == FDIV_P ||  tpl_4(ffI.first) == FADD_P || tpl_4(ffI.first) == FSUB_P)
+`else
 		else if(tpl_4(ffI.first) == FDA_P || tpl_4(ffI.first) == FDS_P || tpl_4(ffI.first) == FMS_P || tpl_4(ffI.first) == FMA_P)
+`endif
 			begin
 				let in_posit1 = Input_posit {posit_inp : tpl_1(ffI.first).P};
 			   	extracter1.inoutifc.request.put (in_posit1);
 				let in_posit2 = Input_posit {posit_inp : tpl_2(ffI.first).P};
+`ifdef BASIC_OPS
+				if(tpl_4(ffI.first) == FMS_P || tpl_4(ffI.first) == FDS_P || tpl_4(ffI.first) == FSUB_P)
+`else
 				if(tpl_4(ffI.first) == FMS_P || tpl_4(ffI.first) == FDS_P)
+`endif
 					in_posit2 = Input_posit {posit_inp : twos_complement(tpl_2(ffI.first).P)};
 			   	extracter2.inoutifc.request.put (in_posit2);
 			end
@@ -159,6 +181,33 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		rg_quire_busy <= 1'b1;
 	endrule
 
+`ifdef BASIC_OPS
+	rule rl_add(opcode_in.first == FADD_P || opcode_in.first == FSUB_P );
+		let extOut1 <- extracter1.inoutifc.response.get();
+	   	let extOut2 <- extracter2.inoutifc.response.get();
+		add.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
+		opcode.enq(opcode_in.first);
+		opcode_in.deq;
+                
+	endrule
+
+	rule rl_mul(opcode_in.first == FMUL_P);
+		let extOut1 <- extracter1.inoutifc.response.get();
+	   	let extOut2 <- extracter2.inoutifc.response.get();
+		mul.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
+		opcode.enq(opcode_in.first);
+		opcode_in.deq;
+	endrule
+
+	rule rl_div(opcode_in.first == FDIV_P);
+		let extOut1 <- extracter1.inoutifc.response.get();
+	   	let extOut2 <- extracter2.inoutifc.response.get();
+		div.compute.request.put((InputTwoExtractPosit{posit_inp_e1 : extOut1,posit_inp_e2 : extOut2}));
+		opcode.enq(opcode_in.first);
+		opcode_in.deq;
+	endrule
+`endif
+
         // normalize the values that are got as outputs from the operation pipelines
 	rule rl_norm;
 		let op = opcode_norm.first;
@@ -179,6 +228,23 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
                                 if (verbosity > 1)
                                    $display ("%0d: %m: rl_norm: ", cur_cycle, fshow(op));
 			end
+`ifdef BASIC_OPS
+		else if(op == FMUL_P )
+			begin
+				let out_pf <- mul.compute.response.get();
+				normalizer.inoutifc.request.put (out_pf);				
+			end
+		else if(op == FDIV_P )
+			begin
+				let out_pf <- div.compute.response.get();
+				normalizer.inoutifc.request.put (out_pf);				
+			end
+		else if(op == FADD_P || op == FSUB_P)
+			begin
+				let out_pf <- add.compute.response.get();
+				normalizer.inoutifc.request.put (out_pf);				
+			end
+`endif
 		else
                    $display (  "%0d: %m: rl_norm: Error Illegal Opcode", cur_cycle, fshow(op));
 	
@@ -215,17 +281,11 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 				FloatU posit_out = tagged S fs;
 				ffO.enq(tuple2(posit_out,excep));
 			end
-		else if(op == FCVT_P_S)
-			begin
-				let out_pf <- normalizer.inoutifc.response.get ();
-				excep.invalid_op = out_pf.nan_flag == 1'b1;
-				excep.overflow = out_pf.zero_infinity_flag == INF;
-				excep.underflow = out_pf.zero_infinity_flag == ZERO && out_pf.rounding;
-				excep.inexact = out_pf.rounding;
-				FloatU posit_out = tagged P out_pf.out_posit;
-				ffO.enq(tuple2(posit_out,excep));
-			end
-		else if(op == FCVT_P_R)
+`ifdef BASIC_OPS
+		else if (op == FCVT_P_S || op ==  FCVT_P_R || op == FSUB_P || op == FADD_P || op == FMUL_P || op == FDIV_P )
+`else
+		else if ((op == FCVT_P_S) || (op == FCVT_P_R))
+`endif
 			begin
 				let out_pf <- normalizer.inoutifc.response.get ();
 				excep.invalid_op = out_pf.nan_flag == 1'b1;
