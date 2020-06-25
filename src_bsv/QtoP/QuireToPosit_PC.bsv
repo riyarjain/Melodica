@@ -181,8 +181,6 @@ interface Server inoutifc;
 		`ifdef RANDOM_PRINT
 			$display("sign %b scale %b carry_int_frac %b",stage0_regf.sign,stage0_regf.scale,stage0_regf.carry_int_frac);
 		`endif
-   	endrule
-
    	endmethod
       endinterface
       interface Get response = toGet (fifo_output_reg);
