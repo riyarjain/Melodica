@@ -18,14 +18,14 @@ import Posit_User_Types :: *;
 // Type Definations for struct
 typedef Bit#(64) Mdata;            //data to be fetched from memory
 typedef Bit#(PositWidth) Data;     //operands from flute register
-typedef Bit#(3) Reg_sel;   //Part of custom instruction to select whether register adderss is of flute or accelerator
-typedef Bit#(7) Op;        //opcode
-typedef Bit#(1) Value;     //value bit of ROCC
-typedef Bit#(5) Rdst;      //destination reg
+typedef Bit#(3) Reg_sel;   	   //Part of custom instruction to select whether register adderss is of flute or accelerator
+typedef Bit#(7) Op;                //opcode
+typedef Bit#(1) Value;             //value bit of ROCC
+typedef Bit#(5) Rdst;              //destination reg
 typedef PositCore::FloatU Result;        //output from melodica
 typedef FloatingPoint::Exception Ex;     //exception
 typedef Bit#(QuireWidth) Quire;          //Quire output (rg_quire)
-typedef Bit#(1) LS;			 //to determine whether its load aur store for memory
+typedef Bit#(1) LS;			 //to determine whether its load or store operation for memory
 
 typedef struct {
    Data data1;
@@ -50,13 +50,13 @@ typedef struct {
    Data addr1;
    LS load_store;
    Data vdata_store;
-}Mem_Req deriving(Bits);
+}Mem_Req deriving(Bits);        //struct for memory request
 
 
 typedef struct {
    Mdata vdata_load1;
    Bit#(1) valid;
-}Mem_Rsp deriving(Bits);
+}Mem_Rsp deriving(Bits);	//struct for memory response
 
  
 // ================================================================
@@ -69,7 +69,7 @@ Bit #(7) f7_fcvt_p_s = 7'h4;
 Bit #(7) f7_fcvt_s_p = 7'h5;
 Bit #(7) f7_fcvt_p_r = 7'h6;
 Bit #(7) f7_fcvt_r_p = 7'h7;
-Bit #(7) f7_mem = 7'h8;
+Bit #(7) f7_mem = 7'h8;     //memory function
 
 
 // ================================================================
