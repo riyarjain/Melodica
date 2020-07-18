@@ -30,6 +30,7 @@ print the intermediate values got during simulation
 
 6. Looking at ./src_bsv/PositCore.bsv gives the user an idea of how Melodica can be used. The flag BASIC_OPS is to enable the basic operation pipelines (ADD, SUB, MUL, DIV). If not set only fused and conversions are enabled.
 
+7. Please refer ./Documents/Melodica-Thesis for more information on Melodica. 
 
 Building Instructions:
 	
