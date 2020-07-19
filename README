@@ -28,11 +28,13 @@ occurs when communicating with ./src_c/softposit_wrappers.c.
 using LFSR RANDOM_PRINT flag - that makes the input random using LFSR and also
 print the intermediate values got during simulation
 
-6. The flag BASIC_OPS is to enable the basic operation pipelines (ADD, SUB, MUL, DIV). If not set only fused and conversions are enabled.
+6. Looking at ./src_bsv/PositCore.bsv gives the user an idea of how Melodica can be used. The flag BASIC_OPS is to enable the basic operation pipelines (ADD, SUB, MUL, DIV). If not set only fused and conversions are enabled.
+
+7. Please refer ./Documents/Melodica-Thesis for more information on Melodica. 
 
 Building Instructions:
 	
-	For ADDER
+	For Adder
 	Takes 2 Posits as input and gives Posit as output
 	To compile Adder
 		command : make compile_adder
@@ -45,8 +47,9 @@ Building Instructions:
 	(the files build are in builds/Adder)
 	(the output file is out_adder which is in builds/Adder/output directory )
 	(the verilog code generated is in VerilogCode/Adder directory)
+	
 
-	For MULTIPLIER 
+	For Multiplier 
 	Takes 2 Posits as input and gives Posit as output
 	To compile Multiplier
 		command : make compile_multiplier
@@ -59,6 +62,21 @@ Building Instructions:
 	(the files build are in builds/Multiplier)
 	(the output file is out_multiplier which is in builds/Multiplier/output directory )
 	(the verilog code generated is in VerilogCode/Multiplier directory)
+
+	For Divider 
+	Takes 2 Posits as input and gives Posit as output
+	To compile Divider
+		command : make compile_divider
+	To link Divider files and also with softposit
+		command : make link_divider link_divider_d
+	To compile and link Divider
+		command : make divider
+	To simulate Divider
+		command : make simulate_divider
+	(the files build are in builds/Divider)
+	(the output file is out_divider which is in builds/Divider/output directory )
+	(the verilog code generated is in VerilogCode/Divider directory)
+
 
 	For Multiply-and-accumulate
 	Takes 3 Posits as input and gives Posit as output 
@@ -75,9 +93,9 @@ Building Instructions:
 	(the output file is out_mac which is in builds/Mac/output directory )
 	(the verilog code generated is in VerilogCode/Mac directory)
 
-	For Fused-multiply-add 
+	For Fused-Multiply-Add 
 	Takes 2 Posits and Quire as input and gives Quire as output
-	Qutput Quire is computed by multiplying the two posits abd accumulating it into the quire 
+	Qutput Quire is computed by multiplying the two posits and accumulating it into the quire 
 	To compile Fma
 		command : make compile_fma
 	To link Fma files and also with softposit
@@ -89,6 +107,21 @@ Building Instructions:
 	(the files build are in builds/Fused_Op/fma)
 	(the output file is out_fma which is in builds/Fused_Op/fma/output directory )
 	(the verilog code generated is in VerilogCode/Fused_Op/fma directory)
+
+	For Fused-Divide-Add 
+	Takes 2 Posits and Quire as input and gives Quire as output
+	Qutput Quire is computed by dividing the two posits and accumulating it into the quire 
+	To compile Fda
+		command : make compile_fda
+	To link Fma files and also with softposit
+		command : make link_fda link_fda_d
+	To compile and link Fda
+		command : make fda
+	To simulate Fda
+		command : make simulate_fda
+	(the files build are in builds/Fused_Op/fda)
+	(the output file is out_fda which is in builds/Fused_Op/fda/output directory )
+	(the verilog code generated is in VerilogCode/Fused_Op/fda directory)
 
 	For Quire-To-Posit 
 	Takes Quire as input and gives Posit as output
@@ -119,34 +152,33 @@ Building Instructions:
 	(the output file is out_ptoq which is in builds/PtoQ/output directory )
 	(the verilog code generated is in VerilogCode/PtoQ directory)
 
-For Quire-To-Posit 
-	Takes Quire as input and gives Posit as output
-	To compile QtoP
-		command : make compile_qtop
-	To link QtoP files and also with softposit
-		command : make link_qtop link_qtop_d
-	To compile and link QtoP
-		command : make qtop
-	To simulate QtoP
-		command : make simulate_qtop
-	(the files build are in builds/QtoP)
-	(the output file is out_qtop which is in builds/QtoP/output directory )
-	(the verilog code generated is in VerilogCode/QtoP directory)
+	For Float-To-Posit 
+	Takes Float as input and gives Posit as output
+	To compile FtoP
+		command : make compile_ftop
+	To link FtoP files and also with softposit
+		command : make link_ftop link_ftop_d
+	To compile and link FtoP
+		command : make ftop
+	To simulate FtoP
+		command : make simulate_ftop
+	(the files build are in builds/FtoP)
+	(the output file is out_ftop which is in builds/FtoP/output directory )
+	(the verilog code generated is in VerilogCode/FtoP directory)
 
 
-	For Posit-To-Quire
-	Takes Posit as input and gives Quire as output 
-	To compile PtoQ
-		command : make compile_ptoq
-	To link PtoQ files and also with softposit
-		command : make link_ptoq link_ptoq_d
-	To compile and link PtoQ
-		command : make ptoq
-	To simulate PtoQ
-		command : make simulate_ptoq
-	(the files build are in builds/PtoQ)
-	(the output file is out_ptoq which is in builds/PtoQ/output directory )
-	(the verilog code generated is in VerilogCode/PtoQ directory)
-
+	For Posit-To-Float
+	Takes Posit as input and gives Float as output 
+	To compile PtoF
+		command : make compile_ptof
+	To link PtoF files and also with softposit
+		command : make link_ptof link_ptof_d
+	To compile and link PtoF
+		command : make ptof
+	To simulate PtoF
+		command : make simulate_ptof
+	(the files build are in builds/PtoF)
+	(the output file is out_ptof which is in builds/PtoF/output directory )
+	(the verilog code generated is in VerilogCode/PtoF directory)
 
 
