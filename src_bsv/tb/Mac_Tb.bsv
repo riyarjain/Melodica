@@ -40,7 +40,13 @@ import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
 import Utils :: *;
-import "BDPI" positMAC16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2, Bit#(PositWidth) in3)	;
+`ifdef P8
+	import "BDPI" positMAC8  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+`elsif P16
+	import "BDPI" positMAC16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+`elsif P32
+	import "BDPI" positMAC32  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+
 `ifdef FPGA
 interface FpgaLedIfc;
 (* always_ready *)
@@ -72,9 +78,9 @@ module mkTestbench (Empty);
 // Depending on which input mode we are using, the input to the DUT will be
 // from a LFSR or from a counter. The LFSR is always sized to the maximal size
 `ifdef RANDOM
-LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_16;
-LFSR  #(Bit #(PositWidth))            lfsr2           <- mkLFSR_16;
-LFSR  #(Bit #(PositWidth))            lfsr3           <- mkLFSR_16;
+LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_32;
+LFSR  #(Bit #(PositWidth))            lfsr2           <- mkLFSR_32;
+LFSR  #(Bit #(PositWidth))            lfsr3           <- mkLFSR_32;
 Reg   #(Bool)                 rgSetup        <- mkReg (False);
 `endif
 

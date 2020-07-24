@@ -28,8 +28,10 @@ ptof: compile_ptof link_ptof link_ptof_d
 # Random or exhaustive testbench. Comment following line for exhaustive
 BSC_COMPILATION_FLAGS += \
 		 -D RANDOM \
-		 -D RANDOM_PRINT
-
+#		 -D RANDOM_PRINT \
+#		 -D P8 \	
+#		 -D P16 \
+#		 -D P32 \			 		
 OBJ = .o
 
 TOPMOD = mkTestbench
