@@ -5,29 +5,6 @@
 POSIT_SIZE ?= 32
 # --------
 #
-#make to compile link add,mul,mac,fma,q-to-p
-default: adder multiplier divider mac fma fda qtop ptoq ftop ptof
-#make to compile link adder only
-adder: compile_adder link_adder link_adder_d 
-#make to compile link multiplier
-multiplier: compile_multiplier link_multiplier link_multiplier_d
-#make to compile link divider
-divider: compile_divider link_divider link_divider_d
-#make to compile link mac
-mac: compile_mac link_mac link_mac_d
-#make to compile link fma
-fma: compile_fma link_fma link_fma_d
-#make to compile link fda
-fda: compile_fda link_fda link_fda_d  
-#make to compile link q-to-p
-qtop: compile_qtop link_qtop link_qtop_d 
-#make to compile link p-to-q
-ptoq: compile_ptoq link_ptoq link_ptoq_d
-#make to compile link f-to-p
-ftop: compile_ftop link_ftop link_ftop_d 
-#make to compile link p-to-q
-ptof: compile_ptof link_ptof link_ptof_d 
-
 # Select P8 for 8-bit posits, P16 for 16-bit and P32 for 32-bit
 BSC_COMPILATION_FLAGS += \
 		 -D RANDOM \
@@ -166,7 +143,6 @@ $(SOFTPOSIT_OBJPATH)/c_convertQuireX2ToPositX2$(OBJ)
 BSIM_INCDIR=$(BLUESPECDIR)/Bluesim
 BSIM_LIBDIR=$(BSIM_INCDIR)/$(CXXFAMILY)
 Testbench_Path = src_bsv/tb
-# Change me - in case you change where compile-time files are created
 
 #ADDER------------
 ADDER_PATH = .:$(BLUESPEC_LIB):src_bsv/Adder:src_bsv/lib:src_bsv/common:$(Testbench_Path) 
@@ -260,6 +236,10 @@ CPP_FLAGS += \
 	-O3 \
 
 #COMPILE-------------------------------------------------------------------------------------
+default: compile link
+compile: compile_adder compile_multiplier compile_divider compile_mac compile_fma compile_fda compile_qtop compile_ptoq compile_ftop compile_ptof
+link:    link_adder link_multiplier link_divider link_mac link_fma link_fda link_qtop link_ptoq link_ftop link_ptof
+
 #ADDER
 .PHONY: compile_adder
 compile_adder:
@@ -668,6 +648,9 @@ simulate_ptof:
 
 
 #CLEAN------------------------------------------------------------------------------------------------------------
+.PHONY: full_clean
+full_clean: clean_adder clean_multiplier clean_divider clean_mac clean_fma clean_fda clean_qtop clean_ptoq clean_ftop clean_ptof
+
 #ADDER
 .PHONY: clean_adder
 clean_adder:
@@ -718,7 +701,3 @@ clean_ftop:
 .PHONY: clean_ptof
 clean_ptof:
 	rm -r ./builds/PtoF ./VerilogCode/PtoF 
-
-.PHONY: full_clean
-full_clean:
-	rm -r ./builds ./VerilogCode 

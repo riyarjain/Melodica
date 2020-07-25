@@ -39,14 +39,14 @@ import PNE              :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
-`ifdef FPGA
 `ifdef P8
-	import "BDPI" positDiv8  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+	import "BDPI" positDiv8  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2);
 `elsif P16
-	import "BDPI" positDiv16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+	import "BDPI" positDiv16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2);
 `elsif P32
-	import "BDPI" positDiv32  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+	import "BDPI" positDiv32  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2);
 `endif
+`ifdef FPGA
 interface FpgaLedIfc;
 (* always_ready *)
 method Bool chkComplete;
@@ -56,10 +56,13 @@ endinterface
 `endif
 
 
-`ifdef RANDOM_PRINT
-typedef 1 Num_Tests;    // Number of random tests to be run
-`elsif RANDOM
-typedef 60000 Num_Tests;    // Number of random tests to be run
+// Number of random tests to be run
+`ifdef P8
+typedef 255 Num_Tests;
+`elsif P16
+typedef 1024 Num_Tests;
+`elsif P32
+typedef 4096 Num_Tests;
 `endif
 
 typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE

@@ -23,11 +23,11 @@ import Normalizer_Types :: *;
 import FMA_PNE_Quire ::*;
 
 
-	import "BDPI" fmaAdd8 = function Bit#(QuireWidth) checkoperation1 (Bit#(QuireWidth) in1,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
-	import "BDPI" fmaAdd161 = function Bit#(QuireWidthBy2) checkoperation1 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
-	import "BDPI" fmaAdd162 = function Bit#(QuireWidthBy2) checkoperation2 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
+import "BDPI" fmaAdd8 = function Bit#(QuireWidth) checkoperation1 (Bit#(QuireWidth) in1,Bit#(8) in3, Bit#(8) in4);
+import "BDPI" fmaAdd161 = function Bit#(QuireWidthBy2) checkoperation1 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(32) in3, Bit#(32) in4);
+import "BDPI" fmaAdd162 = function Bit#(QuireWidthBy2) checkoperation2 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(32) in3, Bit#(32) in4);
 
-ifdef FPGA
+`ifdef FPGA
 interface FpgaLedIfc;
 (* always_ready *)
 method Bool chkComplete;
@@ -37,10 +37,13 @@ endinterface
 `endif
 
 
-`ifdef RANDOM_PRINT
-typedef 1 Num_Tests;    // Number of random tests to be run
-`elsif RANDOM
-typedef 1000 Num_Tests;    // Number of random tests to be run
+// Number of random tests to be run
+`ifdef P8
+typedef 255 Num_Tests;
+`elsif P16
+typedef 1024 Num_Tests;
+`elsif P32
+typedef 4096 Num_Tests;
 `endif
 
 typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE

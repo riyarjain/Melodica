@@ -42,11 +42,12 @@ import Normalizer_Types :: *;
 
 
 `ifdef P8
-	import "BDPI" positMul8 = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+	import "BDPI" positMul8 = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2);
 `elsif P16
-	import "BDPI" positMul16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+	import "BDPI" positMul16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2);
 `elsif P32
-	import "BDPI" positMul32  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+	import "BDPI" positMul32  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2);
+`endif
 
 `ifdef FPGA
 interface FpgaLedIfc;
@@ -58,11 +59,15 @@ endinterface
 `endif
 
 
-`ifdef RANDOM_PRINT
-typedef 1 Num_Tests;    // Number of random tests to be run
-`elsif RANDOM
-typedef 60000 Num_Tests;    // Number of random tests to be run
+// Number of random tests to be run
+`ifdef P8
+typedef 255 Num_Tests;
+`elsif P16
+typedef 1024 Num_Tests;
+`elsif P32
+typedef 4096 Num_Tests;
 `endif
+
 
 typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
 
@@ -80,8 +85,8 @@ module mkTestbench (Empty);
 // Depending on which input mode we are using, the input to the DUT will be
 // from a LFSR or from a counter. The LFSR is always sized to the maximal size
 `ifdef RANDOM
-LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_32;
-LFSR  #(Bit #(PositWidth))            lfsr2           <- mkLFSR_32;
+LFSR  #(Bit #(32))            lfsr1          <- mkLFSR_32;
+LFSR  #(Bit #(32))            lfsr2           <- mkLFSR_32;
 Reg   #(Bool)                 rgSetup        <- mkReg (False);
 `endif
 
@@ -117,15 +122,8 @@ endrule
 rule rlGenerate (!rgGenComplete && doneSet);
 `ifdef RANDOM
    // Drive input into DU
-   ///*
-   // Drive input into DU
-   let inPosit11 = 16'b0000001001001101;
-   let inPosit22 = 16'b1111111111011001;
-   //*/
-   /*	
    let inPosit11 = lfsr1.value();
    let inPosit22 = lfsr2.value();
-   //*/
    dut.compute.request.put (InputTwoPosit{posit_inp1 : truncate (inPosit11),posit_inp2 : truncate (inPosit22) });
 
    // Bookkeeping

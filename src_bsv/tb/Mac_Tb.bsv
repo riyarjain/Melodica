@@ -40,12 +40,14 @@ import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
 import Utils :: *;
+
 `ifdef P8
-	import "BDPI" positMAC8  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
-`elsif P16
-	import "BDPI" positMAC16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
-`elsif P32
-	import "BDPI" positMAC32  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+import "BDPI" positMAC8  = function Bit#(PositWidth) checkoperation  (Bit#(PositWidth) in1, Bit#(PositWidth) in2, Bit#(PositWidth) in3);
+`elsif P16                                                                                                                            
+import "BDPI" positMAC16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2, Bit#(PositWidth) in3);
+`elsif P32                                                                                                                            
+import "BDPI" positMAC32  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2, Bit#(PositWidth) in3);
+`endif
 
 `ifdef FPGA
 interface FpgaLedIfc;
@@ -56,10 +58,13 @@ method Bool completeWithErrors;
 endinterface
 `endif
 
-`ifdef RANDOM_PRINT
-typedef 100 Num_Tests;    // Number of random tests to be run
-`elsif RANDOM
-typedef 10000000 Num_Tests;    // Number of random tests to be run
+// Number of random tests to be run
+`ifdef P8
+typedef 255 Num_Tests;
+`elsif P16
+typedef 1024 Num_Tests;
+`elsif P32
+typedef 4096 Num_Tests;
 `endif
 
 typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
@@ -78,9 +83,9 @@ module mkTestbench (Empty);
 // Depending on which input mode we are using, the input to the DUT will be
 // from a LFSR or from a counter. The LFSR is always sized to the maximal size
 `ifdef RANDOM
-LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_32;
-LFSR  #(Bit #(PositWidth))            lfsr2           <- mkLFSR_32;
-LFSR  #(Bit #(PositWidth))            lfsr3           <- mkLFSR_32;
+LFSR  #(Bit #(32))            lfsr1          <- mkLFSR_32;
+LFSR  #(Bit #(32))            lfsr2           <- mkLFSR_32;
+LFSR  #(Bit #(32))            lfsr3           <- mkLFSR_32;
 Reg   #(Bool)                 rgSetup        <- mkReg (False);
 `endif
 
