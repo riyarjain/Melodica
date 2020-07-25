@@ -21,9 +21,13 @@ import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
 import FMA_PNE_Quire ::*;
-import "BDPI" fmaAdd161 = function Bit#(QuireWidthBy2) checkoperation1 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
-import "BDPI" fmaAdd162 = function Bit#(QuireWidthBy2) checkoperation2 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
-`ifdef FPGA
+
+
+	import "BDPI" fmaAdd8 = function Bit#(QuireWidth) checkoperation1 (Bit#(QuireWidth) in1,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
+	import "BDPI" fmaAdd161 = function Bit#(QuireWidthBy2) checkoperation1 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
+	import "BDPI" fmaAdd162 = function Bit#(QuireWidthBy2) checkoperation2 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(PositWidth) in3, Bit#(PositWidth) in4);
+
+ifdef FPGA
 interface FpgaLedIfc;
 (* always_ready *)
 method Bool chkComplete;
@@ -55,12 +59,12 @@ module mkTestbench (Empty);
 // Depending on which input mode we are using, the input to the DUT will be
 // from a LFSR or from a counter. The LFSR is always sized to the maximal size
 `ifdef RANDOM
-LFSR  #(Bit #(32))            lfsr1          <- mkLFSR_32;
-LFSR  #(Bit #(32))            lfsr2          <- mkLFSR_32;
-LFSR  #(Bit #(32))            lfsr11          <- mkLFSR_32;
-LFSR  #(Bit #(32))            lfsr22          <- mkLFSR_32;
-LFSR  #(Bit #(PositWidth))    lfsr1m          <- mkLFSR_16;
-LFSR  #(Bit #(PositWidth))    lfsr2m          <- mkLFSR_16;
+	LFSR  #(Bit #(32))            lfsr1          <- mkLFSR_32;
+	LFSR  #(Bit #(32))            lfsr2          <- mkLFSR_32;
+	LFSR  #(Bit #(32))            lfsr11          <- mkLFSR_32;
+	LFSR  #(Bit #(32))            lfsr22          <- mkLFSR_32;
+	LFSR  #(Bit #(PositWidth))    lfsr1m          <- mkLFSR_16;
+	LFSR  #(Bit #(PositWidth))    lfsr2m          <- mkLFSR_16;
 Reg   #(Bool)                 rgSetup        <- mkReg (False);
 `endif
 

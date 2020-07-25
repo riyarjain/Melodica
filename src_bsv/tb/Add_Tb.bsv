@@ -39,7 +39,14 @@ import PNE              :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
-import "BDPI" positAdd16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+`ifdef P8
+	import "BDPI" positAdd8  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+`elsif P16
+	import "BDPI" positAdd16  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+`elsif P32
+	import "BDPI" positAdd32  = function Bit#(PositWidth) checkoperation (Bit#(PositWidth) in1, Bit#(PositWidth) in2)	;
+`endif
+
 `ifdef FPGA
 interface FpgaLedIfc;
 (* always_ready *)
@@ -73,8 +80,8 @@ module mkTestbench (Empty);
 // Depending on which input mode we are using, the input to the DUT will be
 // from a LFSR or from a counter. The LFSR is always sized to the maximal size
 `ifdef RANDOM
-LFSR  #(Bit #(PositWidth))            lfsr1          <- mkLFSR_16;
-LFSR  #(Bit #(PositWidth))            lfsr2           <- mkLFSR_16;
+LFSR  #(Bit #(32))            lfsr1          <- mkLFSR_32;
+LFSR  #(Bit #(32))            lfsr2           <- mkLFSR_32;
 Reg   #(Bool)                 rgSetup        <- mkReg (False);
 `endif
 
@@ -110,8 +117,6 @@ endrule
 rule rlGenerate (!rgGenComplete && doneSet);
 `ifdef RANDOM
    // Drive input into DUT
-   //let inPosit11 = 16'b1000000000000010;
-   //let inPosit22 = 16'b1000000000000010;
    let inPosit11 = lfsr1.value();
    let inPosit22 = lfsr2.value();
    dut.compute.request.put (InputTwoPosit{posit_inp1 : truncate (inPosit11),posit_inp2 : truncate (inPosit22) });

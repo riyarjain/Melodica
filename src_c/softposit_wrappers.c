@@ -143,6 +143,15 @@ unsigned int quireToPosit32(unsigned long long a, unsigned long long b,unsigned 
 	
 }
 
+unsigned int floatToPosit8(unsigned char a)
+{
+	ufloat b;
+	b.u = a;
+	posit8 pZ = convertDoubleToP8(b.f);	
+	return pZ.v;
+	
+}
+
 unsigned int floatToPosit16(unsigned int a)
 {
 	ufloat b;
@@ -160,6 +169,17 @@ unsigned int floatToPosit32(unsigned int a)
 	return pZ.v;
 	
 }
+
+unsigned int Posit8Tofloat(unsigned char a)
+{
+	posit8_t x;
+	x = castP8(a);
+	ufloat b;
+	b.f = convertP8ToDouble(x);
+	return b.u;	
+	
+}
+
 
 unsigned int Posit16Tofloat(unsigned int a)
 {

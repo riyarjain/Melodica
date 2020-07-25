@@ -40,6 +40,13 @@ import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
 import "BDPI" floatToPosit32  = function Bit#(PositWidth) checkoperation (Bit#(FloatWidth) in1)	;
+`ifdef P8
+	import "BDPI" floatToPosit8  =  function Bit#(PositWidth) checkoperation (Bit#(FloatWidth) in1)	;
+`elsif P16
+	import "BDPI" floatToPosit16  =  function Bit#(PositWidth) checkoperation (Bit#(FloatWidth) in1);
+`elsif P32
+	import "BDPI" floatToPosit32  = function Bit#(PositWidth) checkoperation (Bit#(FloatWidth) in1)	;
+`endif
 `ifdef FPGA
 interface FpgaLedIfc;
 (* always_ready *)
