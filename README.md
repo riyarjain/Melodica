@@ -16,6 +16,12 @@ proceeding:
 ```
     git submodule update --init --recursive
 ```
+In order to build the SoftPosit objects (from the SoftPosit
+instructions):
+```
+   cd SoftPosit/build/Linux-x86_64-GCC
+   make all
+```
 
 ### Posit Type-definition
 The BSV source in Melodica depends on a type definition file to
