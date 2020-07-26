@@ -67,10 +67,10 @@ provisos (Add#(a__,t,TAdd#(FracWidthQuire,2)), Add#(b__,CarryWidthQuire,t), Add#
 		//first two bits of fraction are integer bits so if scale = 0 we have to shift fract left by FWQ-(FW*2 or (no_of_frac_bits_input - 2))
 		//Thus frac_shift = FWQ-(FW*2 or (no_of_frac_bits_input - 2)) + scale(signed sum)
 		// if input scale is negative beyond and extent s.t fracshift < 0
-		Int#(LogCarryWidthPlusIntWidthPlusFracWidthQuire) scale_neg_temp = abs(signExtend(s)) - fromInteger(valueOf(FracWidthQuire));//scale_neg_temp = abs(s)-FWQ
-		Int#(LogCarryWidthPlusIntWidthPlusFracWidthQuire) scale_neg = scale_neg_temp + fromInteger(frac_width);//frac_shift = scale_neg = abs(s) - (FWQ-(FW*2 or (no_of_frac_bits_input - 2)))
+		Int#(TAdd#(LogCarryWidthPlusIntWidthPlusFracWidthQuire,1)) scale_neg_temp = abs(signExtend(s)) - fromInteger(valueOf(FracWidthQuire));//scale_neg_temp = abs(s)-FWQ
+		Int#(LogCarryWidthPlusIntWidthPlusFracWidthQuire) scale_neg = truncate(scale_neg_temp + fromInteger(frac_width));//frac_shift = scale_neg = abs(s) - (FWQ-(FW*2 or (no_of_frac_bits_input - 2)))
 		// if input scale is negative beyond and extent s.t fracshift > 0
-		Int#(LogCarryWidthPlusIntWidthPlusFracWidthQuire) scale_pos = signExtend(s) + fromInteger(valueOf(FracWidthQuire)-frac_width);// frac_shift = scale_pos = s + FWQ-(FW*2 or (no_of_frac_bits_input - 2))
+		Int#(TAdd#(LogCarryWidthPlusIntWidthPlusFracWidthQuire,1)) scale_pos = signExtend(s) + fromInteger(valueOf(FracWidthQuire)-frac_width);// frac_shift = scale_pos = s + FWQ-(FW*2 or (no_of_frac_bits_input - 2))
 		Bit#(1) truncated_frac_msb = truncated_frac_msb_in;
 		Bit#(1) truncated_frac_zero = ~truncated_frac_msb_in & truncated_frac_zero_in;
 		Bit#(CarryWidthQuire) carry = '0;
