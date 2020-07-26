@@ -4,7 +4,10 @@
 # Mandatory command-line argument -- use to fix posit size
 POSIT_SIZE ?= 32
 # --------
-#
+#  Common compilation flags
+BSC_COMPILATION_FLAGS = -keep-fires -agressive-conditions
+
+# Melodica-specific compilation flags
 # Select P8 for 8-bit posits, P16 for 16-bit and P32 for 32-bit
 BSC_COMPILATION_FLAGS += \
 		 -D RANDOM \
@@ -12,6 +15,7 @@ BSC_COMPILATION_FLAGS += \
 OBJ = .o
 
 TOPMOD = mkTestbench
+PNE_TOPMOD = mkPNE_test
 
 BLUESPEC_LIB = %/Prelude:%/Libraries:%/Libraries/BlueNoC
 
@@ -144,12 +148,14 @@ BSIM_INCDIR=$(BLUESPECDIR)/Bluesim
 BSIM_LIBDIR=$(BSIM_INCDIR)/$(CXXFAMILY)
 Testbench_Path = src_bsv/tb
 
+# ---------------
+#  PATH and Variable settings for individual pipelines
 #ADDER------------
 ADDER_PATH = .:$(BLUESPEC_LIB):src_bsv/Adder:src_bsv/lib:src_bsv/common:$(Testbench_Path) 
 BUILD_DIR_ADDER=builds/Adder
 BUILD_BSIM_DIR_ADDER=builds/Adder
 BSC_BUILDDIR_ADDER=-simdir $(BUILD_BSIM_DIR_ADDER) -bdir $(BUILD_DIR_ADDER) -info-dir $(BUILD_DIR_ADDER)
-VERILOG_CODE_DIR_ADDER=VerilogCode/Adder
+VERILOG_CODE_DIR_ADDER=Verilog_RTL/Adder
 OUTPUT_ADDER = builds/Adder/output
 
 #MULTIPLIER------------
@@ -157,7 +163,7 @@ MULTIPLIER_PATH = .:$(BLUESPEC_LIB):src_bsv/Multiplier:src_bsv/lib:src_bsv/commo
 BUILD_DIR_MULTIPLIER=builds/Multiplier
 BUILD_BSIM_DIR_MULTIPLIER=builds/Multiplier
 BSC_BUILDDIR_MULTIPLIER=-simdir $(BUILD_BSIM_DIR_MULTIPLIER) -bdir $(BUILD_DIR_MULTIPLIER) -info-dir $(BUILD_DIR_MULTIPLIER)
-VERILOG_CODE_DIR_MULTIPLIER=VerilogCode/Multiplier
+VERILOG_CODE_DIR_MULTIPLIER=Verilog_RTL/Multiplier
 OUTPUT_MULTIPLIER = builds/Multiplier/output
 
 #DIVIDER------------
@@ -165,7 +171,7 @@ DIVIDER_PATH = .:$(BLUESPEC_LIB):src_bsv/Divider:src_bsv/lib:src_bsv/common:$(Te
 BUILD_DIR_DIVIDER=builds/Divider
 BUILD_BSIM_DIR_DIVIDER=builds/Divider
 BSC_BUILDDIR_DIVIDER=-simdir $(BUILD_BSIM_DIR_DIVIDER) -bdir $(BUILD_DIR_DIVIDER) -info-dir $(BUILD_DIR_DIVIDER)
-VERILOG_CODE_DIR_DIVIDER=VerilogCode/Divider
+VERILOG_CODE_DIR_DIVIDER=Verilog_RTL/Divider
 OUTPUT_DIVIDER = builds/Divider/output
 
 #MAC------------
@@ -173,7 +179,7 @@ MAC_PATH = .:$(BLUESPEC_LIB):src_bsv/Mac:src_bsv/lib:src_bsv/common:$(Testbench_
 BUILD_DIR_MAC=builds/Mac
 BUILD_BSIM_DIR_MAC=builds/Mac
 BSC_BUILDDIR_MAC=-simdir $(BUILD_BSIM_DIR_MAC) -bdir $(BUILD_DIR_MAC) -info-dir $(BUILD_DIR_MAC)
-VERILOG_CODE_DIR_MAC=VerilogCode/Mac
+VERILOG_CODE_DIR_MAC=Verilog_RTL/Mac
 OUTPUT_MAC = builds/Mac/output
 
 #FMA------------
@@ -181,7 +187,7 @@ FMA_PATH = .:$(BLUESPEC_LIB):src_bsv/Fused_Op:src_bsv/lib:src_bsv/common:$(Testb
 BUILD_DIR_FMA=builds/Fused_Op/fma
 BUILD_BSIM_DIR_FMA=builds/Fused_Op/fma
 BSC_BUILDDIR_FMA=-simdir $(BUILD_BSIM_DIR_FMA) -bdir $(BUILD_DIR_FMA) -info-dir $(BUILD_DIR_FMA)
-VERILOG_CODE_DIR_FMA=VerilogCode/Fused_Op/fma
+VERILOG_CODE_DIR_FMA=Verilog_RTL/Fused_Op/fma
 OUTPUT_FMA = builds/Fused_Op/fma/output
 
 #FDA------------
@@ -189,7 +195,7 @@ FDA_PATH = .:$(BLUESPEC_LIB):src_bsv/Fused_Op:src_bsv/lib:src_bsv/common:$(Testb
 BUILD_DIR_FDA=builds/Fused_Op/fda
 BUILD_BSIM_DIR_FDA=builds/Fused_Op/fda
 BSC_BUILDDIR_FDA=-simdir $(BUILD_BSIM_DIR_FDA) -bdir $(BUILD_DIR_FDA) -info-dir $(BUILD_DIR_FDA)
-VERILOG_CODE_DIR_FDA=VerilogCode/Fused_Op/fda
+VERILOG_CODE_DIR_FDA=Verilog_RTL/Fused_Op/fda
 OUTPUT_FDA = builds/Fused_Op/fda/output
 
 #QtoP------------
@@ -197,7 +203,7 @@ QtoP_PATH = .:$(BLUESPEC_LIB):src_bsv/QtoP:src_bsv/lib:src_bsv/common:$(Testbenc
 BUILD_DIR_QtoP=builds/QtoP
 BUILD_BSIM_DIR_QtoP=builds/QtoP
 BSC_BUILDDIR_QtoP=-simdir $(BUILD_BSIM_DIR_QtoP) -bdir $(BUILD_DIR_QtoP) -info-dir $(BUILD_DIR_QtoP)
-VERILOG_CODE_DIR_QtoP=VerilogCode/QtoP
+VERILOG_CODE_DIR_QtoP=Verilog_RTL/QtoP
 OUTPUT_QtoP = builds/QtoP/output
 
 #PtoQ------------
@@ -205,7 +211,7 @@ PtoQ_PATH = .:$(BLUESPEC_LIB):src_bsv/PtoQ:src_bsv/lib:src_bsv/common:$(Testbenc
 BUILD_DIR_PtoQ=builds/PtoQ
 BUILD_BSIM_DIR_PtoQ=builds/PtoQ
 BSC_BUILDDIR_PtoQ=-simdir $(BUILD_BSIM_DIR_PtoQ) -bdir $(BUILD_DIR_PtoQ) -info-dir $(BUILD_DIR_PtoQ)
-VERILOG_CODE_DIR_PtoQ=VerilogCode/PtoQ
+VERILOG_CODE_DIR_PtoQ=Verilog_RTL/PtoQ
 OUTPUT_PtoQ = builds/PtoQ/output
 
 #FtoP------------
@@ -213,7 +219,7 @@ FtoP_PATH = .:$(BLUESPEC_LIB):src_bsv/FtoP:src_bsv/lib:src_bsv/common:$(Testbenc
 BUILD_DIR_FtoP=builds/FtoP
 BUILD_BSIM_DIR_FtoP=builds/FtoP
 BSC_BUILDDIR_FtoP=-simdir $(BUILD_BSIM_DIR_FtoP) -bdir $(BUILD_DIR_FtoP) -info-dir $(BUILD_DIR_FtoP)
-VERILOG_CODE_DIR_FtoP=VerilogCode/FtoP
+VERILOG_CODE_DIR_FtoP=Verilog_RTL/FtoP
 OUTPUT_FtoP = builds/FtoP/output
 
 #PtoF------------
@@ -221,10 +227,12 @@ PtoF_PATH = .:$(BLUESPEC_LIB):src_bsv/PtoF:src_bsv/lib:src_bsv/common:$(Testbenc
 BUILD_DIR_PtoF=builds/PtoF
 BUILD_BSIM_DIR_PtoF=builds/PtoF
 BSC_BUILDDIR_PtoF=-simdir $(BUILD_BSIM_DIR_PtoF) -bdir $(BUILD_DIR_PtoF) -info-dir $(BUILD_DIR_PtoF)
-VERILOG_CODE_DIR_PtoF=VerilogCode/PtoF
+VERILOG_CODE_DIR_PtoF=Verilog_RTL/PtoF
 OUTPUT_PtoF = builds/PtoF/output
+# ---------------
 
 # For final C++ link with main.cxx driver for non-BlueTcl version
+# (needed for SoftPosits)
 CPP_FLAGS += \
 	-static \
 	-D_GLIBCXX_USE_CXX11_ABI=0 \
@@ -235,7 +243,57 @@ CPP_FLAGS += \
 	-L$(SOFTPOSIT_OBJPATH) \
 	-O3 \
 
-#COMPILE-------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
+# Compilation Targets
+.PHONY: rtl
+rtl: rtl_adder rtl_multiplier rtl_divider rtl_mac rtl_fma rtl_fda rtl_qtop rtl_ptoq rtl_ftop rtl_ptof
+	@echo "Generating Melodica RTL ..."
+
+.PHONY: adder_working_dirs
+adder_working_dirs :
+	mkdir -p $(VERILOG_CODE_DIR_ADDER) $(BUILD_DIR_ADDER) $(BUILD_BSIM_DIR_ADDER) $(OUTPUT_ADDER)
+
+.PHONY: multiplier_working_dirs
+multiplier_working_dirs :
+	mkdir -p $(VERILOG_CODE_DIR_MULTIPLIER) $(BUILD_DIR_MULTIPLIER) $(BUILD_BSIM_DIR_MULTIPLIER) $(OUTPUT_MULTIPLIER)
+
+.PHONY: divider_working_dirs
+divider_working_dirs :
+	mkdir -p $(VERILOG_CODE_DIR_DIVIDER) $(BUILD_DIR_DIVIDER) $(BUILD_BSIM_DIR_DIVIDER) $(OUTPUT_DIVIDER)
+
+.PHONY: rtl_adder 
+rtl_adder : adder_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+.PHONY: rtl_multiplier 
+rtl_multiplier : multiplier_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_MULTIPLIER) -vdir $(VERILOG_CODE_DIR_MULTIPLIER) $(BSC_COMPILATION_FLAGS) -p $(MULTIPLIER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+.PHONY: rtl_divider 
+rtl_divider : divider_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_DIVIDER) -vdir $(VERILOG_CODE_DIR_DIVIDER) $(BSC_COMPILATION_FLAGS) -p $(DIVIDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+.PHONY: rtl_mac 
+rtl_mac : mac_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_MAC) -vdir $(VERILOG_CODE_DIR_MAC) $(BSC_COMPILATION_FLAGS) -p $(MAC_PATH) -g $(PNE_TOPMOD) PNE.bsv
+.PHONY: rtl_fma 
+rtl_fma : fma_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_FMA) -vdir $(VERILOG_CODE_DIR_FMA) $(BSC_COMPILATION_FLAGS) -p $(FMA_PATH) -g $(PNE_TOPMOD) FMA_PNE_Quire.bsv
+.PHONY: rtl_fda 
+rtl_fda : fda_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_FDA) -vdir $(VERILOG_CODE_DIR_FDA) $(BSC_COMPILATION_FLAGS) -p $(FDA_PATH) -g $(PNE_TOPMOD) FDA_PNE_Quire.bsv
+.PHONY: rtl_qtop 
+rtl_qtop : qtop_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+.PHONY: rtl_ptoq 
+rtl_ptoq : ptoq_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+.PHONY: rtl_ftop 
+rtl_ftop : ftop_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+.PHONY: rtl_ptof
+rtl_ptof: ptof:_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+
+
 default: compile link
 compile: compile_adder compile_multiplier compile_divider compile_mac compile_fma compile_fda compile_qtop compile_ptoq compile_ftop compile_ptof
 link:    link_adder link_multiplier link_divider link_mac link_fma link_fda link_qtop link_ptoq link_ftop link_ptof
@@ -246,7 +304,6 @@ compile_adder:
 	@echo Compiling...
 	mkdir -p $(VERILOG_CODE_DIR_ADDER) $(BUILD_DIR_ADDER) $(BUILD_BSIM_DIR_ADDER) $(OUTPUT_ADDER)
 	bsc -u -sim $(BSC_BUILDDIR_ADDER) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(ADDER_PATH) -g $(TOPMOD) $(Testbench_Path)/Add_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(ADDER_PATH) -g $(TOPMOD)  $(Testbench_Path)/Add_Tb.bsv
 	@echo Compilation finished
 
 #MULTIPLIER
@@ -255,7 +312,6 @@ compile_multiplier:
 	@echo Compiling...
 	mkdir -p $(VERILOG_CODE_DIR_MULTIPLIER) $(BUILD_DIR_MULTIPLIER) $(BUILD_BSIM_DIR_MULTIPLIER) $(OUTPUT_MULTIPLIER)
 	bsc -u -sim $(BSC_BUILDDIR_MULTIPLIER) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(MULTIPLIER_PATH) -g $(TOPMOD)  $(Testbench_Path)/Mul_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_MULTIPLIER) -vdir $(VERILOG_CODE_DIR_MULTIPLIER) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(MULTIPLIER_PATH) -g $(TOPMOD)  $(Testbench_Path)/Mul_Tb.bsv
 	@echo Compilation finished
 
 #DIVIDER
@@ -264,7 +320,6 @@ compile_divider:
 	@echo Compiling...
 	mkdir -p $(VERILOG_CODE_DIR_DIVIDER) $(BUILD_DIR_DIVIDER) $(BUILD_BSIM_DIR_DIVIDER) $(OUTPUT_DIVIDER)
 	bsc -u -sim $(BSC_BUILDDIR_DIVIDER) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(DIVIDER_PATH) -g $(TOPMOD)  $(Testbench_Path)/Div_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_DIVIDER) -vdir $(VERILOG_CODE_DIR_DIVIDER) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(DIVIDER_PATH) -g $(TOPMOD)  $(Testbench_Path)/Div_Tb.bsv
 	@echo Compilation finished
 
 #MAC
@@ -654,50 +709,50 @@ full_clean: clean_adder clean_multiplier clean_divider clean_mac clean_fma clean
 #ADDER
 .PHONY: clean_adder
 clean_adder:
-	rm -r ./builds/Adder ./VerilogCode/Adder
+	rm -r ./builds/Adder ./Verilog_RTL/Adder
 
 #MULTIPLIER
 .PHONY: clean_multiplier
 clean_multiplier:
-	rm -r ./builds/Multiplier ./VerilogCode/Multiplier 
+	rm -r ./builds/Multiplier ./Verilog_RTL/Multiplier 
 
 #DIVIDER
 .PHONY: clean_divider
 clean_divider:
-	rm -r ./builds/Divider ./VerilogCode/Divider 
+	rm -r ./builds/Divider ./Verilog_RTL/Divider 
 
 #MAC
 .PHONY: clean_mac
 clean_mac:
-	rm -r ./builds/Mac ./VerilogCode/Mac 
+	rm -r ./builds/Mac ./Verilog_RTL/Mac 
 
 #FMA
 .PHONY: clean_fma
 clean_fma:
-	rm -r ./builds/Fused_Op/fma ./VerilogCode/Fused_Op/fma 
+	rm -r ./builds/Fused_Op/fma ./Verilog_RTL/Fused_Op/fma 
 
 #FDA
 .PHONY: clean_fda
 clean_fda:
-	rm -r ./builds/Fused_Op/fda ./VerilogCode/Fused_Op/fda 
+	rm -r ./builds/Fused_Op/fda ./Verilog_RTL/Fused_Op/fda 
 
 #Q-TO-P
 .PHONY: clean_qtop
 clean_qtop:
-	rm -r ./builds/QtoP ./VerilogCode/QtoP 
+	rm -r ./builds/QtoP ./Verilog_RTL/QtoP 
 
 #P-to-Q
 .PHONY: clean_ptoq
 clean_ptoq:
-	rm -r ./builds/PtoQ ./VerilogCode/PtoQ 
+	rm -r ./builds/PtoQ ./Verilog_RTL/PtoQ 
 
  
 #F-TO-P
 .PHONY: clean_ftop
 clean_ftop:
-	rm -r ./builds/FtoP ./VerilogCode/FtoP 
+	rm -r ./builds/FtoP ./Verilog_RTL/FtoP 
 
 #P-to-Q
 .PHONY: clean_ptof
 clean_ptof:
-	rm -r ./builds/PtoF ./VerilogCode/PtoF 
+	rm -r ./builds/PtoF ./Verilog_RTL/PtoF 
