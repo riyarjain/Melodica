@@ -111,8 +111,7 @@ endinterface
 endmodule
 
 (* synthesize *)
-
-module mkFDA_PNE_Quire_test (FDA_PNE_Quire);
+module mkPNE_test (FDA_PNE_Quire);
    let _ifc <- mkFDA_PNE_Quire;
    return (_ifc);
 endmodule

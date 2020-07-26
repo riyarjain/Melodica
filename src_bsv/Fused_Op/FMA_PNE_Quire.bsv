@@ -52,7 +52,6 @@ interface FMA_PNE_Quire ;
 endinterface
 
 module mkFMA_PNE_Quire(FMA_PNE_Quire);
-
 FIFO #(Bit#(QuireWidth)) ffO <- mkFIFO;
 FIFO #(Bit#(QuireWidth)) fftemp <- mkFIFO;
 Extracter_IFC  extracter1 <- mkExtracter;
@@ -110,8 +109,7 @@ endinterface
 endmodule
 
 (* synthesize *)
-
-module mkFMA_PNE_Quire_test (FMA_PNE_Quire);
+module mkPNE_test (FMA_PNE_Quire);
    let _ifc <- mkFMA_PNE_Quire;
    return (_ifc);
 endmodule
