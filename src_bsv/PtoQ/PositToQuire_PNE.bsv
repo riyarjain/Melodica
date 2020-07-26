@@ -70,7 +70,7 @@ endmodule
 
 (* synthesize *)
 
-module mkPositToQuire_PNE_test (PositToQuire_PNE );
+module mkPNE_test (PositToQuire_PNE );
    let _ifc <- mkPositToQuire_PNE;
    return (_ifc);
 endmodule

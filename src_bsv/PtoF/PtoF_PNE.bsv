@@ -72,7 +72,7 @@ endmodule
 
 (* synthesize *)
 
-module mkPtoF_PNE_test (PtoF_PNE );
+module mkPNE_test (PtoF_PNE );
    let _ifc <- mkPtoF_PNE;
    return (_ifc);
 endmodule

@@ -74,7 +74,7 @@ endmodule
 
 (* synthesize *)
 
-module mkQuireToPosit_PNE_test (QuireToPosit_PNE );
+module mkPNE_test (QuireToPosit_PNE );
    let _ifc <- mkQuireToPosit_PNE;
    return (_ifc);
 endmodule
