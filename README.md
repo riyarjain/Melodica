@@ -44,19 +44,28 @@ the make command:
    POSIT_SIZE=8/16/32
 ```
 
-To build all the pipelines to process 8-bit posits:
+To build all the pipelines (rtl and simulator) to process 8-bit posits:
 ```
    make POSIT_SIZE=8
 ```
 
-To build all the pipelines to process 16-bit posits:
+To build all the pipelines (rtl and simulator) to process 16-bit posits:
 ```
    make POSIT_SIZE=16
 ```
 
-To build all the pipelines to process 32-bit posits:
+To build all the pipelines (rtl and simulator) to process 32-bit posits:
 ```
    make POSIT_SIZE=32
 ```
 
+To build the rtl only for all the pipelines
+```
+   make rtl POSIT_SIZE=...
+```
+
+To build the simulator only for all the pipelines
+```
+   make sim POSIT_SIZE=...
+```
 The generated RTL is in the `VerilogCode` directories.

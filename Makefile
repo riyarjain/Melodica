@@ -5,7 +5,7 @@
 POSIT_SIZE ?= 32
 # --------
 #  Common compilation flags
-BSC_COMPILATION_FLAGS = -keep-fires -agressive-conditions
+BSC_COMPILATION_FLAGS = -keep-fires -aggressive-conditions
 
 # Melodica-specific compilation flags
 # Select P8 for 8-bit posits, P16 for 16-bit and P32 for 32-bit
@@ -151,7 +151,7 @@ Testbench_Path = src_bsv/tb
 # ---------------
 #  PATH and Variable settings for individual pipelines
 #ADDER------------
-ADDER_PATH = .:$(BLUESPEC_LIB):src_bsv/Adder:src_bsv/lib:src_bsv/common:$(Testbench_Path) 
+ADDER_PATH = .:src_bsv/Adder:src_bsv/lib:src_bsv/common:$(Testbench_Path):$(BLUESPEC_LIB) 
 BUILD_DIR_ADDER=builds/Adder
 BUILD_BSIM_DIR_ADDER=builds/Adder
 BSC_BUILDDIR_ADDER=-simdir $(BUILD_BSIM_DIR_ADDER) -bdir $(BUILD_DIR_ADDER) -info-dir $(BUILD_DIR_ADDER)
@@ -243,13 +243,13 @@ CPP_FLAGS += \
 	-L$(SOFTPOSIT_OBJPATH) \
 	-O3 \
 
-
 # -------------------------------------------------------------------------------------
-# Compilation Targets
-.PHONY: rtl
-rtl: rtl_adder rtl_multiplier rtl_divider rtl_mac rtl_fma rtl_fda rtl_qtop rtl_ptoq rtl_ftop rtl_ptof
-	@echo "Generating Melodica RTL ..."
+# Compilation Targets -- Here starts the real work
+default: rtl sim
 
+# --------
+# Working Directories
+# --------
 .PHONY: adder_working_dirs
 adder_working_dirs :
 	mkdir -p $(VERILOG_CODE_DIR_ADDER) $(BUILD_DIR_ADDER) $(BUILD_BSIM_DIR_ADDER) $(OUTPUT_ADDER)
@@ -262,128 +262,144 @@ multiplier_working_dirs :
 divider_working_dirs :
 	mkdir -p $(VERILOG_CODE_DIR_DIVIDER) $(BUILD_DIR_DIVIDER) $(BUILD_BSIM_DIR_DIVIDER) $(OUTPUT_DIVIDER)
 
+.PHONY: fma_working_dirs
+fma_working_dirs :
+	mkdir -p $(VERILOG_CODE_DIR_FMA) $(BUILD_DIR_FMA) $(BUILD_BSIM_DIR_FMA) $(OUTPUT_FMA)
+
+.PHONY: fda_working_dirs
+fda_working_dirs :
+	mkdir -p $(VERILOG_CODE_DIR_FDA) $(BUILD_DIR_FDA) $(BUILD_BSIM_DIR_FDA) $(OUTPUT_FDA)
+
+.PHONY: ftop_working_dirs
+ftop_working_dirs :
+	mkdir -p $(VERILOG_CODE_DIR_FtoP) $(BUILD_DIR_FtoP) $(BUILD_BSIM_DIR_FtoP) $(OUTPUT_FtoP)
+
+.PHONY: ptof_working_dirs
+ptof_working_dirs :
+	mkdir -p $(VERILOG_CODE_DIR_PtoF) $(BUILD_DIR_PtoF) $(BUILD_BSIM_DIR_PtoF) $(OUTPUT_PtoF)
+
+.PHONY: ptoq_working_dirs
+ptoq_working_dirs :
+	mkdir -p $(VERILOG_CODE_DIR_PtoQ) $(BUILD_DIR_PtoQ) $(BUILD_BSIM_DIR_PtoQ) $(OUTPUT_PtoQ)
+
+.PHONY: qtop_working_dirs
+qtop_working_dirs :
+	mkdir -p $(VERILOG_CODE_DIR_QtoP) $(BUILD_DIR_QtoP) $(BUILD_BSIM_DIR_QtoP) $(OUTPUT_QtoP)
+
+# --------
+# RTL Generation
+# --------
+.PHONY: rtl
+rtl: rtl_adder rtl_multiplier rtl_divider rtl_fma rtl_fda rtl_qtop rtl_ptoq rtl_ftop rtl_ptof
+	@echo "Generating Melodica RTL ..."
+
 .PHONY: rtl_adder 
 rtl_adder : adder_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) src_bsv/Adder/PNE.bsv
 .PHONY: rtl_multiplier 
 rtl_multiplier : multiplier_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_MULTIPLIER) -vdir $(VERILOG_CODE_DIR_MULTIPLIER) $(BSC_COMPILATION_FLAGS) -p $(MULTIPLIER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_MULTIPLIER) -vdir $(VERILOG_CODE_DIR_MULTIPLIER) $(BSC_COMPILATION_FLAGS) -p $(MULTIPLIER_PATH) -g $(PNE_TOPMOD) src_bsv/Multiplier/PNE.bsv
 .PHONY: rtl_divider 
 rtl_divider : divider_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_DIVIDER) -vdir $(VERILOG_CODE_DIR_DIVIDER) $(BSC_COMPILATION_FLAGS) -p $(DIVIDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
-.PHONY: rtl_mac 
-rtl_mac : mac_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_MAC) -vdir $(VERILOG_CODE_DIR_MAC) $(BSC_COMPILATION_FLAGS) -p $(MAC_PATH) -g $(PNE_TOPMOD) PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_DIVIDER) -vdir $(VERILOG_CODE_DIR_DIVIDER) $(BSC_COMPILATION_FLAGS) -p $(DIVIDER_PATH) -g $(PNE_TOPMOD) src_bsv/Divider/PNE.bsv
 .PHONY: rtl_fma 
 rtl_fma : fma_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_FMA) -vdir $(VERILOG_CODE_DIR_FMA) $(BSC_COMPILATION_FLAGS) -p $(FMA_PATH) -g $(PNE_TOPMOD) FMA_PNE_Quire.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_FMA) -vdir $(VERILOG_CODE_DIR_FMA) $(BSC_COMPILATION_FLAGS) -p $(FMA_PATH) -g $(PNE_TOPMOD) src_bsv/Fused_Op/FMA_PNE_Quire.bsv
 .PHONY: rtl_fda 
 rtl_fda : fda_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_FDA) -vdir $(VERILOG_CODE_DIR_FDA) $(BSC_COMPILATION_FLAGS) -p $(FDA_PATH) -g $(PNE_TOPMOD) FDA_PNE_Quire.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_FDA) -vdir $(VERILOG_CODE_DIR_FDA) $(BSC_COMPILATION_FLAGS) -p $(FDA_PATH) -g $(PNE_TOPMOD) src_bsv/Fused_Op/FDA_PNE_Quire.bsv
 .PHONY: rtl_qtop 
 rtl_qtop : qtop_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) src_bsv/QtoP/PNE.bsv
 .PHONY: rtl_ptoq 
 rtl_ptoq : ptoq_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) src_bsv/PtoQ/PNE.bsv
 .PHONY: rtl_ftop 
 rtl_ftop : ftop_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) src_bsv/FtoP/PNE.bsv
 .PHONY: rtl_ptof
-rtl_ptof: ptof:_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) PNE.bsv
+rtl_ptof: ptof_working_dirs
+	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) src_bsv/PtoF/PNE.bsv
 
 
-default: compile link
-compile: compile_adder compile_multiplier compile_divider compile_mac compile_fma compile_fda compile_qtop compile_ptoq compile_ftop compile_ptof
-link:    link_adder link_multiplier link_divider link_mac link_fma link_fda link_qtop link_ptoq link_ftop link_ptof
+# --------
+# Building a (bsim) simulator
+# --------
+sim:  sim_adder sim_multiplier sim_divider sim_mac sim_fma sim_fda sim_qtop sim_ptoq sim_ftop sim_ptof
+	@echo "Generating Melodica simulator ..."
 
-#ADDER
-.PHONY: compile_adder
-compile_adder:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_ADDER) $(BUILD_DIR_ADDER) $(BUILD_BSIM_DIR_ADDER) $(OUTPUT_ADDER)
-	bsc -u -sim $(BSC_BUILDDIR_ADDER) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(ADDER_PATH) -g $(TOPMOD) $(Testbench_Path)/Add_Tb.bsv 
-	@echo Compilation finished
+link: link_adder link_multiplier link_divider link_mac link_fma link_fda link_qtop link_ptoq link_ftop link_ptof
+
+.PHONY: sim_adder
+sim_adder: bsim_adder link_adder_d
+
+.PHONY: bsim_adder
+bsim_adder: adder_working_dirs
+	bsc -u -sim $(BSC_BUILDDIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(TOPMOD) $(Testbench_Path)/Add_Tb.bsv 
 
 #MULTIPLIER
-.PHONY: compile_multiplier
-compile_multiplier:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_MULTIPLIER) $(BUILD_DIR_MULTIPLIER) $(BUILD_BSIM_DIR_MULTIPLIER) $(OUTPUT_MULTIPLIER)
-	bsc -u -sim $(BSC_BUILDDIR_MULTIPLIER) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(MULTIPLIER_PATH) -g $(TOPMOD)  $(Testbench_Path)/Mul_Tb.bsv 
-	@echo Compilation finished
+.PHONY: sim_multiplier
+sim_multiplier: bsim_multiplier link_multiplier_d
+
+.PHONY: bsim_multiplier
+bsim_multiplier: multiplier_working_dirs
+	bsc -u -sim $(BSC_BUILDDIR_MULTIPLIER) $(BSC_COMPILATION_FLAGS) -p $(MULTIPLIER_PATH) -g $(TOPMOD) $(Testbench_Path)/Mul_Tb.bsv 
 
 #DIVIDER
-.PHONY: compile_divider
-compile_divider:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_DIVIDER) $(BUILD_DIR_DIVIDER) $(BUILD_BSIM_DIR_DIVIDER) $(OUTPUT_DIVIDER)
-	bsc -u -sim $(BSC_BUILDDIR_DIVIDER) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(DIVIDER_PATH) -g $(TOPMOD)  $(Testbench_Path)/Div_Tb.bsv 
-	@echo Compilation finished
+.PHONY: sim_divider
+sim_divider: bsim_divider link_divider_d
 
-#MAC
-.PHONY: compile_mac
-compile_mac:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_MAC) $(BUILD_DIR_MAC) $(BUILD_BSIM_DIR_MAC) $(OUTPUT_MAC)
-	bsc -u -sim $(BSC_BUILDDIR_MAC) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(MAC_PATH) -g $(TOPMOD)  $(Testbench_Path)/Mac_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_MAC) -vdir $(VERILOG_CODE_DIR_MAC) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(MAC_PATH) -g $(TOPMOD)  $(Testbench_Path)/Mac_Tb.bsv
-	@echo Compilation finished
+.PHONY: bsim_divider
+bsim_divider: divider_working_dirs
+	bsc -u -sim $(BSC_BUILDDIR_DIVIDER) $(BSC_COMPILATION_FLAGS) -p $(DIVIDER_PATH) -g $(TOPMOD) $(Testbench_Path)/Div_Tb.bsv 
 
 #FMA
-.PHONY: compile_fma
-compile_fma:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_FMA) $(BUILD_DIR_FMA) $(BUILD_BSIM_DIR_FMA) $(OUTPUT_FMA)
-	bsc -u -sim $(BSC_BUILDDIR_FMA) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(FMA_PATH) -g $(TOPMOD)  $(Testbench_Path)/Fma_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_FMA) -vdir $(VERILOG_CODE_DIR_FMA) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(FMA_PATH) -g $(TOPMOD)  $(Testbench_Path)/Fma_Tb.bsv
-	@echo Compilation finished
+.PHONY: sim_fma
+sim_fma: bsim_fma link_fma_d
+
+.PHONY: bsim_fma
+bsim_fma: fma_working_dirs
+	bsc -u -sim $(BSC_BUILDDIR_FMA) $(BSC_COMPILATION_FLAGS) -p $(FMA_PATH) -g $(TOPMOD) $(Testbench_Path)/Fma_Tb.bsv 
 
 #FDA
-.PHONY: compile_fda
-compile_fda:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_FDA) $(BUILD_DIR_FDA) $(BUILD_BSIM_DIR_FDA) $(OUTPUT_FDA)
-	bsc -u -sim $(BSC_BUILDDIR_FDA) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(FDA_PATH) -g $(TOPMOD)  $(Testbench_Path)/Fda_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_FDA) -vdir $(VERILOG_CODE_DIR_FDA) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(FDA_PATH) -g $(TOPMOD)  $(Testbench_Path)/Fda_Tb.bsv
-	@echo Compilation finished
+.PHONY: sim_fda
+sim_fda: bsim_fda link_fda_d
+
+.PHONY: bsim_fda
+bsim_fda: fda_working_dirs
+	bsc -u -sim $(BSC_BUILDDIR_FDA) $(BSC_COMPILATION_FLAGS) -p $(FDA_PATH) -g $(TOPMOD) $(Testbench_Path)/Fda_Tb.bsv 
 
 #QtoP
-.PHONY: compile_qtop
-compile_qtop:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_QtoP) $(BUILD_DIR_QtoP) $(BUILD_BSIM_DIR_QtoP) $(OUTPUT_QtoP)
-	bsc -u -sim $(BSC_BUILDDIR_QtoP) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(QtoP_PATH) -g $(TOPMOD)  $(Testbench_Path)/QtoP_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_QtoP) -vdir $(VERILOG_CODE_DIR_QtoP) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(QtoP_PATH) -g $(TOPMOD)  $(Testbench_Path)/QtoP_Tb.bsv
-	@echo Compilation finished
+.PHONY: sim_qtop
+sim_qtop: bsim_qtop link_qtop_d
+
+.PHONY: bsim_qtop
+bsim_qtop: qtop_working_dirs
+	bsc -u -sim $(BSC_BUILDDIR_QtoP) $(BSC_COMPILATION_FLAGS) -p $(QtoP_PATH) -g $(TOPMOD) $(Testbench_Path)/QtoP_Tb.bsv 
 
 #PtoQ
-.PHONY: compile_ptoq
-compile_ptoq:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_PtoQ) $(BUILD_DIR_PtoQ) $(BUILD_BSIM_DIR_PtoQ) $(OUTPUT_PtoQ)
-	bsc -u -sim $(BSC_BUILDDIR_PtoQ) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(PtoQ_PATH) -g $(TOPMOD)  $(Testbench_Path)/PtoQ_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_PtoQ) -vdir $(VERILOG_CODE_DIR_PtoQ) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(PtoQ_PATH) -g $(TOPMOD)  $(Testbench_Path)/PtoQ_Tb.bsv
-	@echo Compilation finished
+.PHONY: sim_ptoq
+sim_ptoq: bsim_ptoq link_ptoq_d
+
+.PHONY: bsim_ptoq
+bsim_ptoq: ptoq_working_dirs
+	bsc -u -sim $(BSC_BUILDDIR_PtoQ) $(BSC_COMPILATION_FLAGS) -p $(PtoQ_PATH) -g $(TOPMOD) $(Testbench_Path)/PtoQ_Tb.bsv 
 
 #FtoP
-.PHONY: compile_ftop
-compile_ftop:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_FtoP) $(BUILD_DIR_FtoP) $(BUILD_BSIM_DIR_FtoP) $(OUTPUT_FtoP)
-	bsc -u -sim $(BSC_BUILDDIR_FtoP) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(FtoP_PATH) -g $(TOPMOD)  $(Testbench_Path)/FtoP_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_FtoP) -vdir $(VERILOG_CODE_DIR_FtoP) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(FtoP_PATH) -g $(TOPMOD)  $(Testbench_Path)/FtoP_Tb.bsv
-	@echo Compilation finished
+.PHONY: sim_ftop
+sim_ftop: bsim_ftop link_ftop_d
+
+.PHONY: bsim_ftop
+bsim_ftop: ftopworking_dirs
+	bsc -u -sim $(BSC_BUILDDIR_FtoP) $(BSC_COMPILATION_FLAGS) -p $(FtoP_PATH) -g $(TOPMOD) $(Testbench_Path)/FtoP_Tb.bsv 
 
 #PtoF
-.PHONY: compile_ptof
-compile_ptof:
-	@echo Compiling...
-	mkdir -p $(VERILOG_CODE_DIR_PtoF) $(BUILD_DIR_PtoF) $(BUILD_BSIM_DIR_PtoF) $(OUTPUT_PtoF)
-	bsc -u -sim $(BSC_BUILDDIR_PtoF) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(PtoF_PATH) -g $(TOPMOD)  $(Testbench_Path)/PtoF_Tb.bsv 
-	bsc -u -elab -verilog $(BSC_BUILDDIR_PtoF) -vdir $(VERILOG_CODE_DIR_PtoF) $(BSC_COMPILATION_FLAGS) -keep-fires -aggressive-conditions -p $(PtoF_PATH) -g $(TOPMOD)  $(Testbench_Path)/PtoF_Tb.bsv
-	@echo Compilation finished
+.PHONY: sim_ptof
+sim_ptof: bsim_ptof link_ptof_d
+
+.PHONY: bsim_ptof
+bsim_ptof: ptof_working_dirs
+	bsc -u -sim $(BSC_BUILDDIR_PtoF) $(BSC_COMPILATION_FLAGS) -p $(PtoF_PATH) -g $(TOPMOD) $(Testbench_Path)/PtoF_Tb.bsv 
 
 #LINK----------------------------------------------------------------------------------------------
 #ADDER
