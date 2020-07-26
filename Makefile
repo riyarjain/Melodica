@@ -310,16 +310,16 @@ rtl_fda : fda_working_dirs
 	bsc -u -elab -verilog $(BSC_BUILDDIR_FDA) -vdir $(VERILOG_CODE_DIR_FDA) $(BSC_COMPILATION_FLAGS) -p $(FDA_PATH) -g $(PNE_TOPMOD) src_bsv/Fused_Op/FDA_PNE_Quire.bsv
 .PHONY: rtl_qtop 
 rtl_qtop : qtop_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) src_bsv/QtoP/PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_QtoP) -vdir $(VERILOG_CODE_DIR_QtoP) $(BSC_COMPILATION_FLAGS) -p $(QtoP_PATH) -g $(PNE_TOPMOD) src_bsv/QtoP/PNE.bsv
 .PHONY: rtl_ptoq 
 rtl_ptoq : ptoq_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) src_bsv/PtoQ/PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_PtoQ) -vdir $(VERILOG_CODE_DIR_PtoQ) $(BSC_COMPILATION_FLAGS) -p $(PtoQ_PATH) -g $(PNE_TOPMOD) src_bsv/PtoQ/PNE.bsv
 .PHONY: rtl_ftop 
 rtl_ftop : ftop_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) src_bsv/FtoP/PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_FtoP) -vdir $(VERILOG_CODE_DIR_FtoP) $(BSC_COMPILATION_FLAGS) -p $(FtoP_PATH) -g $(PNE_TOPMOD) src_bsv/FtoP/PNE.bsv
 .PHONY: rtl_ptof
 rtl_ptof: ptof_working_dirs
-	bsc -u -elab -verilog $(BSC_BUILDDIR_ADDER) -vdir $(VERILOG_CODE_DIR_ADDER) $(BSC_COMPILATION_FLAGS) -p $(ADDER_PATH) -g $(PNE_TOPMOD) src_bsv/PtoF/PNE.bsv
+	bsc -u -elab -verilog $(BSC_BUILDDIR_PtoF) -vdir $(VERILOG_CODE_DIR_PtoF) $(BSC_COMPILATION_FLAGS) -p $(PtoF_PATH) -g $(PNE_TOPMOD) src_bsv/PtoF/PNE.bsv
 
 
 # --------
