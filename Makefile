@@ -326,12 +326,12 @@ rtl_ptof: ptof_working_dirs
 # Building a (bsim) simulator
 # --------
 sim:  sim_adder sim_multiplier sim_divider sim_mac sim_fma sim_fda sim_qtop sim_ptoq sim_ftop sim_ptof
-	@echo "Generating Melodica simulator ..."
+	@echo "Generating and run Melodica simulator ..."
 
 link: link_adder link_multiplier link_divider link_mac link_fma link_fda link_qtop link_ptoq link_ftop link_ptof
 
 .PHONY: sim_adder
-sim_adder: bsim_adder link_adder_d
+sim_adder: bsim_adder link_adder link_adder_d simulate_adder
 
 .PHONY: bsim_adder
 bsim_adder: adder_working_dirs
@@ -339,7 +339,7 @@ bsim_adder: adder_working_dirs
 
 #MULTIPLIER
 .PHONY: sim_multiplier
-sim_multiplier: bsim_multiplier link_multiplier_d
+sim_multiplier: bsim_multiplier link_multiplier link_multiplier_d simulate_multiplier
 
 .PHONY: bsim_multiplier
 bsim_multiplier: multiplier_working_dirs
@@ -347,7 +347,7 @@ bsim_multiplier: multiplier_working_dirs
 
 #DIVIDER
 .PHONY: sim_divider
-sim_divider: bsim_divider link_divider_d
+sim_divider: bsim_divider link_divider link_divider_d simulate_divider
 
 .PHONY: bsim_divider
 bsim_divider: divider_working_dirs
@@ -355,7 +355,7 @@ bsim_divider: divider_working_dirs
 
 #FMA
 .PHONY: sim_fma
-sim_fma: bsim_fma link_fma_d
+sim_fma: bsim_fma link_fma link_fma_d simulate_fma
 
 .PHONY: bsim_fma
 bsim_fma: fma_working_dirs
@@ -363,7 +363,7 @@ bsim_fma: fma_working_dirs
 
 #FDA
 .PHONY: sim_fda
-sim_fda: bsim_fda link_fda_d
+sim_fda: bsim_fda link_fda link_fda_d simulate_fda
 
 .PHONY: bsim_fda
 bsim_fda: fda_working_dirs
@@ -371,7 +371,7 @@ bsim_fda: fda_working_dirs
 
 #QtoP
 .PHONY: sim_qtop
-sim_qtop: bsim_qtop link_qtop_d
+sim_qtop: bsim_qtop link_qtop link_qtop_d simulate_qtop
 
 .PHONY: bsim_qtop
 bsim_qtop: qtop_working_dirs
@@ -379,7 +379,7 @@ bsim_qtop: qtop_working_dirs
 
 #PtoQ
 .PHONY: sim_ptoq
-sim_ptoq: bsim_ptoq link_ptoq_d
+sim_ptoq: bsim_ptoq link_ptoq link_ptoq_d simulate_ptoq
 
 .PHONY: bsim_ptoq
 bsim_ptoq: ptoq_working_dirs
@@ -387,7 +387,7 @@ bsim_ptoq: ptoq_working_dirs
 
 #FtoP
 .PHONY: sim_ftop
-sim_ftop: bsim_ftop link_ftop_d
+sim_ftop: bsim_ftop link_ftop link_ftop_d simulate_ftop
 
 .PHONY: bsim_ftop
 bsim_ftop: ftopworking_dirs
@@ -395,7 +395,7 @@ bsim_ftop: ftopworking_dirs
 
 #PtoF
 .PHONY: sim_ptof
-sim_ptof: bsim_ptof link_ptof_d
+sim_ptof: bsim_ptof link_ptof link_ptof_d simulate_ptof
 
 .PHONY: bsim_ptof
 bsim_ptof: ptof_working_dirs
