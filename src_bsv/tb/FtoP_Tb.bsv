@@ -98,7 +98,7 @@ Reg   #(Bit #(PositWidth))   rgCurOutput    <- mkReg (0);
 Reg   #(Bool)                 rgChkComplete  <- mkReg (False);
 Reg   #(Bool)                 rgError        <- mkReg (False);
 
-FtoP_PNE            dut            <- mkFtoP_PNE_test;	
+FtoP_PNE            dut            <- mkPNE_test;	
 Reg #(Bool) doneSet <-mkReg(False);
 // -----------------------------------------------------------------
 

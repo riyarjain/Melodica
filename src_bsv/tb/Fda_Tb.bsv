@@ -91,7 +91,7 @@ Reg   #(Bit #(PositWidth))   rgCurOutput2    <- mkReg (0);
 Reg   #(Bool)                 rgChkComplete  <- mkReg (False);
 Reg   #(Bool)                 rgError        <- mkReg (False);
 
-FDA_PNE_Quire            dut            <- mkFDA_PNE_Quire_test;	
+FDA_PNE_Quire            dut            <- mkPNE_test;	
 Reg #(Bool) doneSet <-mkReg(False);
 // -----------------------------------------------------------------
 

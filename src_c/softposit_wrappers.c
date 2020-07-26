@@ -147,7 +147,7 @@ unsigned int floatToPosit8(unsigned char a)
 {
 	ufloat b;
 	b.u = a;
-	posit8 pZ = convertDoubleToP8(b.f);	
+	posit8_t pZ = convertDoubleToP8(b.f);	
 	return pZ.v;
 	
 }
@@ -201,7 +201,49 @@ unsigned int Posit32Tofloat(unsigned int a)
 	
 }
 
-unsigned long long fmaAdd161(unsigned long long a,unsigned long long b,unsigned int c, unsigned int d)
+void fmaAdd16 (unsigned int* result, unsigned int* a, unsigned int c, unsigned int d) {
+	posit16_t x,y; quire16_t qZ;
+	x = castP16(c); y = castP16(d); qZ = q16_clr(qZ);
+	unsigned long long var1= a[1];
+	unsigned long long var2= a[3];
+	var1 = (var1<<32) + a[0];
+	var2 = (var2<<32) + a[2];
+	qZ = castQ16(var2,var1);  
+	qZ = q16_fdp_add(qZ, x, y);
+	for (int idx=0; idx<4; idx++) result[idx] = qZ.v[idx];
+	return;
+	$printf("result[0]",result[0]);
+}
+
+void fmaAdd32 (unsigned int* result, unsigned int* a, unsigned int c, unsigned int d) {
+	posit32_t x,y; quire32_t qZ;
+	x = castP32(c); y = castP32(d); qZ = q32_clr(qZ);
+	unsigned long long var1= a[1];
+	unsigned long long var2= a[3];
+	unsigned long long var3= a[5];
+	unsigned long long var4= a[7];
+	unsigned long long var5= a[9];
+	unsigned long long var6= a[11];
+	unsigned long long var7= a[13];
+	unsigned long long var8= a[15];
+	var1 = (var1<<32) + a[0];
+	var2 = (var2<<32) + a[2];
+	var3 = (var3<<32) + a[4];
+	var4 = (var4<<32) + a[6];
+	var5 = (var5<<32) + a[8];
+	var6 = (var6<<32) + a[10];
+	var7 = (var7<<32) + a[12];
+	var8 = (var8<<32) + a[14];
+	qZ = castQ32(var8,var7,var6,var5,var4,var3,var2,var1);  
+	qZ = q32_fdp_add(qZ, x, y);
+	for (int idx=0; idx<16; idx++) result[idx] = qZ.v[idx];
+	return;
+}
+
+
+
+
+/*unsigned long long fmaAdd161(unsigned long long a,unsigned long long b,unsigned int c, unsigned int d)
 {
 	posit16_t x,y;
 	x = castP16(c);
@@ -224,7 +266,7 @@ unsigned long long fmaAdd162(unsigned long long a,unsigned long long b,unsigned 
 	qZ = castQ16(a,b);
 	qZ = q16_fdp_add(qZ, x, y);
 	return qZ.v[1];
-}
+}*/
 unsigned long long fmaAdd8(unsigned long long a,unsigned char c, unsigned char d)
 {
 	//c*d+(a,b)
