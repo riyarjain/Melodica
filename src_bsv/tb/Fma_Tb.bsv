@@ -17,15 +17,19 @@ import ClientServer     :: *;
 import GetPut           :: *;
 import FIFO             :: *;
 import LFSR             :: *;
+import Vector           :: *;
 import Posit_Numeric_Types :: *;
 import Posit_User_Types :: *;
 import Normalizer_Types :: *;
 import FMA_PNE_Quire ::*;
 
 
-import "BDPI" fmaAdd8 = function Bit#(QuireWidth) checkoperation1 (Bit#(QuireWidth) in1,Bit#(8) in3, Bit#(8) in4);
-import "BDPI" fmaAdd161 = function Bit#(QuireWidthBy2) checkoperation1 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(32) in3, Bit#(32) in4);
-import "BDPI" fmaAdd162 = function Bit#(QuireWidthBy2) checkoperation2 (Bit#(QuireWidthBy2) in1,Bit#(QuireWidthBy2) in2,Bit#(32) in3, Bit#(32) in4);
+`ifdef P8
+import "BDPI" c_fmaAdd8 = function Bit#(QuireWidth) c_reference_fma (Bit#(QuireWidth) q, Bit#(PositWidth) p1, Bit#(PositWidth) p2);
+`endif
+`ifdef P16
+import "BDPI" c_fmaAdd16 = function Bit #(QuireWidth) c_reference_fma (Bit #(QuireWidth) q, Bit#(PositWidth) p1, Bit#(PositWidth) p2);
+`endif
 
 `ifdef FPGA
 interface FpgaLedIfc;
@@ -41,7 +45,7 @@ endinterface
 `ifdef P8
 typedef 255 Num_Tests;
 `elsif P16
-typedef 1024 Num_Tests;
+typedef 4096 Num_Tests;
 `elsif P32
 typedef 4096 Num_Tests;
 `endif
@@ -50,6 +54,9 @@ typedef 20 Pipe_Depth;      // Estimated pipeline depth of the PNE
 
 // -----------------------------------------------------------------
 
+// 32-bit LFSR is the widest lfsr available. So we will use
+// multiple of them to generate the quire
+typedef TDiv#(QuireWidth, 32) QuireWidthInWords;
 
 //
 // Module definition
@@ -59,195 +66,115 @@ module mkTestbench (FpgaLedIfc);
 `else
 module mkTestbench (Empty);
 `endif
-// Depending on which input mode we are using, the input to the DUT will be
-// from a LFSR or from a counter. The LFSR is always sized to the maximal size
+   // Depending on which input mode we are using, the input to the
+   // DUT will be from a LFSR or from a counter. The LFSR is
+   // always sized to the maximal size
+   FIFO #(InputQuireTwoPosit) ff_dut_inputs <- mkSizedFIFO (valueOf (TAdd #(Pipe_Depth, 2)));
+   Reg #(Bit #(16)) rg_num_ins <- mkReg (0);
+   Reg #(Bit #(16)) rg_num_outs <- mkReg (0);
+   Reg #(Bool) rgGenComplete  <- mkReg (False);
+
 `ifdef RANDOM
-	LFSR  #(Bit #(32))            lfsr1          <- mkLFSR_32;
-	LFSR  #(Bit #(32))            lfsr2          <- mkLFSR_32;
-	LFSR  #(Bit #(32))            lfsr11          <- mkLFSR_32;
-	LFSR  #(Bit #(32))            lfsr22          <- mkLFSR_32;
-	LFSR  #(Bit #(PositWidth))    lfsr1m          <- mkLFSR_16;
-	LFSR  #(Bit #(PositWidth))    lfsr2m          <- mkLFSR_16;
-Reg   #(Bool)                 rgSetup        <- mkReg (False);
+   Vector #(QuireWidthInWords, LFSR #(Bit #(32))) qlfsr <- replicateM(mkLFSR_32);
+   Vector #(2, LFSR #(Bit #(32))) plfsr <- replicateM (mkLFSR_32);
+`else
+   Reg #(Bit #(QuireWidth)) rg_ctr_quire <- mkReg ('h12345678123456781234567812345678);
+   Reg #(Bit #(PositWidth)) rg_ctr_posit_1 <- mkReg (0);
+   Reg #(Bit #(PositWidth)) rg_ctr_posit_2 <- mkReg (0);
 `endif
 
-Reg   #(Bool)                 rgGenComplete  <- mkReg (False);
-
-Reg   #(Bit #(QuireWidthBy2)) rgCurInput     <- mkReg (0000000000000000);
-Reg   #(Bit #(QuireWidthBy2)) rgCurInput1     <- mkReg (0000000010001010);
-Reg   #(Bit #(PositWidth))    rgCurInput3     <- mkReg (00010000);
-Reg   #(Bit #(PositWidth))    rgCurInput2     <- mkReg (0);
-
-FIFO  #(Bit #(QuireWidthBy2)) ffInputVals    <- mkSizedFIFO (valueOf (
-                                                   TAdd# (Pipe_Depth,2)));
-FIFO  #(Bit #(QuireWidthBy2)) ffInputVals1    <- mkSizedFIFO (valueOf (
-                                                   TAdd# (Pipe_Depth,2)));
-FIFO  #(Bit #(PositWidth))    ffInputVals3    <- mkSizedFIFO (valueOf (
-                                                   TAdd# (Pipe_Depth,2)));
-FIFO  #(Bit #(PositWidth))    ffInputVals2    <- mkSizedFIFO (valueOf (
-                                                   TAdd# (Pipe_Depth,2)));
-
 Reg   #(Bit#(TAdd#(PositWidth,PositWidth)))   wrongOut    <- mkReg (0);
-Reg   #(Bit #(QuireWidthBy2))   rgCurOutput    <- mkReg (0);
-Reg   #(Bit #(QuireWidthBy2))   rgCurOutput1    <- mkReg (0);
-Reg   #(Bit #(PositWidth))   rgCurOutput3    <- mkReg (0);
-Reg   #(Bit #(PositWidth))   rgCurOutput2    <- mkReg (0);
 Reg   #(Bool)                 rgChkComplete  <- mkReg (False);
 Reg   #(Bool)                 rgError        <- mkReg (False);
 
-FMA_PNE_Quire            dut            <- mkFMA_PNE_Quire_test;	
+FMA_PNE_Quire            dut            <- mkPNE_test;	
 Reg #(Bool) doneSet <-mkReg(False);
 // -----------------------------------------------------------------
 
-rule lfsrGenerate(!doneSet);
+rule rl_init (!doneSet);
 `ifdef RANDOM
-	lfsr1.seed('h16);// to create different random series
-	lfsr2.seed('h12);// to create different random series
-	lfsr11.seed('h04);// to create different random series
-	lfsr22.seed('h11);// to create different random series
-	lfsr1m.seed('h18);// to create different random series
-	lfsr2m.seed('h02);// to create different random series
+   Bit #(32) seed = 'h12345678;
+   for (Integer i=0; i<valueOf (QuireWidthInWords); i=i+1) begin
+      qlfsr[i].seed (seed);
+      seed = seed << 1;
+   end
+   for (Integer i=0; i<2; i=i+1) begin
+      plfsr[i].seed (seed);
+      seed = seed << 1;
+   end
 `endif
-	doneSet<= True;
+   doneSet<= True;
 endrule
 
 rule rlGenerate (!rgGenComplete && doneSet);
 `ifdef RANDOM
-   // Drive input into DUT
-   /*
-   //let inPosit11 = 64'hd3703af7c4bfa67e;
-   //let inPosit22 = 64'h70a14b36b12fe9c8;
-   let inPosit11 = 64'h4a49d66167828429;
-   let inPosit22 = 64'h2dcb524847eab17d;
-   let inPosit33 = 16'h2fa2;
-   let inPosit44 = 16'h86b1;
-   //*/
-   ///*
-   Bit#(QuireWidthBy2) inPosit11 = {lfsr1.value(),lfsr11.value()};
-   Bit#(QuireWidthBy2) inPosit22 = {lfsr2.value(),lfsr22.value()};
-   Bit#(PositWidth) inPosit33 = lfsr1m.value();
-   Bit#(PositWidth) inPosit44 = lfsr2m.value();
-   //*/
+   // Form the quire from the constituent lfsrs
+   Bit# (QuireWidth) inQuire = 0;
+   for (Integer i=0; i<valueOf (QuireWidthInWords); i=i+1) begin
+      inQuire = inQuire | ((extend (qlfsr[i].value)) << (i*32));
+      qlfsr [i].next;
+   end
+   for (Integer i=0; i<2; i=i+1) plfsr [i].next;
+
+   let dut_in = InputQuireTwoPosit {
+        quire_inp : inQuire
+      , posit_inp1 : truncate (plfsr[0].value)
+      , posit_inp2 : truncate (plfsr[1].value)};
    
-   dut.compute.request.put (InputQuireTwoPosit{quire_inp : {inPosit11,inPosit22},posit_inp1 : inPosit33, posit_inp2 : inPosit44});
-   // Bookkeeping
-   rgCurInput <= rgCurInput + 1;
-   ffInputVals.enq (truncate (inPosit11));
-   ffInputVals1.enq (truncate (inPosit22));
-   ffInputVals2.enq (truncate (inPosit33));
-   ffInputVals3.enq (truncate (inPosit44));
-   // Prepare LFSR for the next input
-   lfsr1.next ();
-   lfsr2.next ();
-   lfsr11.next ();
-   lfsr22.next ();
-   lfsr1m.next ();
-   lfsr2m.next ();
-   // Completion of test generation
-
-   rgGenComplete <= ((rgCurInput + 1) == fromInteger (valueOf (Num_Tests)));
-
 `else
    // Drive input into DUT
-   dut.compute.request.put (InputQuireTwoPosit{quire_inp : {rgCurInput,rgCurInput1},posit_inp1 : rgCurInput2, posit_inp2 : rgCurInput3});
-  // dut.compute.request.put (rgCurInput);
-   // Prepare for next input
-	ffInputVals.enq (rgCurInput);
-	ffInputVals1.enq (rgCurInput1);
-	ffInputVals2.enq (rgCurInput2);
-	ffInputVals3.enq (rgCurInput3);
-	if((rgCurInput + 1) == 0)
-	begin
-		if((rgCurInput1 + 1) == 0)
-			begin
-				rgCurInput1 <= 0;
-				if((rgCurInput2 + 1) == 0)
-					begin
-						rgCurInput2 <= 0;
-						rgCurInput3 <= rgCurInput3 + 10;
-					end
-				else
-						rgCurInput2 <= rgCurInput2 + 5;
-			end
-		else
-			rgCurInput1 <= rgCurInput1 + 15;
-	end
-	else
-		rgCurInput <= rgCurInput + 1;
+   let dut_in = InputQuireTwoPosit {
+        quire_inp : rg_ctr_quire
+      , posit_inp1 : rg_ctr_posit_1
+      , posit_inp2 : rg_ctr_posit_2};
 
-	   // Completion of test generation
-   rgGenComplete <= ((rgCurInput + 1) == 0 && (rgCurInput1 + 1) == 0 && (rgCurInput2 + 1) == 0 && (rgCurInput3 + 1) == 0);
+   // prepare for next set of inputs
+   rg_ctr_quire <= rg_ctr_quire + 1;
+   rg_ctr_posit_1 <= rg_ctr_posit_1 + 1;
+   rg_ctr_posit_2 <= rg_ctr_posit_2 + 1;
 `endif
-endrule
 
+   // drive the input into the DUT
+   dut.compute.request.put (dut_in);
+
+   // Bookkeeping
+   ff_dut_inputs.enq (dut_in);
+   rg_num_ins <= rg_num_ins + 1;
+
+   // Completion of test generation
+   rgGenComplete <= ((rg_num_ins + 1) == fromInteger (valueOf (Num_Tests)));
+
+endrule
 
 
 // --------
 //rule rlCheck (!rgChkComplete && !rgError);
 rule rlCheck (!rgChkComplete && doneSet );
-      let rsp <- dut.compute.response.get ();
-	let input1_c = ffInputVals.first; ffInputVals.deq;
-	let input2_c = ffInputVals1.first; ffInputVals1.deq;
-	let input3_c = ffInputVals2.first; ffInputVals2.deq;
-	let input4_c = ffInputVals3.first; ffInputVals3.deq;
-	let expected0 = checkoperation1(input1_c,input2_c,input3_c,input4_c);
-	let expected1 = checkoperation2(input1_c,input2_c,input3_c,input4_c);
-   `ifdef RANDOM
+   let rsp <- dut.compute.response.get ();
+   let dut_in = ff_dut_inputs.first; ff_dut_inputs.deq;
+   let expected = c_reference_fma (
+        dut_in.quire_inp
+      , dut_in.posit_inp1
+      , dut_in.posit_inp2);
+
+   // Detected an error
+   if (rsp != expected) begin
+      $display (
+           "[%0d]::ERR::(Q-IN=%h::P1-IN=%h::P2-IN=%h) -> (REF=%h)"
+         , $time, dut_in.quire_inp, dut_in.posit_inp1,dut_in.posit_inp2, expected);
+      $display (
+           "[%0d]::ERR::(Q-IN=%h::P1-IN=%h::P2-IN=%h) -> (DUT=%h)"
+         , $time, dut_in.quire_inp, dut_in.posit_inp1,dut_in.posit_inp2, rsp);
+      $display ("--------");
+      rgError <= True;
+      wrongOut <= wrongOut+1;
+   end
       
-      // Detected an error
-      if (rsp != {expected0,expected1}) begin
-         `ifdef RANDOM
-	$display ("[%0d]::ERR::Input=%h::Input2=%h::Input3=%h::Input4=%h::Expected Output=%h::Output=%h", $time, input1_c,input2_c,input3_c,input4_c,{expected0,expected1}, rsp);
-	`else RANDOM_PRINT
-	$display ("[%0d]::ERR::Input=%b::Input2=%b::Input3=%b::Input4=%b::Expected Output=%b::Output=%b", $time, input1_c,input2_c,input3_c,input4_c,{expected0,expected1}, rsp);
-	`endif
-         rgError <= True;
-	 wrongOut <= wrongOut+1;
-         
-      end
-      
-         rgCurOutput <= rgCurOutput + 1;
+   rg_num_outs <= rg_num_outs + 1;
 
-         // Completion condition
-         rgChkComplete <= ((rgCurOutput + 1) == fromInteger (valueOf (Num_Tests)));
-     // end
-
-   `else
-      //let expected = rgCurOutput;
-
-      // Detected an error
-      if (rsp != {expected0,expected1}) begin
-	$display ("[%0d]::ERR::Input=%h::Input2=%h::Input3=%h::Input4=%h::Expected Output=%h::Output=%h", $time, input1_c,input2_c,input3_c,input4_c,{expected0,expected1}, rsp);
-         rgError <= True;
-	 wrongOut <= wrongOut+1;
-      end
-	// Next output expected
-	if((rgCurOutput + 1) == 0)
-	begin
-		if((rgCurOutput1 + 1) == 0)
-				begin
-					rgCurOutput1 <= 0;
-					if((rgCurOutput2 + 1) == 0)
-						begin
-							rgCurOutput2 <= 0;
-							rgCurOutput3 <= rgCurOutput3 + 1;
-						end
-					else
-							rgCurOutput2 <= rgCurOutput2 + 1;
-					end
-		
-		else
-				rgCurOutput1 <= rgCurOutput1 + 1;
-	end
-	else
-		rgCurOutput <= rgCurOutput + 1;
-         // Completion condition
-   	rgChkComplete <= ((rgCurOutput + 1) == 0 && (rgCurOutput1 + 1) == 0 && (rgCurOutput2 + 1) == 0 && (rgCurOutput3 + 1) == 0);
-      //end
-   `endif
-   endrule
-
-
+   // Completion condition
+   rgChkComplete <= ((rg_num_outs + 1) == fromInteger (valueOf (Num_Tests)));
+endrule
 
 // --------
 //rule rlFinish (rgError || rgChkComplete);

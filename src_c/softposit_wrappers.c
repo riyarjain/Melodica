@@ -147,7 +147,7 @@ unsigned int floatToPosit8(unsigned char a)
 {
 	ufloat b;
 	b.u = a;
-	posit8 pZ = convertDoubleToP8(b.f);	
+	posit8_t pZ = convertDoubleToP8(b.f);	
 	return pZ.v;
 	
 }
@@ -199,6 +199,29 @@ unsigned int Posit32Tofloat(unsigned int a)
 	b.f = convertP32ToDouble(x);
 	return b.u;
 	
+}
+
+void c_fmaAdd16 (unsigned int* quire_out, unsigned int* quire_in, unsigned int posit1, unsigned posit2) {
+   posit16_t x = castP16 ((uint16_t) posit1);
+   posit16_t y = castP16 ((uint16_t) posit2);
+   quire16_t qZ; q16_clr (qZ);
+
+   // Form quire from constituents
+   uint64_t q1 = (uint64_t) quire_in[3];
+   uint64_t q0 = (uint64_t) quire_in[1];
+   q1 = ((q1 << 32) | ((uint64_t) quire_in[2]));
+   q0 = ((q0 << 32) | ((uint64_t) quire_in[0]));
+   qZ = castQ16 (q0, q1);
+   qZ = q16_fdp_add(qZ, x, y);
+   
+   // Break it back into its constituents
+   q0 = qZ.v[0];
+   q1 = qZ.v[1];
+
+   quire_out[0] = (unsigned int) q0;
+   quire_out[1] = (unsigned int) (q0 >> 32);
+   quire_out[2] = (unsigned int) q1;
+   quire_out[3] = (unsigned int) (q1 >> 32);
 }
 
 unsigned long long fmaAdd161(unsigned long long a,unsigned long long b,unsigned int c, unsigned int d)
