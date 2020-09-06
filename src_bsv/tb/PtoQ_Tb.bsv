@@ -71,7 +71,7 @@ Reg   #(Bit #(PositWidth))   rgCurOutput    <- mkReg (0);
 Reg   #(Bool)                 rgError        <- mkReg (False);
 Reg   #(Bit#(TAdd#(PositWidth,PositWidth)))   wrongOut    <- mkReg (0);
 
-PositToQuire_PNE            dut            <- mkPositToQuire_PNE_test;
+PositToQuire_PNE            dut            <- mkPNE_test;
 
 Reg #(Bool) doneSet <-mkReg(False);
 // -----------------------------------------------------------------

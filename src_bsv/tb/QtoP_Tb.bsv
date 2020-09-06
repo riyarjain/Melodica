@@ -96,7 +96,7 @@ Reg   #(Bit #(QuireWidthBy2))   rgCurOutput1    <- mkReg (0);
 Reg   #(Bool)                 rgChkComplete  <- mkReg (False);
 Reg   #(Bool)                 rgError        <- mkReg (False);
 
-QuireToPosit_PNE            dut            <- mkQuireToPosit_PNE_test;	
+QuireToPosit_PNE            dut            <- mkPNE_test;	
 Reg #(Bool) doneSet <-mkReg(False);
 // -----------------------------------------------------------------
 
