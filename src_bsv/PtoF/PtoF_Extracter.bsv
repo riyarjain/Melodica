@@ -72,8 +72,14 @@ module mkPtoF_Extracter (PtoF_IFC );
 			$display("float_no %b add_round %b ",float_no,add_round);
 			$display("truncated_frac_zero %b truncated_frac_msb %b lsbfrac_f %b",truncated_frac_zero,truncated_frac_msb,lsb(frac_f));
 		`endif
-		fifo_output_reg.enq(float_no);	
-	
+		let output_regf = Output_float {
+		//Output floating point number
+		float_out : float_no,
+		//Zero infinity flag
+		zero_infinity_flag: dIn.zero_infinity_flag == REGULAR? (float_no == 0? ZERO: (float_no == {'1,frac_zero}? INF: REGULAR)): dIn.zero_infinity_flag,
+		//rounnding bit
+		rounding: pack(add_round)}
+		fifo_output_reg.enq(output_regf);	
 	endrule
 	
 interface Server inoutifc;

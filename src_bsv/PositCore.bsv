@@ -278,6 +278,9 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 			begin
 				let out_pf <- ptof.compute.response.get();
 				FSingle fs = FSingle{sign : unpack(msb(out_pf)), exp : (out_pf[valueOf(FloatExpoBegin):valueOf(FloatFracWidth)]), sfd : truncate(out_pf) };
+                                excep.overflow = out_pf.zero_infinity_flag == INF;
+                                excep.underflow = out_pf.zero_infinity_flag == ZERO && out_pf.rounding;
+                                excep.inexact = out_pf.rounding;
 				FloatU posit_out = tagged S fs;
 				ffO.enq(tuple2(posit_out,excep));
 			end

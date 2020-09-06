@@ -34,8 +34,12 @@ typedef struct {Bit#(1) sign;
 		Bit#(1) truncated_frac_msb;
 		Bit#(1) truncated_frac_zero;} Stage0_pf deriving(Bits,FShow);
 
+typedef struct {Bit#(FloatWidth) float_out;
+		PositType zero_infinity_flag;
+		Bool rounding;} Output_float deriving(Bits,FShow);
+
 interface PtoF_IFC ;
-   interface Server #(Output_posit,Bit#(FloatWidth)) inoutifc;
+   interface Server #(Output_posit,Output_float) inoutifc;
 endinterface
 
 
