@@ -56,7 +56,7 @@ endrule
 
 rule rl_out;
    let ptoFOut <- ptoF.inoutifc.response.get ();
-   ffO.enq(ptoFOut);
+   ffO.enq(ptoFOut.float_out);
 endrule
 interface Server compute;
       interface Put request;
