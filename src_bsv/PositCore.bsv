@@ -277,7 +277,7 @@ module mkPositCore #(Bit #(4) verbosity) (PositCore_IFC);
 		else if(op == FCVT_S_P)
 			begin
 				let out_pf <- ptof.compute.response.get();
-				FSingle fs = FSingle{sign : unpack(msb(out_pf)), exp : (out_pf[valueOf(FloatExpoBegin):valueOf(FloatFracWidth)]), sfd : truncate(out_pf) };
+				FSingle fs = FSingle{sign : unpack(msb(out_pf.float_out)), exp : (out_pf.float_out[valueOf(FloatExpoBegin):valueOf(FloatFracWidth)]), sfd : truncate(out_pf.float_out) };
                                 excep.overflow = out_pf.zero_infinity_flag == INF;
                                 excep.underflow = out_pf.zero_infinity_flag == ZERO && out_pf.rounding;
                                 excep.inexact = out_pf.rounding;
