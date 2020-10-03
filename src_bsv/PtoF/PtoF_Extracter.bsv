@@ -78,7 +78,7 @@ module mkPtoF_Extracter (PtoF_IFC );
 		//Zero infinity flag
 		zero_infinity_flag: dIn.zero_infinity_flag == REGULAR? (float_no == 0? ZERO: (float_no == {'1,frac_zero}? INF: REGULAR)): dIn.zero_infinity_flag,
 		//rounnding bit
-		rounding: pack(add_round)}
+		rounding: unpack(add_round)}
 		fifo_output_reg.enq(output_regf);	
 	endrule
 	
