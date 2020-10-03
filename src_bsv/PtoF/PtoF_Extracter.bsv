@@ -40,7 +40,7 @@ module mkPtoF_Extracter (PtoF_IFC );
 
 
    	FIFOF #(Stage0_pf )  fifo_stage0_reg <- mkFIFOF;
-	FIFOF #(Bit#(FloatWidth))  fifo_output_reg <- mkFIFOF;
+	FIFOF #(Output_float)  fifo_output_reg <- mkFIFOF;
 
 	// --------
         // Pipeline stages

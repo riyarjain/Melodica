@@ -44,7 +44,7 @@ endinterface
 
 module mkPtoF_PNE(PtoF_PNE);
 
-FIFO #(Bit#(FloatWidth)) ffO <- mkFIFO;
+FIFO #(Output_float) ffO <- mkFIFO;
 PtoF_IFC  ptoF <- mkPtoF_Extracter;
 
 rule rl_out;
